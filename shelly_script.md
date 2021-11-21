@@ -8,7 +8,7 @@ Official Shelly documentation can be found here: https://shelly-api-docs.shelly.
 
 Examples below explained in detail in this video:
 
-[![Prototype](https://img.youtube.com/vi/Mz1dJGthIJk/0.jpg)](https://www.youtube.com/watch?v=Mz1dJGthIJk)
+[![Video](https://img.youtube.com/vi/9-EN1_-cM40/0.jpg)](https://www.youtube.com/watch?v=9-EN1_-cM40)
 
 ### Simple flasher cycle
 
