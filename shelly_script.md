@@ -22,6 +22,7 @@ function callback(userdata) {
 let timer_handle = Timer.set(1000,true,callback,null); 
 ```
 
+
 ### Asymmetric cycle
 
 This script toggles the relay (output 0) on and off. On time is 1 second, off time is 2 seconds.
@@ -47,6 +48,7 @@ function callback(userdata) {
 
 callback(null);
 ```
+
 
 ### Event handler
 
@@ -89,6 +91,7 @@ function timercallback(userdata) {
  Shelly.addEventHandler(eventcallback, userdata);
 ```
 
+
 ### Remote script call
 
 This script calls a 3rd party web service with a JSON response
@@ -102,7 +105,7 @@ Shelly.call("HTTP.GET", { url: "http://192.168.1.91/rpc/Script.Start?id=1" },
     },
     null);
 ```
-```
+
 
 ### Control two devices
 
@@ -148,6 +151,7 @@ let bool = false;
  
  Shelly.addEventHandler(eventcallback, userdata);
 ```
+
 
 ### Public websevice call
 
