@@ -1,0 +1,652 @@
+[
+    {
+        "id": "c45359088177f56e",
+        "type": "mqtt in",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "topic": "zigbee2mqtt/Knob",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "61ce4537bbcdab98"
+            ]
+        ]
+    },
+    {
+        "id": "8627dc8e931c59a5",
+        "type": "switch",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "property": "payload.action",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "toggle",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "brightness_step_down",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "brightness_step_up",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "color_temperature_step_up",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "color_temperature_step_down",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 5,
+        "x": 130,
+        "y": 220,
+        "wires": [
+            [
+                "ba4c362889d3da4a"
+            ],
+            [
+                "0fa6542131562afa"
+            ],
+            [
+                "0fa6542131562afa"
+            ],
+            [
+                "8175519808c3e7f5"
+            ],
+            [
+                "8175519808c3e7f5"
+            ]
+        ]
+    },
+    {
+        "id": "8a26ebb0bcebb769",
+        "type": "wled",
+        "z": "9d6045f175be2d26",
+        "name": "TV Led",
+        "address": "192.168.1.71",
+        "interval": 0,
+        "x": 940,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "b7f8985294f070f2",
+        "type": "http request",
+        "z": "9d6045f175be2d26",
+        "name": "WLED status",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.71/json/state",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 550,
+        "y": 160,
+        "wires": [
+            [
+                "3418b7226fea0c0b"
+            ]
+        ]
+    },
+    {
+        "id": "3418b7226fea0c0b",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Toggle state",
+        "func": "msg.payload.on = !msg.payload.on;\n\nflow.set(\"WLED_TV\", msg.payload);\nlet now = new Date();\nflow.set(\"WLED_TV_lastupdate\", now.getTime())\n\nmsg.payload = msg.payload.on;\nnode.status({fill:\"grey\",shape:\"ring\",text:(msg.payload ? \"On\": \"Off\")});\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 180,
+        "wires": [
+            [
+                "8a26ebb0bcebb769"
+            ]
+        ]
+    },
+    {
+        "id": "96383655d4ced2f1",
+        "type": "http request",
+        "z": "9d6045f175be2d26",
+        "name": "WLED status",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.71/json/state",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 550,
+        "y": 240,
+        "wires": [
+            [
+                "9b93ed51e5116ff1"
+            ]
+        ]
+    },
+    {
+        "id": "9b93ed51e5116ff1",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Change Brightness",
+        "func": "// How quickly the brightness changes\nconst velocity = 5;\n\nif (msg.payload.on) {\n\n    let brightness = msg.payload.bri;\n\n    if (msg.knob.action ===\"brightness_step_down\" ) {\n        brightness -= Math.floor(msg.knob.action_step_size / 12) * velocity;\n        if (brightness < 10) brightness = 10;\n    }\n    if (msg.knob.action === \"brightness_step_up\") {\n        brightness += Math.floor(msg.knob.action_step_size / 12) * velocity;\n        if (brightness > 255) brightness = 255;\n    }\n\n    msg.payload.bri = brightness;\n    flow.set(\"WLED_TV\", msg.payload);\n    let now = new Date();\n    flow.set(\"WLED_TV_lastupdate\", now.getTime());\n\n    msg.payload = brightness;\n\n    node.status({fill:\"grey\",shape:\"ring\",text:brightness});\n    return msg;\n} else {\n    let now = new Date();\n    flow.set(\"WLED_TV_lastupdate\", now.getTime());\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 260,
+        "wires": [
+            [
+                "8a26ebb0bcebb769"
+            ]
+        ]
+    },
+    {
+        "id": "61ce4537bbcdab98",
+        "type": "change",
+        "z": "9d6045f175be2d26",
+        "name": "Save Message",
+        "rules": [
+            {
+                "t": "set",
+                "p": "knob",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 360,
+        "y": 100,
+        "wires": [
+            [
+                "8627dc8e931c59a5"
+            ]
+        ]
+    },
+    {
+        "id": "ba4c362889d3da4a",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Status?",
+        "func": "let wled_tv = flow.get(\"WLED_TV\");\n\nif (wled_tv===undefined) {\n    // settings from the past not available\n    // get settings first\n    return [msg,null];\n} else {\n    let lastupdate = flow.get(\"WLED_TV_lastupdate\");\n    let now = new Date();\n    if (now.getTime()-lastupdate>60000) {\n        // settings stored is too old\n        // get new settings first\n        return [msg, null];\n    } else {\n        msg.payload = wled_tv;\n        return [null, msg];\n    }\n\n}\n",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 180,
+        "wires": [
+            [
+                "b7f8985294f070f2"
+            ],
+            [
+                "3418b7226fea0c0b"
+            ]
+        ]
+    },
+    {
+        "id": "0fa6542131562afa",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Status?",
+        "func": "let wled_tv = flow.get(\"WLED_TV\");\n\nif (wled_tv===undefined) {\n    // settings from the past not available\n    // get settings first\n    return [msg,null];\n} else {\n    let lastupdate = flow.get(\"WLED_TV_lastupdate\");\n    let now = new Date();\n    if (now.getTime()-lastupdate>60000) {\n        // settings stored is too old\n        // get new settings first\n        return [msg, null];\n    } else {\n        msg.payload = wled_tv;\n        return [null, msg];\n    }\n\n}\n",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 260,
+        "wires": [
+            [
+                "96383655d4ced2f1"
+            ],
+            [
+                "9b93ed51e5116ff1"
+            ]
+        ]
+    },
+    {
+        "id": "bd4249a9430bb2f2",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Change Colour",
+        "func": "// Degree change on the Hue color with a single click\nconst degree = 10;\n// Difference between color1, color2 and color3\nconst diff = 30;\n\n/**\n* HSV to RGB color conversion\n*\n* H runs from 0 to 360 degrees\n* S and V run from 0 to 100\n*\n* Ported from the excellent java algorithm by Eugene Vishnevsky at:\n* http://www.cs.rit.edu/~ncs/color/t_convert.html\n*/\n\n/* accepts parameters\n * r  Object = {r:x, g:y, b:z}\n * OR \n * r, g, b\n*/\nfunction RGBtoHSV(r, g, b) {\n    if (arguments.length === 1) {\n        g = r.g, b = r.b, r = r.r;\n    }\n    var max = Math.max(r, g, b), min = Math.min(r, g, b),\n        d = max - min,\n        h,\n        s = (max === 0 ? 0 : d / max),\n        v = max / 255;\n\n    switch (max) {\n        case min: h = 0; break;\n        case r: h = (g - b) + d * (g < b ? 6 : 0); h /= 6 * d; break;\n        case g: h = (b - r) + d * 2; h /= 6 * d; break;\n        case b: h = (r - g) + d * 4; h /= 6 * d; break;\n    }\n\n    return {\n        h: Math.round(h*360),\n        s: Math.round(s*100),\n        v: Math.round(v*100)\n    };\n}\n\n// H runs from 0 to 360 degrees\n// S and V run from 0 to 100\n\nfunction hsvToRgb(h, s, v) {\n    var r, g, b;\n    var i;\n    var f, p, q, t;\n\n    // Make sure our arguments stay in-range\n    h = Math.max(0, Math.min(360, h));\n    s = Math.max(0, Math.min(100, s));\n    v = Math.max(0, Math.min(100, v));\n\n    // We accept saturation and value arguments from 0 to 100 because that's\n    // how Photoshop represents those values. Internally, however, the\n    // saturation and value are calculated from a range of 0 to 1. We make\n    // That conversion here.\n    s /= 100;\n    v /= 100;\n\n    if (s === 0) {\n        // Achromatic (grey)\n        r = g = b = v;\n        return [\n            Math.round(r * 255),\n            Math.round(g * 255),\n            Math.round(b * 255)\n        ];\n    }\n\n    h /= 60; // sector 0 to 5\n    i = Math.floor(h);\n    f = h - i; // factorial part of h\n    p = v * (1 - s);\n    q = v * (1 - s * f);\n    t = v * (1 - s * (1 - f));\n\n    switch (i) {\n        case 0:\n            r = v;\n            g = t;\n            b = p;\n            break;\n\n        case 1:\n            r = q;\n            g = v;\n            b = p;\n            break;\n\n        case 2:\n            r = p;\n            g = v;\n            b = t;\n            break;\n\n        case 3:\n            r = p;\n            g = q;\n            b = v;\n            break;\n\n        case 4:\n            r = t;\n            g = p;\n            b = v;\n            break;\n\n        default: // case 5:\n            r = v;\n            g = p;\n            b = q;\n    }\n\n    return [\n        Math.round(r * 255),\n        Math.round(g * 255),\n        Math.round(b * 255)\n    ];\n}\n\nfunction rotateHue(h, angle) {\n    h = h + angle;\n    if (h < 0) h = -h;\n    if (h>360) h = h - 360;\n    return h;\n}\n\n\nif (msg.payload.on) {\n\n    // Get color1\n    let rgbcolor1 = msg.payload.seg[0].col[0];\n\n    // determine step from knob rotation\n    let step = Math.floor(msg.knob.action_step_size / 12);\n\n    if (msg.knob.action ===\"color_temperature_step_down\" ) {\n        step = -1*step;\n    }\n\n    // convert color1 to HSV\n    let hsvcolor1 = RGBtoHSV(rgbcolor1[0],rgbcolor1[1],rgbcolor1[2]);\n\n    // Rotate the Hue, convert back to RGB and reset color1\n    hsvcolor1.h = rotateHue(hsvcolor1.h,step*degree);\n    let starthue = hsvcolor1.h;\n    let newrgb = hsvToRgb(hsvcolor1.h, hsvcolor1.s, hsvcolor1.v);\n    msg.payload.seg[0].col[0][0] = newrgb[0];\n    msg.payload.seg[0].col[0][1] = newrgb[1];\n    msg.payload.seg[0].col[0][2] = newrgb[2];\n\n    // Rotate the Hue, convert back to RGB and reset color2\n    hsvcolor1.h = rotateHue(hsvcolor1.h, diff);\n    newrgb = hsvToRgb(hsvcolor1.h, hsvcolor1.s, hsvcolor1.v);\n    msg.payload.seg[0].col[1][0] = newrgb[0];\n    msg.payload.seg[0].col[1][1] = newrgb[1];\n    msg.payload.seg[0].col[1][2] = newrgb[2];\n\n    // Rotate the Hue, convert back to RGB and reset color3\n    hsvcolor1.h = rotateHue(hsvcolor1.h, diff);\n    newrgb = hsvToRgb(hsvcolor1.h, hsvcolor1.s, hsvcolor1.v);\n    msg.payload.seg[0].col[2][0] = newrgb[0];\n    msg.payload.seg[0].col[2][1] = newrgb[1];\n    msg.payload.seg[0].col[2][2] = newrgb[2];\n\n    flow.set(\"WLED_TV\", msg.payload);\n    let now = new Date();\n    flow.set(\"WLED_TV_lastupdate\", now.getTime());\n\n    node.status({fill:\"grey\",shape:\"ring\",text:starthue});\n    return msg;\n} else {\n    let now = new Date();\n    flow.set(\"WLED_TV_lastupdate\", now.getTime());\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 360,
+        "wires": [
+            [
+                "8a26ebb0bcebb769"
+            ]
+        ]
+    },
+    {
+        "id": "8175519808c3e7f5",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Status?",
+        "func": "let wled_tv = flow.get(\"WLED_TV\");\n\nif (wled_tv===undefined) {\n    // settings from the past not available\n    // get settings first\n    return [msg,null];\n} else {\n    let lastupdate = flow.get(\"WLED_TV_lastupdate\");\n    let now = new Date();\n    if (now.getTime()-lastupdate>60000) {\n        // settings stored is too old\n        // get new settings first\n        return [msg, null];\n    } else {\n        msg.payload = wled_tv;\n        return [null, msg];\n    }\n\n}\n",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 360,
+        "wires": [
+            [
+                "178189ed190ace88"
+            ],
+            [
+                "bd4249a9430bb2f2"
+            ]
+        ]
+    },
+    {
+        "id": "178189ed190ace88",
+        "type": "http request",
+        "z": "9d6045f175be2d26",
+        "name": "WLED status",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.71/json/state",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 550,
+        "y": 340,
+        "wires": [
+            [
+                "bd4249a9430bb2f2"
+            ]
+        ]
+    },
+    {
+        "id": "3209835a2389887c",
+        "type": "comment",
+        "z": "9d6045f175be2d26",
+        "name": "Smart Knob control WLED",
+        "info": "",
+        "x": 130,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "c7a911163fce66e3",
+        "type": "mqtt in",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "topic": "zigbee2mqtt/IKEA-switch1",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 480,
+        "wires": [
+            [
+                "181e963ed7763dba"
+            ]
+        ]
+    },
+    {
+        "id": "5d99a227d2b825f6",
+        "type": "switch",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "property": "payload.action",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "toggle",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "brightness_up_click",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "brightness_down_click",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "arrow_right_click",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "arrow_left_click",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 5,
+        "x": 130,
+        "y": 600,
+        "wires": [
+            [
+                "cce4834e956a5404"
+            ],
+            [
+                "d731d2962ba9525c"
+            ],
+            [
+                "d731d2962ba9525c"
+            ],
+            [
+                "6d2618bf86ec1490"
+            ],
+            [
+                "6d2618bf86ec1490"
+            ]
+        ]
+    },
+    {
+        "id": "dac7f6a849c47f73",
+        "type": "wled",
+        "z": "9d6045f175be2d26",
+        "name": "TV Led",
+        "address": "192.168.1.71",
+        "interval": 0,
+        "x": 940,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "d40f90bb3a9bbc57",
+        "type": "http request",
+        "z": "9d6045f175be2d26",
+        "name": "WLED status",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.71/json/state",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 550,
+        "y": 540,
+        "wires": [
+            [
+                "8eb9aae778b97daa"
+            ]
+        ]
+    },
+    {
+        "id": "8eb9aae778b97daa",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Toggle state",
+        "func": "msg.payload.on = !msg.payload.on;\n\nflow.set(\"WLED_TV\", msg.payload);\nlet now = new Date();\nflow.set(\"WLED_TV_lastupdate\", now.getTime())\n\nmsg.payload = msg.payload.on;\nnode.status({fill:\"grey\",shape:\"ring\",text:(msg.payload ? \"On\": \"Off\")});\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 560,
+        "wires": [
+            [
+                "dac7f6a849c47f73"
+            ]
+        ]
+    },
+    {
+        "id": "f5cbb2c8e13cd76c",
+        "type": "http request",
+        "z": "9d6045f175be2d26",
+        "name": "WLED status",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.71/json/state",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 550,
+        "y": 620,
+        "wires": [
+            [
+                "19b151c5f0fccb75"
+            ]
+        ]
+    },
+    {
+        "id": "19b151c5f0fccb75",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Change Brightness",
+        "func": "// How quickly the brightness changes\nconst velocity = 50;\n\nif (msg.payload.on) {\n\n    let brightness = msg.payload.bri;\n\n    if (msg.knob.action ===\"brightness_down_click\" ) {\n        brightness -= velocity;\n        if (brightness < 10) brightness = 10;\n    }\n    if (msg.knob.action === \"brightness_up_click\") {\n        brightness += velocity;\n        if (brightness > 255) brightness = 255;\n    }\n\n    msg.payload.bri = brightness;\n    flow.set(\"WLED_TV\", msg.payload);\n    let now = new Date();\n    flow.set(\"WLED_TV_lastupdate\", now.getTime());\n\n    msg.payload = brightness;\n\n    node.status({fill:\"grey\",shape:\"ring\",text:brightness});\n    return msg;\n} else {\n    let now = new Date();\n    flow.set(\"WLED_TV_lastupdate\", now.getTime());\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 640,
+        "wires": [
+            [
+                "dac7f6a849c47f73"
+            ]
+        ]
+    },
+    {
+        "id": "181e963ed7763dba",
+        "type": "change",
+        "z": "9d6045f175be2d26",
+        "name": "Save Message",
+        "rules": [
+            {
+                "t": "set",
+                "p": "knob",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 380,
+        "y": 480,
+        "wires": [
+            [
+                "5d99a227d2b825f6"
+            ]
+        ]
+    },
+    {
+        "id": "cce4834e956a5404",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Status?",
+        "func": "let wled_tv = flow.get(\"WLED_TV\");\n\nif (wled_tv===undefined) {\n    // settings from the past not available\n    // get settings first\n    return [msg,null];\n} else {\n    let lastupdate = flow.get(\"WLED_TV_lastupdate\");\n    let now = new Date();\n    if (now.getTime()-lastupdate>60000) {\n        // settings stored is too old\n        // get new settings first\n        return [msg, null];\n    } else {\n        msg.payload = wled_tv;\n        return [null, msg];\n    }\n\n}\n",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 560,
+        "wires": [
+            [
+                "d40f90bb3a9bbc57"
+            ],
+            [
+                "8eb9aae778b97daa"
+            ]
+        ]
+    },
+    {
+        "id": "d731d2962ba9525c",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Status?",
+        "func": "let wled_tv = flow.get(\"WLED_TV\");\n\nif (wled_tv===undefined) {\n    // settings from the past not available\n    // get settings first\n    return [msg,null];\n} else {\n    let lastupdate = flow.get(\"WLED_TV_lastupdate\");\n    let now = new Date();\n    if (now.getTime()-lastupdate>60000) {\n        // settings stored is too old\n        // get new settings first\n        return [msg, null];\n    } else {\n        msg.payload = wled_tv;\n        return [null, msg];\n    }\n\n}\n",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 640,
+        "wires": [
+            [
+                "f5cbb2c8e13cd76c"
+            ],
+            [
+                "19b151c5f0fccb75"
+            ]
+        ]
+    },
+    {
+        "id": "5b18086ac37ce605",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Change Colour",
+        "func": "// Degree change on the Hue color with a single click\nconst degree = 20;\n// Difference between color1, color2 and color3\nconst diff = 30;\n\n/**\n* HSV to RGB color conversion\n*\n* H runs from 0 to 360 degrees\n* S and V run from 0 to 100\n*\n* Ported from the excellent java algorithm by Eugene Vishnevsky at:\n* http://www.cs.rit.edu/~ncs/color/t_convert.html\n*/\n\n/* accepts parameters\n * r  Object = {r:x, g:y, b:z}\n * OR \n * r, g, b\n*/\nfunction RGBtoHSV(r, g, b) {\n    if (arguments.length === 1) {\n        g = r.g, b = r.b, r = r.r;\n    }\n    var max = Math.max(r, g, b), min = Math.min(r, g, b),\n        d = max - min,\n        h,\n        s = (max === 0 ? 0 : d / max),\n        v = max / 255;\n\n    switch (max) {\n        case min: h = 0; break;\n        case r: h = (g - b) + d * (g < b ? 6 : 0); h /= 6 * d; break;\n        case g: h = (b - r) + d * 2; h /= 6 * d; break;\n        case b: h = (r - g) + d * 4; h /= 6 * d; break;\n    }\n\n    return {\n        h: Math.round(h*360),\n        s: Math.round(s*100),\n        v: Math.round(v*100)\n    };\n}\n\n// H runs from 0 to 360 degrees\n// S and V run from 0 to 100\n\nfunction hsvToRgb(h, s, v) {\n    var r, g, b;\n    var i;\n    var f, p, q, t;\n\n    // Make sure our arguments stay in-range\n    h = Math.max(0, Math.min(360, h));\n    s = Math.max(0, Math.min(100, s));\n    v = Math.max(0, Math.min(100, v));\n\n    // We accept saturation and value arguments from 0 to 100 because that's\n    // how Photoshop represents those values. Internally, however, the\n    // saturation and value are calculated from a range of 0 to 1. We make\n    // That conversion here.\n    s /= 100;\n    v /= 100;\n\n    if (s === 0) {\n        // Achromatic (grey)\n        r = g = b = v;\n        return [\n            Math.round(r * 255),\n            Math.round(g * 255),\n            Math.round(b * 255)\n        ];\n    }\n\n    h /= 60; // sector 0 to 5\n    i = Math.floor(h);\n    f = h - i; // factorial part of h\n    p = v * (1 - s);\n    q = v * (1 - s * f);\n    t = v * (1 - s * (1 - f));\n\n    switch (i) {\n        case 0:\n            r = v;\n            g = t;\n            b = p;\n            break;\n\n        case 1:\n            r = q;\n            g = v;\n            b = p;\n            break;\n\n        case 2:\n            r = p;\n            g = v;\n            b = t;\n            break;\n\n        case 3:\n            r = p;\n            g = q;\n            b = v;\n            break;\n\n        case 4:\n            r = t;\n            g = p;\n            b = v;\n            break;\n\n        default: // case 5:\n            r = v;\n            g = p;\n            b = q;\n    }\n\n    return [\n        Math.round(r * 255),\n        Math.round(g * 255),\n        Math.round(b * 255)\n    ];\n}\n\nfunction rotateHue(h, angle) {\n    h = h + angle;\n    if (h < 0) h = -h;\n    if (h>360) h = h - 360;\n    return h;\n}\n\n\nif (msg.payload.on) {\n\n    // Get color1\n    let rgbcolor1 = msg.payload.seg[0].col[0];\n\n    // it is only a single click, step is always 1\n    let step = 1;\n\n    if (msg.knob.action ===\"arrow_left_click\" ) {\n        step = -1*step;\n    }\n\n    // convert color1 to HSV\n    let hsvcolor1 = RGBtoHSV(rgbcolor1[0],rgbcolor1[1],rgbcolor1[2]);\n\n    // Rotate the Hue, convert back to RGB and reset color1\n    hsvcolor1.h = rotateHue(hsvcolor1.h,step*degree);\n    let starthue = hsvcolor1.h;\n    let newrgb = hsvToRgb(hsvcolor1.h, hsvcolor1.s, hsvcolor1.v);\n    msg.payload.seg[0].col[0][0] = newrgb[0];\n    msg.payload.seg[0].col[0][1] = newrgb[1];\n    msg.payload.seg[0].col[0][2] = newrgb[2];\n\n    // Rotate the Hue, convert back to RGB and reset color2\n    hsvcolor1.h = rotateHue(hsvcolor1.h, diff);\n    newrgb = hsvToRgb(hsvcolor1.h, hsvcolor1.s, hsvcolor1.v);\n    msg.payload.seg[0].col[1][0] = newrgb[0];\n    msg.payload.seg[0].col[1][1] = newrgb[1];\n    msg.payload.seg[0].col[1][2] = newrgb[2];\n\n    // Rotate the Hue, convert back to RGB and reset color3\n    hsvcolor1.h = rotateHue(hsvcolor1.h, diff);\n    newrgb = hsvToRgb(hsvcolor1.h, hsvcolor1.s, hsvcolor1.v);\n    msg.payload.seg[0].col[2][0] = newrgb[0];\n    msg.payload.seg[0].col[2][1] = newrgb[1];\n    msg.payload.seg[0].col[2][2] = newrgb[2];\n\n    flow.set(\"WLED_TV\", msg.payload);\n    let now = new Date();\n    flow.set(\"WLED_TV_lastupdate\", now.getTime());\n\n    node.status({fill:\"grey\",shape:\"ring\",text:starthue});\n    return msg;\n} else {\n    let now = new Date();\n    flow.set(\"WLED_TV_lastupdate\", now.getTime());\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 740,
+        "wires": [
+            [
+                "dac7f6a849c47f73"
+            ]
+        ]
+    },
+    {
+        "id": "6d2618bf86ec1490",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Status?",
+        "func": "let wled_tv = flow.get(\"WLED_TV\");\n\nif (wled_tv===undefined) {\n    // settings from the past not available\n    // get settings first\n    return [msg,null];\n} else {\n    let lastupdate = flow.get(\"WLED_TV_lastupdate\");\n    let now = new Date();\n    if (now.getTime()-lastupdate>60000) {\n        // settings stored is too old\n        // get new settings first\n        return [msg, null];\n    } else {\n        msg.payload = wled_tv;\n        return [null, msg];\n    }\n\n}\n",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 740,
+        "wires": [
+            [
+                "d3ab06b9cb36f572"
+            ],
+            [
+                "5b18086ac37ce605"
+            ]
+        ]
+    },
+    {
+        "id": "d3ab06b9cb36f572",
+        "type": "http request",
+        "z": "9d6045f175be2d26",
+        "name": "WLED status",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.71/json/state",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 550,
+        "y": 720,
+        "wires": [
+            [
+                "5b18086ac37ce605"
+            ]
+        ]
+    },
+    {
+        "id": "a3db18839a80da10",
+        "type": "comment",
+        "z": "9d6045f175be2d26",
+        "name": "IKEA remote control WLED",
+        "info": "",
+        "x": 130,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "4ab53a892fcbe5fa",
+        "type": "mqtt-broker",
+        "name": "Local Broker",
+        "broker": "127.0.0.1",
+        "port": "1883",
+        "clientid": "NodeRed",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    }
+]
