@@ -1,0 +1,2896 @@
+[
+    {
+        "id": "efae3883.36e4c8",
+        "type": "tab",
+        "label": "IP Camera & Onvif",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "83c6b97e.cc7928",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "create image message",
+        "func": "msg.payload = {chatId: \"your_chatid\", type:\"photo\", content:\"/home/nygma/node-red-static/annkec800test.jpg\", caption:\"Picture from the front camera\"};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 680,
+        "wires": [
+            [
+                "d50204034491e61f"
+            ]
+        ]
+    },
+    {
+        "id": "c70334aa.c63908",
+        "type": "file",
+        "z": "efae3883.36e4c8",
+        "name": "Save image",
+        "filename": "/home/nygma/node-red-static/annkec800test.jpg",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 570,
+        "y": 680,
+        "wires": [
+            [
+                "83c6b97e.cc7928"
+            ]
+        ]
+    },
+    {
+        "id": "386537de.920068",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Capture the image from IP camera",
+        "info": "For Reolink cameras (excluding battery operated cameras) the URL is described here:\nhttps://support.reolink.com/hc/en-us/articles/360007011233-How-to-Capture-Live-JPEG-Image-of-Reolink-Cameras-via-Web-Browsers\n\nSame concept will work with any other IP cameras that return a jpg image.\n\nThe file-out node saves the image to a fixed file name. node-red-static folder is set in my\nsettings.js, \nthis is the line in my settings.js:\nhttpStatic: '/home/nygma/node-red-static/',\n\nso any file in that folder can be accessed as:\nhttp(s)://192.168.1.x:1880/gate.jpg",
+        "x": 180,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "d1f2045d.56ff18",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Get and image and send to Telegram as image message",
+        "info": "Output of this function node should go to the the Telegram sender node",
+        "x": 250,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "79000f1a.9db54",
+        "type": "base64",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "action": "str",
+        "property": "payload",
+        "x": 560,
+        "y": 180,
+        "wires": [
+            [
+                "8ca3d27e.9642"
+            ]
+        ]
+    },
+    {
+        "id": "8ca3d27e.9642",
+        "type": "template",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<img width=\"320px\" height=\"240px\" src=\"data:image/jpg;base64,{{{payload}}}\">",
+        "output": "str",
+        "x": 720,
+        "y": 180,
+        "wires": [
+            [
+                "e33b102d.4e346"
+            ]
+        ]
+    },
+    {
+        "id": "e33b102d.4e346",
+        "type": "ui_template",
+        "z": "efae3883.36e4c8",
+        "group": "dff31419.25eca8",
+        "name": "",
+        "order": 0,
+        "width": "6",
+        "height": "5",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 880,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "325b1797.8f2898",
+        "type": "image",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "width": 200,
+        "data": "payload",
+        "dataType": "msg",
+        "thumbnail": false,
+        "active": true,
+        "pass": false,
+        "outputs": 0,
+        "x": 780,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "ebd2f76a.6758e8",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 200,
+        "wires": [
+            [
+                "ab50682ec897287c"
+            ]
+        ]
+    },
+    {
+        "id": "a0f1dc22.a9ce",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Video stream",
+        "info": "Reolink article how to get the stream URL:\nhttps://support.reolink.com/hc/en-us/articles/360007010473-How-to-Live-View-Reolink-Cameras-via-VLC-Media-Player\n\nFFmpeg should install just by\nsudo apt-get install ffmpeg\n\nbut it did not work for me, it looks like it is not available raspbian jessie, please read Post 7 from user Strontium on this discussion: https://www.raspberrypi.org/forums/viewtopic.php?t=170094",
+        "x": 110,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "663830df.9ef1c",
+        "type": "exec",
+        "z": "efae3883.36e4c8",
+        "command": "ffmpeg -rtsp_transport tcp -f rtsp -i rtsp://admin:NodeRed2233@192.168.1.210:554/mpeg4/ch1/sub/av_stream -f image2pipe pipe:1",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Decode RTSP stream",
+        "x": 680,
+        "y": 1360,
+        "wires": [
+            [
+                "ada0e5c3.2da418"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "2af551f8.01253e",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "Start stream",
+        "props": [
+            {
+                "p": "payload",
+                "v": "",
+                "vt": "date"
+            },
+            {
+                "p": "topic",
+                "v": "",
+                "vt": "string"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 1360,
+        "wires": [
+            [
+                "663830df.9ef1c"
+            ]
+        ]
+    },
+    {
+        "id": "ada0e5c3.2da418",
+        "type": "image",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "width": "200",
+        "active": true,
+        "outputs": 0,
+        "x": 910,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "6b0d69d9.462f68",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "Pause all streams",
+        "props": [
+            {
+                "p": "payload",
+                "v": "SIGSTOP",
+                "vt": "str"
+            },
+            {
+                "p": "topic",
+                "v": "",
+                "vt": "string"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "SIGSTOP",
+        "payloadType": "str",
+        "x": 210,
+        "y": 1400,
+        "wires": [
+            [
+                "7121c0aa.5fff6"
+            ]
+        ]
+    },
+    {
+        "id": "4ec42b11.84c454",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "Resume all streams",
+        "props": [
+            {
+                "p": "payload",
+                "v": "SIGCONT",
+                "vt": "str"
+            },
+            {
+                "p": "topic",
+                "v": "",
+                "vt": "string"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "SIGCONT",
+        "payloadType": "str",
+        "x": 210,
+        "y": 1440,
+        "wires": [
+            [
+                "7121c0aa.5fff6"
+            ]
+        ]
+    },
+    {
+        "id": "7121c0aa.5fff6",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "kill",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 1400,
+        "wires": [
+            [
+                "663830df.9ef1c"
+            ]
+        ]
+    },
+    {
+        "id": "80ad0d7f.11454",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "Stop all streams",
+        "props": [
+            {
+                "p": "payload",
+                "v": "SIGTERM",
+                "vt": "str"
+            },
+            {
+                "p": "topic",
+                "v": "",
+                "vt": "string"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "SIGTERM",
+        "payloadType": "str",
+        "x": 200,
+        "y": 1480,
+        "wires": [
+            [
+                "7121c0aa.5fff6"
+            ]
+        ]
+    },
+    {
+        "id": "cbbf5c4b.6c0c9",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "Set up the email",
+        "rules": [
+            {
+                "t": "set",
+                "p": "attachments",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "attachments.content",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "attachments.filename",
+                "pt": "msg",
+                "to": "snapshot.jpg",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Still image from the camera",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Find the snapshot image from the camera attached",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "to",
+                "pt": "msg",
+                "to": "youremail@example.com",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 820,
+        "wires": [
+            [
+                "133f499e.b43716"
+            ]
+        ]
+    },
+    {
+        "id": "133f499e.b43716",
+        "type": "e-mail",
+        "z": "efae3883.36e4c8",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "secure": true,
+        "tls": true,
+        "name": "csongor.varga@gmail.com",
+        "dname": "Csongor Varga",
+        "x": 1000,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "9b6d208e.8b331",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "Filename generator",
+        "func": "// Get the current time and convert it to text\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\n\n// Generate out file name pattern\nmsg.fname = \"snapshot_\"+ yyyy + mm + dd + \"-\" + hh + mmm + ss + \".jpg\";\n// Full filename with path for the file node later\nmsg.filename = \"/home/nygma/node-red-static/\"+ msg.fname;\n\nnode.status({fill:\"blue\",shape:\"ring\",text:msg.fname});\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 520,
+        "wires": [
+            [
+                "6388395a.b80c78"
+            ]
+        ]
+    },
+    {
+        "id": "6388395a.b80c78",
+        "type": "file",
+        "z": "efae3883.36e4c8",
+        "name": "Save image",
+        "filename": "",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 830,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fc123912.2af568",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Save the image in a different file every time",
+        "info": "",
+        "x": 200,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "f5b1c1f7.7e433",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 520,
+        "wires": [
+            [
+                "0c7a3198eee39e69"
+            ]
+        ]
+    },
+    {
+        "id": "9dcfc53d.a21bf8",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "Collect images",
+        "func": "var imagenumber = 3;\n\nlet email = context.get(\"email\");\n\n// If it does not exists, it is the first message with the topic, from, etc.\nif (email===undefined) {\n    msg.attachments=[];\n    context.set(\"email\",msg);\n    return;\n}\n\nemail.attachments.push({\"filename\": \"snapshot\"+(email.attachments.length+1)+\".jpg\", \"content\": msg.payload});\n\nif (email.attachments.length===imagenumber) {\n    context.set(\"email\");\n    return email;\n} else {\n    context.set(\"email\",email);\n    return;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 960,
+        "wires": [
+            [
+                "133f499e.b43716"
+            ]
+        ]
+    },
+    {
+        "id": "9ceeb9aa.ce2ac8",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 960,
+        "wires": [
+            [
+                "1bd9a02.380ea6",
+                "aa08d870.16c9d8",
+                "91196ab3.194e68",
+                "78e85d87d1a3e18a"
+            ]
+        ]
+    },
+    {
+        "id": "1bd9a02.380ea6",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "Set up the email",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Still image from the camera",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Find the snapshot image from the camera attached",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "to",
+                "pt": "msg",
+                "to": "youremail@example.com",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 360,
+        "y": 960,
+        "wires": [
+            [
+                "9dcfc53d.a21bf8"
+            ]
+        ]
+    },
+    {
+        "id": "aa08d870.16c9d8",
+        "type": "delay",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "10",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "outputs": 1,
+        "x": 340,
+        "y": 1040,
+        "wires": [
+            [
+                "78e85d87d1a3e18a"
+            ]
+        ]
+    },
+    {
+        "id": "91196ab3.194e68",
+        "type": "delay",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "20",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "outputs": 1,
+        "x": 340,
+        "y": 1080,
+        "wires": [
+            [
+                "78e85d87d1a3e18a"
+            ]
+        ]
+    },
+    {
+        "id": "fd427a5e.065668",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 1260,
+        "wires": [
+            [
+                "75f8d077.f5bde"
+            ]
+        ]
+    },
+    {
+        "id": "75f8d077.f5bde",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "Set filename",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "/home/nygma/node-red-static/video.mp4",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 350,
+        "y": 1260,
+        "wires": [
+            [
+                "c1da6c70.26dd"
+            ]
+        ]
+    },
+    {
+        "id": "b859859f.c0d488",
+        "type": "ui_template",
+        "z": "efae3883.36e4c8",
+        "group": "dff31419.25eca8",
+        "name": "Video link",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "format": "<div height=\"70\" style=\"height: 70px;\">\n<a href=\"/video.mp4\" target=\"_blank\">Open video</a>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 800,
+        "y": 1240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c1da6c70.26dd",
+        "type": "exec",
+        "z": "efae3883.36e4c8",
+        "command": "ffmpeg -rtsp_transport tcp -i rtsp://admin:NodeRed2233@192.168.1.210:554/mpeg4/ch1/sub/av_stream -r 10 -t 60 -vcodec copy -acodec copy -y ",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Capture video",
+        "x": 560,
+        "y": 1260,
+        "wires": [
+            [
+                "b859859f.c0d488"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c93240f2.0535e",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Getting and image and displaying directly in Dashboard",
+        "info": "Image preview node:\nnode-red-contrib-image-output\n\nBase 64 converter:\nnode-red-node-base64",
+        "x": 260,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "53fabe5f.fe3ea",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 680,
+        "wires": [
+            [
+                "fa226e0a0999c939"
+            ]
+        ]
+    },
+    {
+        "id": "c5193cb9.f2781",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Get an image and email it",
+        "info": "",
+        "x": 150,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "4042f65e.3e12e8",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 820,
+        "wires": [
+            [
+                "073d24e58071a06c"
+            ]
+        ]
+    },
+    {
+        "id": "3b5096f3.72bbba",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Get multiple images and email it",
+        "info": "",
+        "x": 170,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "684687ce.e5b028",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Annke C800",
+        "info": "",
+        "x": 110,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "efd3a769.05c818",
+        "type": "base64",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "action": "str",
+        "property": "payload",
+        "x": 560,
+        "y": 1700,
+        "wires": [
+            [
+                "2bc27b7.4bc4484"
+            ]
+        ]
+    },
+    {
+        "id": "2bc27b7.4bc4484",
+        "type": "template",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<img width=\"320px\" height=\"240px\" src=\"data:image/jpg;base64,{{{payload}}}\">",
+        "output": "str",
+        "x": 720,
+        "y": 1700,
+        "wires": [
+            [
+                "70e1653b.ac453c"
+            ]
+        ]
+    },
+    {
+        "id": "70e1653b.ac453c",
+        "type": "ui_template",
+        "z": "efae3883.36e4c8",
+        "group": "dff31419.25eca8",
+        "name": "",
+        "order": 0,
+        "width": "6",
+        "height": "5",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 880,
+        "y": 1700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b330eb83.27ef88",
+        "type": "image",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "width": 200,
+        "data": "payload",
+        "dataType": "msg",
+        "thumbnail": false,
+        "active": true,
+        "pass": false,
+        "outputs": 0,
+        "x": 580,
+        "y": 1740,
+        "wires": []
+    },
+    {
+        "id": "cd4d6e1d.6bb55",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 1720,
+        "wires": [
+            [
+                "741613b5.a532fc"
+            ]
+        ]
+    },
+    {
+        "id": "35fae297.d8b51e",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Getting and image and displaying directly in Dashboard",
+        "info": "Image preview node:\nnode-red-contrib-image-output\n\nBase 64 converter:\nnode-red-node-base64",
+        "x": 260,
+        "y": 1640,
+        "wires": []
+    },
+    {
+        "id": "741613b5.a532fc",
+        "type": "onvif-media",
+        "z": "efae3883.36e4c8",
+        "name": "Snapshot",
+        "deviceConfig": "e6c78b2e.fe4dc8",
+        "profileToken": "",
+        "profileName": "mainStream",
+        "videoEncoderConfigToken": "",
+        "videoEncoderConfigName": "",
+        "videoEncoderConfigEncoding": "",
+        "action": "getSnapshot",
+        "protocol": "",
+        "stream": "",
+        "x": 360,
+        "y": 1720,
+        "wires": [
+            [
+                "efd3a769.05c818",
+                "b330eb83.27ef88"
+            ]
+        ]
+    },
+    {
+        "id": "ae4cea30.0aa9c8",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "create image message",
+        "func": "msg.payload = { chatId: \"your_chatid\", type:\"photo\", content:\"/home/nygma/node-red-static/c500test.jpg\", caption:\"Picture from the front camera\"};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 2020,
+        "wires": [
+            [
+                "c7b8b02c47f91e5a"
+            ]
+        ]
+    },
+    {
+        "id": "fcafa424.69e608",
+        "type": "file",
+        "z": "efae3883.36e4c8",
+        "name": "Save image",
+        "filename": "/home/nygma/node-red-static/c500test.jpg",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 610,
+        "y": 2020,
+        "wires": [
+            [
+                "ae4cea30.0aa9c8"
+            ]
+        ]
+    },
+    {
+        "id": "d8d3b314.88d4f",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Get and image and send to Telegram as image message",
+        "info": "Output of this function node should go to the the Telegram sender node",
+        "x": 250,
+        "y": 1960,
+        "wires": []
+    },
+    {
+        "id": "cb1b63df.03b26",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "Set up the email",
+        "rules": [
+            {
+                "t": "set",
+                "p": "attachments",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "attachments.content",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "attachments.filename",
+                "pt": "msg",
+                "to": "snapshot.jpg",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Still image from the camera",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Find the snapshot image from the camera attached",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "to",
+                "pt": "msg",
+                "to": "xxx@yyy.com",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 700,
+        "y": 2160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e9e156b3.4379d8",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "Filename generator",
+        "func": "// Get the current time and convert it to text\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\n\n// Generate out file name pattern\nmsg.fname = \"snapshot_\"+ yyyy + mm + dd + \"-\" + hh + mmm + ss + \".jpg\";\n// Full filename with path for the file node later\nmsg.filename = \"/home/nygma/\"+ msg.fname;\n\nnode.status({fill:\"blue\",shape:\"ring\",text:msg.fname});\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 1860,
+        "wires": [
+            [
+                "82f00621.78c268"
+            ]
+        ]
+    },
+    {
+        "id": "82f00621.78c268",
+        "type": "file",
+        "z": "efae3883.36e4c8",
+        "name": "Save image",
+        "filename": "",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 830,
+        "y": 1860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bc3e5fae.a236c",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Save the image in a different file every time",
+        "info": "",
+        "x": 200,
+        "y": 1800,
+        "wires": []
+    },
+    {
+        "id": "658a6ef5.1038b",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 1860,
+        "wires": [
+            [
+                "c8c75df7.99895"
+            ]
+        ]
+    },
+    {
+        "id": "ca5f5218.eca24",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "Collect images",
+        "func": "var imagenumber = 3;\n\nlet email = context.get(\"email\");\n\n// If it does not exists, it is the first message with the topic, from, etc.\nif (email===undefined) {\n    msg.attachments=[];\n    context.set(\"email\",msg);\n    return;\n}\n\nemail.attachments.push({\"filename\": \"snapshot\"+(email.attachments.length+1)+\".jpg\", \"content\": msg.payload});\n\nif (email.attachments.length===imagenumber) {\n    context.set(\"email\");\n    return email;\n} else {\n    context.set(\"email\",email);\n    return;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 760,
+        "y": 2300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "269cad13.6cef92",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 2300,
+        "wires": [
+            [
+                "b1b642bb.39e17",
+                "3a1d9bd0.ed8d94",
+                "9b74ca1.1b85338",
+                "9bab7f67.5eb5b"
+            ]
+        ]
+    },
+    {
+        "id": "b1b642bb.39e17",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "Set up the email",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Still image from the camera",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Find the snapshot image from the camera attached",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "to",
+                "pt": "msg",
+                "to": "xxx@yyy.com",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 360,
+        "y": 2300,
+        "wires": [
+            [
+                "ca5f5218.eca24"
+            ]
+        ]
+    },
+    {
+        "id": "3a1d9bd0.ed8d94",
+        "type": "delay",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "10",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "outputs": 1,
+        "x": 340,
+        "y": 2380,
+        "wires": [
+            [
+                "9bab7f67.5eb5b"
+            ]
+        ]
+    },
+    {
+        "id": "9b74ca1.1b85338",
+        "type": "delay",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "20",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "outputs": 1,
+        "x": 340,
+        "y": 2420,
+        "wires": [
+            [
+                "9bab7f67.5eb5b"
+            ]
+        ]
+    },
+    {
+        "id": "1f4868d0.34cc67",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 2020,
+        "wires": [
+            [
+                "84f6567c.6be8f8"
+            ]
+        ]
+    },
+    {
+        "id": "7476c7b9.53c3a8",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Get an image and email it",
+        "info": "",
+        "x": 150,
+        "y": 2100,
+        "wires": []
+    },
+    {
+        "id": "7809e826.f6dbb8",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 2160,
+        "wires": [
+            [
+                "ac200dc0.7620d"
+            ]
+        ]
+    },
+    {
+        "id": "71c93897.8d6988",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Get multiple images and email it",
+        "info": "",
+        "x": 170,
+        "y": 2240,
+        "wires": []
+    },
+    {
+        "id": "c8c75df7.99895",
+        "type": "onvif-media",
+        "z": "efae3883.36e4c8",
+        "name": "Snapshot",
+        "deviceConfig": "e6c78b2e.fe4dc8",
+        "profileToken": "",
+        "profileName": "mainStream",
+        "videoEncoderConfigToken": "",
+        "videoEncoderConfigName": "",
+        "videoEncoderConfigEncoding": "",
+        "action": "getSnapshot",
+        "protocol": "",
+        "stream": "",
+        "x": 380,
+        "y": 1860,
+        "wires": [
+            [
+                "e9e156b3.4379d8"
+            ]
+        ]
+    },
+    {
+        "id": "84f6567c.6be8f8",
+        "type": "onvif-media",
+        "z": "efae3883.36e4c8",
+        "name": "Snapshot",
+        "deviceConfig": "e6c78b2e.fe4dc8",
+        "profileToken": "",
+        "profileName": "mainStream",
+        "videoEncoderConfigToken": "",
+        "videoEncoderConfigName": "",
+        "videoEncoderConfigEncoding": "",
+        "action": "getSnapshot",
+        "protocol": "",
+        "stream": "",
+        "x": 400,
+        "y": 2020,
+        "wires": [
+            [
+                "fcafa424.69e608"
+            ]
+        ]
+    },
+    {
+        "id": "ac200dc0.7620d",
+        "type": "onvif-media",
+        "z": "efae3883.36e4c8",
+        "name": "Snapshot",
+        "deviceConfig": "e6c78b2e.fe4dc8",
+        "profileToken": "",
+        "profileName": "mainStream",
+        "videoEncoderConfigToken": "",
+        "videoEncoderConfigName": "",
+        "videoEncoderConfigEncoding": "",
+        "action": "getSnapshot",
+        "protocol": "",
+        "stream": "",
+        "x": 436.25,
+        "y": 2162.5,
+        "wires": [
+            [
+                "cb1b63df.03b26"
+            ]
+        ]
+    },
+    {
+        "id": "9bab7f67.5eb5b",
+        "type": "onvif-media",
+        "z": "efae3883.36e4c8",
+        "name": "Snapshot",
+        "deviceConfig": "e6c78b2e.fe4dc8",
+        "profileToken": "",
+        "profileName": "mainStream",
+        "videoEncoderConfigToken": "",
+        "videoEncoderConfigName": "",
+        "videoEncoderConfigEncoding": "",
+        "action": "getSnapshot",
+        "protocol": "",
+        "stream": "",
+        "x": 540,
+        "y": 2340,
+        "wires": [
+            [
+                "ca5f5218.eca24"
+            ]
+        ]
+    },
+    {
+        "id": "3ce04cae.f464f4",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Onvif Events",
+        "info": "",
+        "x": 110,
+        "y": 2500,
+        "wires": []
+    },
+    {
+        "id": "3058e7f7.61ef18",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "Start listening",
+        "props": [
+            {
+                "p": "payload",
+                "v": "",
+                "vt": "date"
+            },
+            {
+                "p": "topic",
+                "v": "",
+                "vt": "string"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 2600,
+        "wires": [
+            [
+                "ff4d304.232fcd"
+            ]
+        ]
+    },
+    {
+        "id": "ff4d304.232fcd",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "action",
+                "pt": "msg",
+                "to": "start",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 2600,
+        "wires": [
+            [
+                "f57af84d.8efee8"
+            ]
+        ]
+    },
+    {
+        "id": "bfd98f01.2b6eb",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "Stop listening",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 2640,
+        "wires": [
+            [
+                "32620d05.6bb062"
+            ]
+        ]
+    },
+    {
+        "id": "32620d05.6bb062",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "action",
+                "pt": "msg",
+                "to": "stop",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 2640,
+        "wires": [
+            [
+                "f57af84d.8efee8"
+            ]
+        ]
+    },
+    {
+        "id": "19cbdd29.c66813",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "Get event properties",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 2720,
+        "wires": [
+            [
+                "ba7b1123.eb2ea"
+            ]
+        ]
+    },
+    {
+        "id": "ba7b1123.eb2ea",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "action",
+                "pt": "msg",
+                "to": "getEventProperties",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 2720,
+        "wires": [
+            [
+                "f57af84d.8efee8"
+            ]
+        ]
+    },
+    {
+        "id": "6da60d9c.bf7ab4",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "Get event service capabilities",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 2680,
+        "wires": [
+            [
+                "be1ea0d3.c9909"
+            ]
+        ]
+    },
+    {
+        "id": "be1ea0d3.c9909",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "action",
+                "pt": "msg",
+                "to": "getEventServiceCapabilities",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 460,
+        "y": 2680,
+        "wires": [
+            [
+                "f57af84d.8efee8"
+            ]
+        ]
+    },
+    {
+        "id": "f57af84d.8efee8",
+        "type": "onvif-events",
+        "z": "efae3883.36e4c8",
+        "name": "C800 Events",
+        "deviceConfig": "e6c78b2e.fe4dc8",
+        "action": "",
+        "x": 670,
+        "y": 2600,
+        "wires": [
+            [
+                "df7acd28.5de5a",
+                "fb02a1a2.0a014"
+            ]
+        ]
+    },
+    {
+        "id": "df7acd28.5de5a",
+        "type": "debug",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 2540,
+        "wires": []
+    },
+    {
+        "id": "fb02a1a2.0a014",
+        "type": "switch",
+        "z": "efae3883.36e4c8",
+        "name": "Camera Event",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "RuleEngine/CellMotionDetector/Motion",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Monitoring/ProcessorUsage",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "RuleEngine/TamperDetector/Tamper",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "VideoSource/MotionAlarm",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 5,
+        "x": 260,
+        "y": 2820,
+        "wires": [
+            [
+                "865c3944.c23358"
+            ],
+            [
+                "59e7217f.40465"
+            ],
+            [
+                "53555296.ce02bc"
+            ],
+            [
+                "9991be04.d366c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "865c3944.c23358",
+        "type": "switch",
+        "z": "efae3883.36e4c8",
+        "name": "IsMotion",
+        "property": "data.name",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "IsMotion",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 520,
+        "y": 2820,
+        "wires": [
+            [
+                "d216fd5e.be9f6"
+            ]
+        ]
+    },
+    {
+        "id": "d216fd5e.be9f6",
+        "type": "switch",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "property": "data.value",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 690,
+        "y": 2820,
+        "wires": [
+            [
+                "82482f99.63eca"
+            ],
+            [
+                "da95978a.061b88"
+            ]
+        ]
+    },
+    {
+        "id": "9c2def91.31d54",
+        "type": "ui_text",
+        "z": "efae3883.36e4c8",
+        "group": "b7bd0867.45c2d8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Motion status",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 1110,
+        "y": 2820,
+        "wires": []
+    },
+    {
+        "id": "82482f99.63eca",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Motion detected",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 900,
+        "y": 2800,
+        "wires": [
+            [
+                "9c2def91.31d54",
+                "1a91a69e.063409"
+            ]
+        ]
+    },
+    {
+        "id": "da95978a.061b88",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "No motion",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 900,
+        "y": 2840,
+        "wires": [
+            [
+                "9c2def91.31d54",
+                "6a3355c.46b1eac"
+            ]
+        ]
+    },
+    {
+        "id": "5245d1be.59a71",
+        "type": "base64",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "action": "str",
+        "property": "payload",
+        "x": 1500,
+        "y": 2760,
+        "wires": [
+            [
+                "569c2ea6.617a3"
+            ]
+        ]
+    },
+    {
+        "id": "569c2ea6.617a3",
+        "type": "template",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<img width=\"320px\" height=\"240px\" src=\"data:image/jpg;base64,{{{payload}}}\">",
+        "output": "str",
+        "x": 1660,
+        "y": 2760,
+        "wires": [
+            [
+                "d5cb9da2.4ef5e"
+            ]
+        ]
+    },
+    {
+        "id": "d5cb9da2.4ef5e",
+        "type": "ui_template",
+        "z": "efae3883.36e4c8",
+        "group": "b7bd0867.45c2d8",
+        "name": "Motion Start",
+        "order": 0,
+        "width": "6",
+        "height": "5",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "x": 1830,
+        "y": 2760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7442eee0.0ba16",
+        "type": "base64",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "action": "str",
+        "property": "payload",
+        "x": 1500,
+        "y": 2880,
+        "wires": [
+            [
+                "a43f763c.f25338"
+            ]
+        ]
+    },
+    {
+        "id": "a43f763c.f25338",
+        "type": "template",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<img width=\"320px\" height=\"240px\" src=\"data:image/jpg;base64,{{{payload}}}\">",
+        "output": "str",
+        "x": 1660,
+        "y": 2880,
+        "wires": [
+            [
+                "f03e9840.9692c8"
+            ]
+        ]
+    },
+    {
+        "id": "f03e9840.9692c8",
+        "type": "ui_template",
+        "z": "efae3883.36e4c8",
+        "group": "b7bd0867.45c2d8",
+        "name": "Motion End",
+        "order": 0,
+        "width": "6",
+        "height": "5",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "x": 1830,
+        "y": 2880,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1a91a69e.063409",
+        "type": "delay",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "15",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1120,
+        "y": 2760,
+        "wires": [
+            [
+                "bdf9b1d6012e32eb"
+            ]
+        ]
+    },
+    {
+        "id": "59e7217f.40465",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "data.value",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Processor Usage",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 2940,
+        "wires": [
+            [
+                "1cb6d0cf.1629cf"
+            ]
+        ]
+    },
+    {
+        "id": "1cb6d0cf.1629cf",
+        "type": "ui_chart",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "group": "b7bd0867.45c2d8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Processor Usage",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": "5",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "x": 870,
+        "y": 2940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "75da40d9.6e33",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "create image message",
+        "func": "msg.payload = { chatId: \"your_chatid\", type: \"photo\", content:\"/home/nygma/node-red-static/c800motionstart.jpg\", caption:\"Motion started\"};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1760,
+        "y": 2700,
+        "wires": [
+            [
+                "482570edff18a893"
+            ]
+        ]
+    },
+    {
+        "id": "9c1b10c9.f9209",
+        "type": "file",
+        "z": "efae3883.36e4c8",
+        "name": "Save image",
+        "filename": "/home/nygma/node-red-static/c800motionstart.jpg",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1530,
+        "y": 2700,
+        "wires": [
+            [
+                "75da40d9.6e33"
+            ]
+        ]
+    },
+    {
+        "id": "73537b83.f71384",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "create image message",
+        "func": "msg.payload = { chatId: \"your_chatid\", type: \"photo\", content:\"/home/nygma/node-red-static/c800motionend.jpg\", caption:\"Motion ended\"};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1760,
+        "y": 2940,
+        "wires": [
+            [
+                "482570edff18a893"
+            ]
+        ]
+    },
+    {
+        "id": "e88ba782.12f178",
+        "type": "file",
+        "z": "efae3883.36e4c8",
+        "name": "Save image",
+        "filename": "/home/nygma/node-red-static/c800motionend.jpg",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1530,
+        "y": 2940,
+        "wires": [
+            [
+                "73537b83.f71384"
+            ]
+        ]
+    },
+    {
+        "id": "5a1a8c1b.b92bb4",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload",
+                "v": "",
+                "vt": "date"
+            },
+            {
+                "p": "topic",
+                "v": "",
+                "vt": "string"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 3360,
+        "wires": [
+            [
+                "10efd566.57b51b"
+            ]
+        ]
+    },
+    {
+        "id": "10efd566.57b51b",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "Set filename",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "/home/nygma/node-red-static/video.mp4",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 330,
+        "y": 3360,
+        "wires": [
+            [
+                "1fcf8d45.e012a3"
+            ]
+        ]
+    },
+    {
+        "id": "1fcf8d45.e012a3",
+        "type": "exec",
+        "z": "efae3883.36e4c8",
+        "command": "ffmpeg -rtsp_transport tcp -i rtsp://admin:NodeRed2233@192.168.1.210:554/mpeg4/ch1/sub/av_stream -r 10 -t 20 -vcodec copy -acodec copy -y ",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "Capture video",
+        "x": 540,
+        "y": 3360,
+        "wires": [
+            [
+                "fc177765.00d548"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "fc177765.00d548",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "create image message",
+        "func": "msg.payload = { chatId: \"your_chatid\", type:\"video\", content:\"/home/nygma/node-red-static/video.mp4\", caption:\"Video from the camera\"};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 3420,
+        "wires": [
+            [
+                "41c4fa5f6fed182e"
+            ]
+        ]
+    },
+    {
+        "id": "a6be3e1e.93da7",
+        "type": "comment",
+        "z": "efae3883.36e4c8",
+        "name": "Record video clip",
+        "info": "",
+        "x": 140,
+        "y": 3280,
+        "wires": []
+    },
+    {
+        "id": "6a3355c.46b1eac",
+        "type": "delay",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "15",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1120,
+        "y": 2880,
+        "wires": [
+            [
+                "879567fb7a5e5345"
+            ]
+        ]
+    },
+    {
+        "id": "53555296.ce02bc",
+        "type": "switch",
+        "z": "efae3883.36e4c8",
+        "name": "IsTamper",
+        "property": "data.name",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "IsTamper",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 560,
+        "y": 3020,
+        "wires": [
+            [
+                "31ddcf52.ffd2"
+            ]
+        ]
+    },
+    {
+        "id": "31ddcf52.ffd2",
+        "type": "switch",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "property": "data.value",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 710,
+        "y": 3020,
+        "wires": [
+            [
+                "a4a14d8c.af20b"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "a4a14d8c.af20b",
+        "type": "change",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Motion detected",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 900,
+        "y": 3020,
+        "wires": [
+            [
+                "3beb855d.f2ae9a"
+            ]
+        ]
+    },
+    {
+        "id": "3beb855d.f2ae9a",
+        "type": "delay",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "15",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "outputs": 1,
+        "x": 1120,
+        "y": 3020,
+        "wires": [
+            [
+                "6ff02a343077f462"
+            ]
+        ]
+    },
+    {
+        "id": "73876cda.db3fe4",
+        "type": "file",
+        "z": "efae3883.36e4c8",
+        "name": "Save image",
+        "filename": "/home/nygma/node-red-static/c800motionstart.jpg",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1530,
+        "y": 3020,
+        "wires": [
+            [
+                "baf8fbd8.ad7918"
+            ]
+        ]
+    },
+    {
+        "id": "baf8fbd8.ad7918",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "create image message",
+        "func": "msg.payload = { chatId: \"your_chatid\", type:\"photo\", content:\"/home/nygma/node-red-static/c500motionstart.jpg\", caption:\"Tamper detected\"};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1760,
+        "y": 3020,
+        "wires": [
+            [
+                "482570edff18a893"
+            ]
+        ]
+    },
+    {
+        "id": "cf982344.a1933",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "Stringify msg.payload",
+        "func": "\nmsg.payload = JSON.stringify(msg);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 540,
+        "y": 3180,
+        "wires": [
+            [
+                "8fcd2d67.081af"
+            ]
+        ]
+    },
+    {
+        "id": "8fcd2d67.081af",
+        "type": "function",
+        "z": "efae3883.36e4c8",
+        "name": "create text message",
+        "func": "msg.payload = { chatId: \"your_chatid\", type:\"message\", content:msg.payload};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1760,
+        "y": 3180,
+        "wires": [
+            [
+                "482570edff18a893"
+            ]
+        ]
+    },
+    {
+        "id": "9991be04.d366c",
+        "type": "switch",
+        "z": "efae3883.36e4c8",
+        "name": "IsState",
+        "property": "data.name",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "State",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 550,
+        "y": 3120,
+        "wires": [
+            [
+                "49599b08.22f384"
+            ]
+        ]
+    },
+    {
+        "id": "49599b08.22f384",
+        "type": "switch",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "property": "data.value",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 710,
+        "y": 3120,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "d50204034491e61f",
+        "type": "link out",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "82332965f25e893c"
+        ],
+        "x": 1015,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "c7b8b02c47f91e5a",
+        "type": "link out",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "82332965f25e893c"
+        ],
+        "x": 1035,
+        "y": 2020,
+        "wires": []
+    },
+    {
+        "id": "41c4fa5f6fed182e",
+        "type": "link out",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "82332965f25e893c"
+        ],
+        "x": 1015,
+        "y": 3420,
+        "wires": []
+    },
+    {
+        "id": "482570edff18a893",
+        "type": "link out",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "82332965f25e893c"
+        ],
+        "x": 2075,
+        "y": 3020,
+        "wires": []
+    },
+    {
+        "id": "f16d2f7827da081e",
+        "type": "inject",
+        "z": "efae3883.36e4c8",
+        "name": "Get snapshot image",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 280,
+        "wires": [
+            [
+                "1473d4bf684a6f17"
+            ]
+        ]
+    },
+    {
+        "id": "9621db0f3a79e9fa",
+        "type": "image",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "width": 200,
+        "active": true,
+        "outputs": 0,
+        "x": 580,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "1473d4bf684a6f17",
+        "type": "onvif-media",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "deviceConfig": "e6c78b2e.fe4dc8",
+        "profileToken": "",
+        "profileName": "mainStream",
+        "videoEncoderConfigToken": "",
+        "videoEncoderConfigName": "",
+        "videoEncoderConfigEncoding": "",
+        "action": "getSnapshot",
+        "protocol": "HTTP",
+        "stream": "RTP-Unicast",
+        "x": 390,
+        "y": 280,
+        "wires": [
+            [
+                "9621db0f3a79e9fa",
+                "26c6ac33a0eeb3bd"
+            ]
+        ]
+    },
+    {
+        "id": "26c6ac33a0eeb3bd",
+        "type": "debug",
+        "z": "efae3883.36e4c8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "ab50682ec897287c",
+        "type": "http request",
+        "z": "efae3883.36e4c8",
+        "name": "Annke C800",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.210:80/ISAPI/Streaming/channels/1/picture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "digest",
+        "senderr": false,
+        "x": 350,
+        "y": 200,
+        "wires": [
+            [
+                "79000f1a.9db54",
+                "325b1797.8f2898"
+            ]
+        ]
+    },
+    {
+        "id": "0c7a3198eee39e69",
+        "type": "http request",
+        "z": "efae3883.36e4c8",
+        "name": "Annke C800",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.210:80/ISAPI/Streaming/channels/1/picture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "digest",
+        "senderr": false,
+        "x": 370,
+        "y": 520,
+        "wires": [
+            [
+                "9b6d208e.8b331"
+            ]
+        ]
+    },
+    {
+        "id": "fa226e0a0999c939",
+        "type": "http request",
+        "z": "efae3883.36e4c8",
+        "name": "Annke C800",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.210:80/ISAPI/Streaming/channels/1/picture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "digest",
+        "senderr": false,
+        "x": 350,
+        "y": 680,
+        "wires": [
+            [
+                "c70334aa.c63908"
+            ]
+        ]
+    },
+    {
+        "id": "073d24e58071a06c",
+        "type": "http request",
+        "z": "efae3883.36e4c8",
+        "name": "Annke C800",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.210:80/ISAPI/Streaming/channels/1/picture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "digest",
+        "senderr": false,
+        "x": 410,
+        "y": 820,
+        "wires": [
+            [
+                "cbbf5c4b.6c0c9"
+            ]
+        ]
+    },
+    {
+        "id": "78e85d87d1a3e18a",
+        "type": "http request",
+        "z": "efae3883.36e4c8",
+        "name": "Annke C800",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.210:80/ISAPI/Streaming/channels/1/picture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "digest",
+        "senderr": false,
+        "x": 550,
+        "y": 1000,
+        "wires": [
+            [
+                "9dcfc53d.a21bf8"
+            ]
+        ]
+    },
+    {
+        "id": "bdf9b1d6012e32eb",
+        "type": "http request",
+        "z": "efae3883.36e4c8",
+        "name": "Annke C800",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.210:80/ISAPI/Streaming/channels/1/picture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "digest",
+        "senderr": false,
+        "x": 1310,
+        "y": 2760,
+        "wires": [
+            [
+                "5245d1be.59a71",
+                "9c1b10c9.f9209"
+            ]
+        ]
+    },
+    {
+        "id": "879567fb7a5e5345",
+        "type": "http request",
+        "z": "efae3883.36e4c8",
+        "name": "Annke C800",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.210:80/ISAPI/Streaming/channels/1/picture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "digest",
+        "senderr": false,
+        "x": 1310,
+        "y": 2880,
+        "wires": [
+            [
+                "7442eee0.0ba16",
+                "e88ba782.12f178"
+            ]
+        ]
+    },
+    {
+        "id": "6ff02a343077f462",
+        "type": "http request",
+        "z": "efae3883.36e4c8",
+        "name": "Annke C800",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.210:80/ISAPI/Streaming/channels/1/picture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "digest",
+        "senderr": false,
+        "x": 1310,
+        "y": 3020,
+        "wires": [
+            [
+                "73876cda.db3fe4"
+            ]
+        ]
+    },
+    {
+        "id": "526c00f267a3ad7c",
+        "type": "ui_template",
+        "z": "efae3883.36e4c8",
+        "group": "6040d2f73faefe6e",
+        "name": "MJPEG stream",
+        "order": 0,
+        "width": "0",
+        "height": "0",
+        "format": "<div>\n<IFRAME src=\"http://192.168.1.210/ISAPI/Streaming/channels/102/httpPreview\" align=\"center\" width=\"640\" height=\"480\" scrolling=\"no\"\n    frameborder=no marginheight=\"0px\" </IFRAME>\n\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": false,
+        "templateScope": "local",
+        "className": "",
+        "x": 620,
+        "y": 1500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dff31419.25eca8",
+        "type": "ui_group",
+        "name": "Snapshot Image",
+        "tab": "835f835c.111",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "e6c78b2e.fe4dc8",
+        "type": "onvif-config",
+        "xaddress": "192.168.1.210",
+        "port": "80",
+        "timeout": "3",
+        "checkConnectionInterval": "5",
+        "name": "Annke C800"
+    },
+    {
+        "id": "b7bd0867.45c2d8",
+        "type": "ui_group",
+        "name": "Events",
+        "tab": "835f835c.111",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "6040d2f73faefe6e",
+        "type": "ui_group",
+        "name": "Live video",
+        "tab": "835f835c.111",
+        "order": 3,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "835f835c.111",
+        "type": "ui_tab",
+        "name": "Annke",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
