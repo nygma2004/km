@@ -1,0 +1,679 @@
+[
+    {
+        "id": "8ec6b2105f8621dd",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Convert to Influx",
+        "func": "let arr = msg.topic.split(\"/\");\n\nlet record = {\n    \"measurement\": \"zigbee\",\n    \"tags\": {\n        \"device\": arr[1]\n    },\n    \"fields\": {\n    }\n};\n\n// Check if there are any nested objects (like update)\nfor (var propt in msg.payload) {\n    if (typeof(msg.payload[propt]) === \"object\") {\n        // Delete the property if it is an object\n        delete msg.payload[propt];\n    }\n}\n\nrecord.fields = msg.payload;\n\nmsg.payload = [record];\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 880,
+        "y": 1140,
+        "wires": [
+            [
+                "18bd4811752e8e16"
+            ]
+        ]
+    },
+    {
+        "id": "18bd4811752e8e16",
+        "type": "influxdb batch",
+        "z": "9d6045f175be2d26",
+        "influxdb": "2dce016f48a38240",
+        "precision": "",
+        "retentionPolicy": "",
+        "name": "Log bucket",
+        "database": "database",
+        "precisionV18FluxV20": "ns",
+        "retentionPolicyV18Flux": "",
+        "org": "nygmatech",
+        "bucket": "log",
+        "x": 1110,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "01bed8d345f481c5",
+        "type": "comment",
+        "z": "9d6045f175be2d26",
+        "name": "Save Zigbee data to InfluxDB",
+        "info": "",
+        "x": 160,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "788a5ff05d52872e",
+        "type": "mqtt in",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "topic": "zigbee2mqtt/#",
+        "qos": "0",
+        "datatype": "utf8",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 960,
+        "wires": [
+            [
+                "7da7f54ed30ff11d"
+            ]
+        ]
+    },
+    {
+        "id": "7da7f54ed30ff11d",
+        "type": "switch",
+        "z": "9d6045f175be2d26",
+        "name": "Bridge or device",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "zigbee2mqtt/bridge",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 340,
+        "y": 960,
+        "wires": [
+            [
+                "4d2a6ab9d7410fe5"
+            ],
+            [
+                "478dd9d744d0db15"
+            ]
+        ]
+    },
+    {
+        "id": "478dd9d744d0db15",
+        "type": "switch",
+        "z": "9d6045f175be2d26",
+        "name": "available topic",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "/availability",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 540,
+        "y": 1120,
+        "wires": [
+            [],
+            [
+                "4eedf8389192d62d"
+            ]
+        ]
+    },
+    {
+        "id": "4eedf8389192d62d",
+        "type": "json",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 710,
+        "y": 1140,
+        "wires": [
+            [
+                "8ec6b2105f8621dd"
+            ]
+        ]
+    },
+    {
+        "id": "4d2a6ab9d7410fe5",
+        "type": "switch",
+        "z": "9d6045f175be2d26",
+        "name": "bridge topic",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "/state",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "/logging",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 570,
+        "y": 940,
+        "wires": [
+            [
+                "7a78689b42eaf02c"
+            ],
+            [
+                "dbd1710fb4315fa6"
+            ]
+        ]
+    },
+    {
+        "id": "dbd1710fb4315fa6",
+        "type": "json",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 750,
+        "y": 1000,
+        "wires": [
+            [
+                "bf67aff1bef9caac"
+            ]
+        ]
+    },
+    {
+        "id": "7a78689b42eaf02c",
+        "type": "switch",
+        "z": "9d6045f175be2d26",
+        "name": "Online/Offline",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "online",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 780,
+        "y": 920,
+        "wires": [
+            [
+                "da28ac8ebf122e84"
+            ],
+            [
+                "3429f2ea3cb3d0cf"
+            ]
+        ]
+    },
+    {
+        "id": "da28ac8ebf122e84",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "System Online Message",
+        "func": "msg.payload = \"Zigbee2MQTT is now online\";\nmsg.system = 47; // System id, use 1 for Dummy\nmsg.state = 1; // specify if the message is to change system status\nmsg.severity = 0; // 0: information, 1: warning, 2: error\nmsg.email = false; // if separate email should be sent\nmsg.emailtext = \"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 900,
+        "wires": [
+            [
+                "3ef062b6758c14a6"
+            ]
+        ]
+    },
+    {
+        "id": "3429f2ea3cb3d0cf",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "System Offline Message",
+        "func": "msg.payload = \"Zigbee2MQTT is now offline\";\nmsg.system = 47; // System id, use 1 for Dummy\nmsg.state = 99; // specify if the message is to change system status\nmsg.severity = 2; // 0: information, 1: warning, 2: error\nmsg.email = false; // if separate email should be sent\nmsg.emailtext = \"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1050,
+        "y": 940,
+        "wires": [
+            [
+                "3ef062b6758c14a6"
+            ]
+        ]
+    },
+    {
+        "id": "3ef062b6758c14a6",
+        "type": "link out",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "links": [
+            "13e089a7.73cb46"
+        ],
+        "x": 1515,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "bf67aff1bef9caac",
+        "type": "switch",
+        "z": "9d6045f175be2d26",
+        "name": "Online/Offline",
+        "property": "payload.level",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "error",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "warn",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 940,
+        "y": 1000,
+        "wires": [
+            [
+                "5c37ea13cfb09441"
+            ],
+            [
+                "c62b617ed2e0ae91"
+            ],
+            [
+                "c91be4913c6e3b03"
+            ]
+        ]
+    },
+    {
+        "id": "5c37ea13cfb09441",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Diagnostic input message structure",
+        "func": "\nmsg.payload = msg.payload.message;\nmsg.system = 47; // System id, use 1 for Dummy\n//msg.state = 1; // specify if the message is to change system status\nmsg.severity = 2; // 0: information, 1: warning, 2: error\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1240,
+        "y": 980,
+        "wires": [
+            [
+                "3ef062b6758c14a6"
+            ]
+        ]
+    },
+    {
+        "id": "c62b617ed2e0ae91",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Diagnostic input message structure",
+        "func": "\nmsg.payload = msg.payload.message;\nmsg.system = 47; // System id, use 1 for Dummy\n//msg.state = 1; // specify if the message is to change system status\nmsg.severity = 1; // 0: information, 1: warning, 2: error\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1240,
+        "y": 1020,
+        "wires": [
+            [
+                "3ef062b6758c14a6"
+            ]
+        ]
+    },
+    {
+        "id": "c91be4913c6e3b03",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Diagnostic input message structure",
+        "func": "\nmsg.payload = msg.payload.message;\nmsg.system = 47; // System id, use 1 for Dummy\n//msg.state = 1; // specify if the message is to change system status\nmsg.severity = 0; // 0: information, 1: warning, 2: error\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1240,
+        "y": 1060,
+        "wires": [
+            [
+                "3ef062b6758c14a6"
+            ]
+        ]
+    },
+    {
+        "id": "dc23e388e6fcb876",
+        "type": "mqtt in",
+        "z": "9d6045f175be2d26",
+        "name": "Zigbee devicelist ",
+        "topic": "zigbee2mqtt/bridge/devices",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 140,
+        "y": 1340,
+        "wires": [
+            [
+                "3487d5b1206b2558"
+            ]
+        ]
+    },
+    {
+        "id": "3487d5b1206b2558",
+        "type": "change",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "zigbee_devicelist",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 1340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9be915568a8d9a4c",
+        "type": "inject",
+        "z": "9d6045f175be2d26",
+        "name": "7pm",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "00 19 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 1480,
+        "wires": [
+            [
+                "6a7c8ef1fc031509"
+            ]
+        ]
+    },
+    {
+        "id": "6a7c8ef1fc031509",
+        "type": "influxdb in",
+        "z": "9d6045f175be2d26",
+        "influxdb": "2dce016f48a38240",
+        "name": "Query last battery state",
+        "query": "from(bucket: \"log\")\n  |> range(start: -24h)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"zigbee\")\n  |> filter(fn: (r) => r[\"_field\"] == \"battery\") \n  |> last()",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "nygmatech",
+        "x": 420,
+        "y": 1480,
+        "wires": [
+            [
+                "40e4db2411af87a6",
+                "f8706cab038a763f"
+            ]
+        ]
+    },
+    {
+        "id": "40e4db2411af87a6",
+        "type": "debug",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "f8706cab038a763f",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Get battery data",
+        "func": "// Low battery treshold\nconst lowbatt = 15;\n\nlet devicelist = flow.get(\"zigbee_devicelist\");\nlet text = \"🔋 Low battery zigbee devices: \\r\\n\";\nlet send = false;\n\nif (devicelist!==undefined) {\n\n    for (let batterydata of msg.payload) {\n        // Find the device from the devicelist\n        let thisdevice = devicelist.filter(obj => {\n            return obj.friendly_name === batterydata.device;\n        });\n        thisdevice = thisdevice[0];\n        // Only work with battery operated devices\n        if (thisdevice.power_source===\"Battery\") {\n            // check if battery is low\n            if (batterydata._value<lowbatt) {\n                text += batterydata.device + \": \" + batterydata._value+\"%\\r\\n\";\n                send = true;\n            }\n        }\n    }  \n    text=text.slice(0,-2);\n    if (send) {\n        msg.payload={\"service\": 22, \"type\": \"message\", \"content\": text};\n        node.status({fill:\"red\",shape:\"ring\",text:msg.payload.content});\n        return msg;\n    }\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 1480,
+        "wires": [
+            [
+                "bc61ce69ed994733"
+            ]
+        ]
+    },
+    {
+        "id": "bc61ce69ed994733",
+        "type": "link out",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "86deb2f58b76aa52"
+        ],
+        "x": 855,
+        "y": 1480,
+        "wires": []
+    },
+    {
+        "id": "d5db0cf6b14ed17e",
+        "type": "comment",
+        "z": "9d6045f175be2d26",
+        "name": "Get device list from Zigbee2mqtt",
+        "info": "",
+        "x": 170,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "999a56953c2e43ff",
+        "type": "comment",
+        "z": "9d6045f175be2d26",
+        "name": "Low battery notification",
+        "info": "",
+        "x": 140,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "6694d8fd3256fb78",
+        "type": "inject",
+        "z": "9d6045f175be2d26",
+        "name": "7pm",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "00 19 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 1620,
+        "wires": [
+            [
+                "7390d0acfec26c6e"
+            ]
+        ]
+    },
+    {
+        "id": "7390d0acfec26c6e",
+        "type": "influxdb in",
+        "z": "9d6045f175be2d26",
+        "influxdb": "2dce016f48a38240",
+        "name": "Query last link quality",
+        "query": "from(bucket: \"log\")\n  |> range(start: -24h)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"zigbee\")\n  |> filter(fn: (r) => r[\"_field\"] == \"linkquality\") \n  |> last()",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "nygmatech",
+        "x": 410,
+        "y": 1620,
+        "wires": [
+            [
+                "7e60a65a0978712b",
+                "e089fa0521db5b46"
+            ]
+        ]
+    },
+    {
+        "id": "7e60a65a0978712b",
+        "type": "debug",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 1560,
+        "wires": []
+    },
+    {
+        "id": "e089fa0521db5b46",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Check linkq and missing device",
+        "func": "// Low battery treshold\nconst lowlinkq = 30;\n\nlet devicelist = flow.get(\"zigbee_devicelist\");\nlet text_miss = \"🎛 Offline zigbee devices: \\r\\n\";\nlet text_link = \"🎛 Low link quality zigbee devices: \\r\\n\";\nlet send = false;\n\n\nif (devicelist!==undefined) {\n\n    send = false;\n    // Check link quality\n    for (let devicedata of msg.payload) {\n        // Find the device from the devicelist\n        let thisdevice = devicelist.filter(obj => {\n            return obj.friendly_name === devicedata.device;\n        });\n        thisdevice = thisdevice[0];\n        // check if link quality is low\n        if (devicedata._value < lowlinkq) {\n            text_link += devicedata.device + \": \" + devicedata._value + \"\\r\\n\";\n            send = true;\n        }\n    }\n    text_link = text_link.slice(0, -2);\n    if (send) {\n        msg.payload = { \"service\": 22, \"type\": \"message\", \"content\": text_link };\n        node.status({ fill: \"red\", shape: \"ring\", text: msg.payload.content });\n        node.send(msg);\n    }\n\n    send = false;\n    // Check offline device\n    for (let devicedata of devicelist) {\n        // Ignore the coordinator\n        if (devicedata.type !== \"Coordinator\") {\n            // Find the device from the influx tablestream\n            let thisdevice = msg.payload.filter(obj => {\n                return obj.device === devicedata.friendly_name;\n            });\n            if (thisdevice.length===0) {\n                text_miss += devicedata.friendly_name + \"\\r\\n\";\n                send = true;\n            }\n        }\n    }\n    text_miss = text_miss.slice(0,-2);\n    if (send) {\n        msg.payload = { \"service\": 22, \"type\": \"message\", \"content\": text_miss};\n        node.status({fill:\"red\",shape:\"ring\",text:msg.payload.content});\n        node.send(msg);\n    }\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 1620,
+        "wires": [
+            [
+                "3350907ea4de031f"
+            ]
+        ]
+    },
+    {
+        "id": "3350907ea4de031f",
+        "type": "link out",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "86deb2f58b76aa52"
+        ],
+        "x": 935,
+        "y": 1620,
+        "wires": []
+    },
+    {
+        "id": "640096d7dab25f7d",
+        "type": "comment",
+        "z": "9d6045f175be2d26",
+        "name": "Offline device and link quality notification",
+        "info": "",
+        "x": 200,
+        "y": 1560,
+        "wires": []
+    },
+    {
+        "id": "2dce016f48a38240",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "database",
+        "name": "InfluxDB",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://localhost:8086",
+        "rejectUnauthorized": false
+    },
+    {
+        "id": "4ab53a892fcbe5fa",
+        "type": "mqtt-broker",
+        "name": "Local Broker",
+        "broker": "127.0.0.1",
+        "port": "1883",
+        "clientid": "NodeRed",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    }
+]
