@@ -1,0 +1,1376 @@
+[
+    {
+        "id": "a7cdead54eaa8661",
+        "type": "comment",
+        "z": "52b8ac534c9b15f7",
+        "name": "Shelly 3EM",
+        "info": "",
+        "x": 110,
+        "y": 3200,
+        "wires": []
+    },
+    {
+        "id": "be698270c79780b1",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/0/power",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 200,
+        "y": 3260,
+        "wires": [
+            [
+                "b2d4db2e8e55a2f2"
+            ]
+        ]
+    },
+    {
+        "id": "ca925732fb5f84f2",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/0/pf",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 180,
+        "y": 3300,
+        "wires": [
+            [
+                "0598cbe9c2f6a125"
+            ]
+        ]
+    },
+    {
+        "id": "b2d4db2e8e55a2f2",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase0.power",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 3260,
+        "wires": [
+            [
+                "94dca2fd45c3bcbf"
+            ]
+        ]
+    },
+    {
+        "id": "cf1464733e78be69",
+        "type": "inject",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 400,
+        "y": 3220,
+        "wires": [
+            [
+                "2c821a456e137751"
+            ]
+        ]
+    },
+    {
+        "id": "2c821a456e137751",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house",
+                "pt": "global",
+                "to": "{\"phase0\":{},\"phase1\":{},\"phase2\":{}}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 3220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "0598cbe9c2f6a125",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase0.pf",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 3300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "db6b14680cd71227",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/0/current",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 200,
+        "y": 3340,
+        "wires": [
+            [
+                "e4432133602bdade"
+            ]
+        ]
+    },
+    {
+        "id": "e4432133602bdade",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase0.current",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 3340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "53ac8baa83885895",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/0/voltage",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 200,
+        "y": 3380,
+        "wires": [
+            [
+                "62d5a6cdf2b50309"
+            ]
+        ]
+    },
+    {
+        "id": "62d5a6cdf2b50309",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase0.voltage",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 3380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "07f83dcb6ba03730",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/0/total",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 190,
+        "y": 3420,
+        "wires": [
+            [
+                "79894108203b1cf7"
+            ]
+        ]
+    },
+    {
+        "id": "79894108203b1cf7",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase0.total",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 3420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "744e050a6e8f7b2f",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/0/total_returned",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 220,
+        "y": 3460,
+        "wires": [
+            [
+                "e5db76d236d2efd2"
+            ]
+        ]
+    },
+    {
+        "id": "e5db76d236d2efd2",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase0.total_returned",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 3460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7b1e1906505d4272",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/0/energy",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 200,
+        "y": 3500,
+        "wires": [
+            [
+                "77176ed7b9198fad"
+            ]
+        ]
+    },
+    {
+        "id": "77176ed7b9198fad",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase0.energy",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 550,
+        "y": 3500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e1919f60e50d4512",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/0/returned_energy",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 230,
+        "y": 3540,
+        "wires": [
+            [
+                "cd3ac6b7ee8f63ae"
+            ]
+        ]
+    },
+    {
+        "id": "cd3ac6b7ee8f63ae",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase0.returned_energy",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 3540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "887011a7cfaf6dbd",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/1/power",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 940,
+        "y": 3260,
+        "wires": [
+            [
+                "d5df47a2dfa76111"
+            ]
+        ]
+    },
+    {
+        "id": "9a2985483ad9d249",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/1/pf",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 920,
+        "y": 3300,
+        "wires": [
+            [
+                "cb86a1bc0d5e8ca8"
+            ]
+        ]
+    },
+    {
+        "id": "d5df47a2dfa76111",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase1.power",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1290,
+        "y": 3260,
+        "wires": [
+            [
+                "30a4080f63f4a423"
+            ]
+        ]
+    },
+    {
+        "id": "cb86a1bc0d5e8ca8",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase1.pf",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1280,
+        "y": 3300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fdc48d68c3d6223b",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/1/current",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 940,
+        "y": 3340,
+        "wires": [
+            [
+                "1bc344912e31d60b"
+            ]
+        ]
+    },
+    {
+        "id": "1bc344912e31d60b",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase1.current",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1290,
+        "y": 3340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5fa121049cc1c233",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/1/voltage",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 940,
+        "y": 3380,
+        "wires": [
+            [
+                "cd4746b92e0c508d"
+            ]
+        ]
+    },
+    {
+        "id": "cd4746b92e0c508d",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase1.voltage",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1290,
+        "y": 3380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "255c222b5805b14d",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/1/total",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 930,
+        "y": 3420,
+        "wires": [
+            [
+                "e706c2a641258092"
+            ]
+        ]
+    },
+    {
+        "id": "e706c2a641258092",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase1.total",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1280,
+        "y": 3420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d3e311ed42d459b9",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/1/total_returned",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 960,
+        "y": 3460,
+        "wires": [
+            [
+                "8da04b5a3d733a61"
+            ]
+        ]
+    },
+    {
+        "id": "8da04b5a3d733a61",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase1.total_returned",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1310,
+        "y": 3460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c9a2672a8c4cc88a",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/1/energy",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 940,
+        "y": 3500,
+        "wires": [
+            [
+                "f38b1db4aaa285b7"
+            ]
+        ]
+    },
+    {
+        "id": "f38b1db4aaa285b7",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase1.energy",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1290,
+        "y": 3500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2e0bcf7f440309f5",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/1/returned_energy",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 970,
+        "y": 3540,
+        "wires": [
+            [
+                "cb3698652f4abd93"
+            ]
+        ]
+    },
+    {
+        "id": "cb3698652f4abd93",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase1.returned_energy",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1320,
+        "y": 3540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "642a59abc495dfe2",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/2/power",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1700,
+        "y": 3260,
+        "wires": [
+            [
+                "cc2b7281ca52e214"
+            ]
+        ]
+    },
+    {
+        "id": "2974de4179810211",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/2/pf",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1680,
+        "y": 3300,
+        "wires": [
+            [
+                "0617352cd632b2fe"
+            ]
+        ]
+    },
+    {
+        "id": "cc2b7281ca52e214",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase2.power",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2050,
+        "y": 3260,
+        "wires": [
+            [
+                "1fb40f71c0ac3c7a"
+            ]
+        ]
+    },
+    {
+        "id": "0617352cd632b2fe",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase2.pf",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2040,
+        "y": 3300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "040b677d78ece708",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/2/current",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1700,
+        "y": 3340,
+        "wires": [
+            [
+                "7cef482d4c2d8235"
+            ]
+        ]
+    },
+    {
+        "id": "7cef482d4c2d8235",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase2.current",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2050,
+        "y": 3340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "921774fc4a0b0751",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/2/voltage",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1700,
+        "y": 3380,
+        "wires": [
+            [
+                "1f150f068abe5284"
+            ]
+        ]
+    },
+    {
+        "id": "1f150f068abe5284",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase2.voltage",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2050,
+        "y": 3380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b81b967b02e1d1b1",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/2/total",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1690,
+        "y": 3420,
+        "wires": [
+            [
+                "862246b31952ec24"
+            ]
+        ]
+    },
+    {
+        "id": "862246b31952ec24",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase2.total",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2040,
+        "y": 3420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "060dee6fa84d4853",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/2/total_returned",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1720,
+        "y": 3460,
+        "wires": [
+            [
+                "3250c72a144e32f3"
+            ]
+        ]
+    },
+    {
+        "id": "3250c72a144e32f3",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase2.total_returned",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2070,
+        "y": 3460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b1ff2730ae87d189",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/2/energy",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1700,
+        "y": 3500,
+        "wires": [
+            [
+                "d40266dce0a33706"
+            ]
+        ]
+    },
+    {
+        "id": "d40266dce0a33706",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase2.energy",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2050,
+        "y": 3500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f29cb8c80f2064ee",
+        "type": "mqtt in",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "topic": "shellies/shellyem3/emeter/2/returned_energy",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "4ab53a892fcbe5fa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1730,
+        "y": 3540,
+        "wires": [
+            [
+                "c0a3f0b77e4a15bc"
+            ]
+        ]
+    },
+    {
+        "id": "c0a3f0b77e4a15bc",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "house.phase2.returned_energy",
+                "pt": "global",
+                "to": "$number(msg.payload)",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2080,
+        "y": 3540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2758d9de0f39a219",
+        "type": "inject",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 3660,
+        "wires": [
+            [
+                "e3b56ad424919a19"
+            ]
+        ]
+    },
+    {
+        "id": "e3b56ad424919a19",
+        "type": "change",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "house",
+                "tot": "global"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 370,
+        "y": 3660,
+        "wires": [
+            [
+                "ef1e5a63bf2a59c5"
+            ]
+        ]
+    },
+    {
+        "id": "ef1e5a63bf2a59c5",
+        "type": "rbe",
+        "z": "52b8ac534c9b15f7",
+        "name": "Changes?",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": false,
+        "property": "payload",
+        "topi": "topic",
+        "x": 570,
+        "y": 3660,
+        "wires": [
+            [
+                "5a1a2fd3a6ca6ddc"
+            ]
+        ]
+    },
+    {
+        "id": "5a1a2fd3a6ca6ddc",
+        "type": "function",
+        "z": "52b8ac534c9b15f7",
+        "name": "Convert to Influx",
+        "func": "let measurement = \"sensors\"\n\nfunction addsensordata(device, value) {\n    let record = {\n        \"measurement\": measurement,\n        \"tags\": {\n            \"device\": device\n        },\n        \"fields\": {\n            \"power\": value.power,\n            \"pf\": value.pf,\n            \"current\": value.current,\n            \"voltage\": value.voltage,\n            \"total\": value.total,\n            \"total_returned\": value.total_returned,\n            \"energy\": value.energy,\n            \"returned_energy\": value.returned_energy,\n            \"power_max\": value.power_max,\n            \"power_min\": value.power_min\n        }\n    };\n    return record;\n}\n\nlet data = [];\n\ndata.push(addsensordata(\"house_phase0\", msg.payload.phase0));\ndata.push(addsensordata(\"house_phase1\", msg.payload.phase1));\ndata.push(addsensordata(\"house_phase2\", msg.payload.phase2));\n\n\nmsg.payload = data;\n\nlet house = global.get(\"house\");\nhouse.phase0.power_max = 0;\nhouse.phase0.power_min = 0;\nhouse.phase1.power_max = 0;\nhouse.phase1.power_min = 0;\nhouse.phase2.power_max = 0;\nhouse.phase2.power_min = 0;\nglobal.set(\"house\",house);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 3660,
+        "wires": [
+            [
+                "07cb7f7b7686c90e",
+                "15423e59cefd9a83"
+            ]
+        ]
+    },
+    {
+        "id": "15423e59cefd9a83",
+        "type": "link out",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "0d3a8155db4e5123"
+        ],
+        "x": 995,
+        "y": 3660,
+        "wires": []
+    },
+    {
+        "id": "07cb7f7b7686c90e",
+        "type": "debug",
+        "z": "52b8ac534c9b15f7",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1030,
+        "y": 3720,
+        "wires": []
+    },
+    {
+        "id": "94dca2fd45c3bcbf",
+        "type": "function",
+        "z": "52b8ac534c9b15f7",
+        "name": "Min/Max",
+        "func": "let house = global.get(\"house\");\nif (house===undefined) return null;\n\nlet power = parseFloat(msg.payload);\n\nif (house.phase0.power_max===undefined) {\n    house.phase0.power_max = power;\n} else {\n    if (power > house.phase0.power_max) {\n        house.phase0.power_max = power;\n    }\n}\n\nif (house.phase0.power_min === undefined) {\n    house.phase0.power_min = power;\n} else {\n    if (power < house.phase0.power_min) {\n        house.phase0.power_min = power;\n    }\n}\n\nglobal.set(\"house\", house);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 3220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "30a4080f63f4a423",
+        "type": "function",
+        "z": "52b8ac534c9b15f7",
+        "name": "Min/Max",
+        "func": "let house = global.get(\"house\");\nif (house===undefined) return null;\n\nlet power = parseFloat(msg.payload);\n\nif (house.phase1.power_max===undefined) {\n    house.phase1.power_max = power;\n} else {\n    if (power > house.phase1.power_max) {\n        house.phase1.power_max = power;\n    }\n}\n\nif (house.phase1.power_min === undefined) {\n    house.phase1.power_min = power;\n} else {\n    if (power < house.phase1.power_min) {\n        house.phase1.power_min = power;\n    }\n}\n\nglobal.set(\"house\", house);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1600,
+        "y": 3220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1fb40f71c0ac3c7a",
+        "type": "function",
+        "z": "52b8ac534c9b15f7",
+        "name": "Min/Max",
+        "func": "let house = global.get(\"house\");\nif (house===undefined) return null;\n\nlet power = parseFloat(msg.payload);\n\nif (house.phase2.power_max===undefined) {\n    house.phase2.power_max = power;\n} else {\n    if (power > house.phase2.power_max) {\n        house.phase2.power_max = power;\n    }\n}\n\nif (house.phase2.power_min === undefined) {\n    house.phase2.power_min = power;\n} else {\n    if (power < house.phase2.power_min) {\n        house.phase2.power_min = power;\n    }\n}\n\nglobal.set(\"house\", house);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2320,
+        "y": 3220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4ab53a892fcbe5fa",
+        "type": "mqtt-broker",
+        "name": "Local Broker",
+        "broker": "127.0.0.1",
+        "port": "1883",
+        "clientid": "NodeRed",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    }
+]

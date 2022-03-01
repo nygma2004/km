@@ -1,0 +1,131 @@
+{
+  "id": 43,
+  "gridPos": {
+    "h": 11,
+    "w": 24,
+    "x": 0,
+    "y": 70
+  },
+  "type": "timeseries",
+  "title": "House Power Consumption",
+  "fieldConfig": {
+    "defaults": {
+      "custom": {
+        "drawStyle": "line",
+        "lineInterpolation": "linear",
+        "barAlignment": 0,
+        "lineWidth": 1,
+        "fillOpacity": 0,
+        "gradientMode": "none",
+        "spanNulls": false,
+        "showPoints": "auto",
+        "pointSize": 5,
+        "stacking": {
+          "mode": "none",
+          "group": "A"
+        },
+        "axisPlacement": "auto",
+        "axisLabel": "",
+        "scaleDistribution": {
+          "type": "linear"
+        },
+        "hideFrom": {
+          "tooltip": false,
+          "viz": false,
+          "legend": false
+        },
+        "thresholdsStyle": {
+          "mode": "line+area"
+        }
+      },
+      "color": {
+        "mode": "palette-classic"
+      },
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {
+            "color": "green",
+            "value": null
+          },
+          {
+            "color": "red",
+            "value": 0
+          }
+        ]
+      },
+      "mappings": []
+    },
+    "overrides": [
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "house_phase0"
+        },
+        "properties": [
+          {
+            "id": "displayName",
+            "value": "Phase A"
+          },
+          {
+            "id": "unit",
+            "value": "Wm"
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "house_phase1"
+        },
+        "properties": [
+          {
+            "id": "displayName",
+            "value": "Phase B"
+          },
+          {
+            "id": "unit",
+            "value": "Wm"
+          }
+        ]
+      },
+      {
+        "matcher": {
+          "id": "byName",
+          "options": "house_phase2"
+        },
+        "properties": [
+          {
+            "id": "displayName",
+            "value": "Phase C"
+          },
+          {
+            "id": "unit",
+            "value": "Wm"
+          }
+        ]
+      }
+    ]
+  },
+  "options": {
+    "tooltip": {
+      "mode": "single"
+    },
+    "legend": {
+      "displayMode": "list",
+      "placement": "bottom",
+      "calcs": []
+    }
+  },
+  "targets": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "JobrKTh7z"
+      },
+      "query": "from(bucket: \"nodered\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensors\")\r\n  |> filter(fn: (r) => r[\"device\"] == \"house_phase0\" or r[\"device\"] == \"house_phase1\" or r[\"device\"] == \"house_phase2\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"energy\" or r[\"_field\"] == \"returned_energy\")\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> map(fn: (r) => ({r with _value: r.energy-r.returned_energy}))\r\n  |> drop(columns: [\"_start\", \"_stop\",\"energy\",\"returned_energy\"])",
+      "refId": "A"
+    }
+  ],
+  "datasource": null
+}
