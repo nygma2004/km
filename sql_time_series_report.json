@@ -1,0 +1,708 @@
+[
+    {
+        "id": "acc02958a45c4bec",
+        "type": "function",
+        "z": "83c2267e41e05b83",
+        "name": "SQL",
+        "func": "// This will handle any device and any attribute as long as it is in the DB\nvar p_30d  = 1000*60*60*24*30 ; //30 Days\nvar p_7d  = 1000*60*60*24*7 ; //7 Days\nvar p_1d   =  1000*60*60*24 ; // 1 Day\nvar d = new Date();\nvar current = d.getTime();\nvar today0h = d.setHours(0,0,0,0);\nvar day = d.getDay();\nvar monday0h = today0h - (day + (day === 0 ? -6:1)) * p_1d;\nvar fromdate = 0;\nvar enddate = 0;\nvar sql = [];\nvar sourcelist = [];\nvar aggrlist = [];\nvar title = \"\";\n\n\n// Get the period and the list of data sources \n// also set some default values if one or the other does not exist yet\nsourcelist = context.get(\"sourcelist\");\nif (sourcelist===undefined) { // if running for the first time\n    sourcelist = [];\n}\naggrlist = context.get(\"aggrlist\");\nif (aggrlist===undefined) { // if running for the first time\n    aggrlist = [];\n}\nfromdate = context.get(\"fromdate\");\nif (fromdate===undefined) {\n    // set the period to a default if it is not selected yet\n    fromdate = current-p_1d;\n}\nenddate = context.get(\"enddate\");\nif (enddate===undefined) {\n    // set the period to a default if it is not selected yet\n    enddate = current;\n}\n\nswitch(msg.topic) {\n    case \"period\":\n        switch(msg.payload) {\n            case \"today\":\n                fromdate = today0h;\n                enddate = today0h+p_1d;\n                break;\n            case \"yesterday\":\n                fromdate = today0h-p_1d;\n                enddate = today0h;\n                break;\n            case \"thisweek\":\n                fromdate = monday0h;\n                enddate = monday0h+p_7d;\n                break;\n            case \"lastweek\":\n                fromdate = monday0h-p_7d;\n                enddate = monday0h;\n                break;\n            case \"last24h\":\n                fromdate = current-p_1d;\n                enddate = current;\n                break;\n            case \"last7d\":\n                fromdate = current-p_7d;\n                enddate = current;\n                break;\n            case \"last30d\":\n                fromdate = current-p_30d;\n                enddate = current;\n                break;\n        }\n        context.set(\"fromdate\",fromdate);\n        context.set(\"enddate\",enddate);\n        break;\n    case \"datasource\":\n        if (msg.payload===\"delete\") {\n            // remove all previous data sources\n            sourcelist = [];\n        } else {\n            sourcelist = context.get(\"sourcelist\");\n            if (sourcelist===undefined) { // if running for the first time\n                sourcelist = [];\n            }\n            sourcelist.push(msg.payload);\n        }\n        context.set(\"sourcelist\",sourcelist);\n        break;\n    case \"aggrsource\":\n        if (msg.payload===\"delete\") {\n            // remove all previous data sources\n            aggrlist = [];\n        } else {\n            aggrlist = context.get(\"aggrlist\");\n            if (aggrlist===undefined) { // if running for the first time\n                aggrlist = [];\n            }\n            aggrlist.push(msg.payload);\n        }\n        context.set(\"aggrlist\",aggrlist);\n        break;\n    case \"minus1w\":\n        fromdate = fromdate-p_7d;\n        enddate = enddate-p_7d;\n        context.set(\"fromdate\",fromdate);\n        context.set(\"enddate\",enddate);\n        break;\n    case \"plus1w\":\n        fromdate = fromdate+p_7d;\n        enddate = enddate+p_7d;\n        context.set(\"fromdate\",fromdate);\n        context.set(\"enddate\",enddate);\n        break;\n    case \"minus1d\":\n        fromdate = fromdate-p_1d;\n        enddate = enddate-p_1d;\n        context.set(\"fromdate\",fromdate);\n        context.set(\"enddate\",enddate);\n        break;\n    case \"plus1d\":\n        fromdate = fromdate+p_1d;\n        enddate = enddate+p_1d;\n        context.set(\"fromdate\",fromdate);\n        context.set(\"enddate\",enddate);\n        break;\n}\n\n\n// Regenerate the SQL statements\n// Run through the data source list an generate the SQL statements\nsql = [];\nif (sourcelist.length>0) {\n    for (var i = 0; i < sourcelist.length; i++) {\n        var parts = sourcelist[i].split(\"/\");\n        sql.push({ topic: \"SELECT * FROM sensor_data WHERE device='\"+parts[0]+\"' AND sensor='\"+parts[1]+\"' AND epoch >= \" + fromdate + \" AND epoch <= \" + enddate });\n    }\n} \nif (aggrlist.length>0) {\n    for (var i = 0; i < aggrlist.length; i++) {\n        var parts = aggrlist[i].split(\"/\");\n        sql.push({ topic: \"SELECT * FROM sensor_aggr WHERE device='\"+parts[0]+\"' AND sensor='\"+parts[1]+\"' AND epoch >= \" + fromdate + \" AND epoch <= \" + enddate });\n    }\n} \nif (sql.length===0) {    \n    // Dummy select that returns nothing to clear the chart\n    sql.push({ topic: \"SELECT * FROM sensor_data WHERE device='xxxx'\" });\n}\n\n// set the completed flag for the join node later\nsql[sql.length-1].complete=true;\n// pass along the email flag to redirect the flow later\nif (msg.topic===\"email\") {\n    sql[sql.length-1].email=true;\n}\n\n// Generate report title\nif (sourcelist.length===0 && aggrlist.length===0) {\n    title = \"No data source\";\n} else {\n    if (sourcelist.length!==0) {\n        title = title + sourcelist.toString()+ \", \";\n    }\n    if (aggrlist.length!==0) {\n        title = title + aggrlist.toString()+ \", \";\n    }\n    title = title.substring(0,title.length-2);\n    title = title + \" | \";\n\n    var d = new Date();\n    d.setTime(fromdate);\n    var yyyy = d.getFullYear();\n    var mm = d.getMonth() < 9 ? \"0\" + (d.getMonth() + 1) : (d.getMonth() + 1); // getMonth() is zero-based\n    var dd  = d.getDate() < 10 ? \"0\" + d.getDate() : d.getDate();\n    var hh = d.getHours() < 10 ? \"0\" + d.getHours() : d.getHours();\n    var mmm  = d.getMinutes() < 10 ? \"0\" + d.getMinutes() : d.getMinutes();\n    var ss  = d.getSeconds() < 10 ? \"0\" + d.getSeconds() : d.getSeconds();\n    title = title + dd + \".\" + mm + \".\" + yyyy;\n    d.setTime(enddate);\n    yyyy = d.getFullYear();\n    mm = d.getMonth() < 9 ? \"0\" + (d.getMonth() + 1) : (d.getMonth() + 1); // getMonth() is zero-based\n    dd  = d.getDate() < 10 ? \"0\" + d.getDate() : d.getDate();\n    hh = d.getHours() < 10 ? \"0\" + d.getHours() : d.getHours();\n    mmm  = d.getMinutes() < 10 ? \"0\" + d.getMinutes() : d.getMinutes();\n    ss  = d.getSeconds() < 10 ? \"0\" + d.getSeconds() : d.getSeconds();\n    title = title + \" - \" + dd + \".\" + mm + \".\" + yyyy;\n}\nsql[sql.length-1].title=title;\n\nreturn [ sql ];\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 363.75,
+        "y": 554.25,
+        "wires": [
+            [
+                "28a375b89cdbd823",
+                "444242b101d782d4"
+            ]
+        ]
+    },
+    {
+        "id": "8cd1ba600e5d570d",
+        "type": "function",
+        "z": "83c2267e41e05b83",
+        "name": "Chart Prep",
+        "func": "var chart = [{\n    \"series\":[],\n    \"data\":[],\n    \"labels\":[msg.title]\n}];\n\nif (msg.payload[0].length>0) {\n    // this is the logic when there are multiple data sets are received\n    for (var i=0; i<msg.payload.length; i++) {\n        chart[0].series.push(msg.payload[i][0].device+\"/\"+msg.payload[i][0].sensor);\n        chart[0].data.push([]);\n        let newdata = [];\n        for (var j=0; j<msg.payload[i].length; j++) {\n            chart[0].data[i].push({\"x\":msg.payload[i][j].epoch, \"y\":msg.payload[i][j].value});\n        }\n    }\n} \n\nmsg.payload=chart;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 830,
+        "y": 600,
+        "wires": [
+            [
+                "1295823cae92b77b",
+                "82e19c9600a09c28"
+            ]
+        ]
+    },
+    {
+        "id": "c0778d2ad697ce17",
+        "type": "inject",
+        "z": "83c2267e41e05b83",
+        "name": "Reset chart",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 524.4999923706055,
+        "y": 651.2500095367432,
+        "wires": [
+            [
+                "52c8248e5f76c863"
+            ]
+        ]
+    },
+    {
+        "id": "52c8248e5f76c863",
+        "type": "function",
+        "z": "83c2267e41e05b83",
+        "name": "Empty payload",
+        "func": "msg.payload = [];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 772.4166641235352,
+        "y": 650.5833234786987,
+        "wires": [
+            [
+                "82e19c9600a09c28"
+            ]
+        ]
+    },
+    {
+        "id": "f958bcce73781d01",
+        "type": "join",
+        "z": "83c2267e41e05b83",
+        "name": "",
+        "mode": "custom",
+        "build": "array",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "timeout": "",
+        "count": "",
+        "x": 636.75,
+        "y": 554.25,
+        "wires": [
+            [
+                "eec722589ee4ef79",
+                "8cd1ba600e5d570d"
+            ]
+        ]
+    },
+    {
+        "id": "506c9c7b6116c5b5",
+        "type": "inject",
+        "z": "83c2267e41e05b83",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 325,
+        "y": 350,
+        "wires": [
+            [
+                "3f031e4d04fd241d",
+                "f4ee1a11cb3b30f0",
+                "ccc992b018fc6737"
+            ]
+        ]
+    },
+    {
+        "id": "783cf9490a841f67",
+        "type": "change",
+        "z": "83c2267e41e05b83",
+        "name": "Reset",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 323,
+        "y": 410,
+        "wires": [
+            [
+                "f4ee1a11cb3b30f0"
+            ]
+        ]
+    },
+    {
+        "id": "eec722589ee4ef79",
+        "type": "change",
+        "z": "83c2267e41e05b83",
+        "name": "Title",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "title",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 843.2500152587891,
+        "y": 506.25000953674316,
+        "wires": [
+            [
+                "e34acfc678eee86c"
+            ]
+        ]
+    },
+    {
+        "id": "80260cba915b1722",
+        "type": "ui_button",
+        "z": "83c2267e41e05b83",
+        "name": "",
+        "group": "55c58aebf9687d5f",
+        "order": 5,
+        "width": "2",
+        "height": "1",
+        "label": "-1W",
+        "color": "",
+        "bgcolor": "",
+        "icon": "chevron_left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "minus1w",
+        "x": 95,
+        "y": 343,
+        "wires": [
+            [
+                "783cf9490a841f67",
+                "acc02958a45c4bec"
+            ]
+        ]
+    },
+    {
+        "id": "7a00ce1a3ae82c35",
+        "type": "ui_button",
+        "z": "83c2267e41e05b83",
+        "name": "",
+        "group": "55c58aebf9687d5f",
+        "order": 6,
+        "width": "2",
+        "height": "1",
+        "label": "-1D",
+        "color": "",
+        "bgcolor": "",
+        "icon": "chevron_left",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "minus1d",
+        "x": 93,
+        "y": 380,
+        "wires": [
+            [
+                "783cf9490a841f67",
+                "acc02958a45c4bec"
+            ]
+        ]
+    },
+    {
+        "id": "68a8afc5f7d3452a",
+        "type": "ui_button",
+        "z": "83c2267e41e05b83",
+        "name": "",
+        "group": "55c58aebf9687d5f",
+        "order": 8,
+        "width": "2",
+        "height": "1",
+        "label": "+1W",
+        "color": "",
+        "bgcolor": "",
+        "icon": "chevron_right",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "plus1w",
+        "x": 96,
+        "y": 418,
+        "wires": [
+            [
+                "783cf9490a841f67",
+                "acc02958a45c4bec"
+            ]
+        ]
+    },
+    {
+        "id": "17ec106bb6c6ebd3",
+        "type": "ui_button",
+        "z": "83c2267e41e05b83",
+        "name": "",
+        "group": "55c58aebf9687d5f",
+        "order": 7,
+        "width": "2",
+        "height": "1",
+        "label": "+1D",
+        "color": "",
+        "bgcolor": "",
+        "icon": "chevron_right",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "plus1d",
+        "x": 94,
+        "y": 455,
+        "wires": [
+            [
+                "783cf9490a841f67",
+                "acc02958a45c4bec"
+            ]
+        ]
+    },
+    {
+        "id": "3f031e4d04fd241d",
+        "type": "ui_dropdown",
+        "z": "83c2267e41e05b83",
+        "name": "Data source",
+        "label": "",
+        "tooltip": "",
+        "place": "",
+        "group": "55c58aebf9687d5f",
+        "order": 1,
+        "width": "5",
+        "height": "1",
+        "passthru": false,
+        "options": [
+            {
+                "label": "[Remove all]",
+                "value": "delete",
+                "type": "str"
+            },
+            {
+                "label": "Miflora temperature",
+                "value": "miflora/temp",
+                "type": "str"
+            },
+            {
+                "label": "Miflora battery level",
+                "value": "miflora/battery",
+                "type": "str"
+            },
+            {
+                "label": "Miflora sunlight",
+                "value": "miflora/sunlight",
+                "type": "str"
+            },
+            {
+                "label": "Miflora soil moisture",
+                "value": "miflora/moisture",
+                "type": "str"
+            },
+            {
+                "label": "Miflora soil fertility",
+                "value": "miflora/fertility",
+                "type": "str"
+            },
+            {
+                "label": "Solar power",
+                "value": "growatt/power",
+                "type": "str"
+            },
+            {
+                "label": "Solar voltage",
+                "value": "growatt/voltage",
+                "type": "str"
+            },
+            {
+                "label": "Pool temperature",
+                "value": "poolheater/pool",
+                "type": "str"
+            },
+            {
+                "label": "Solar temperature",
+                "value": "poolheater/solar",
+                "type": "str"
+            },
+            {
+                "label": "Weather Station Temperature",
+                "value": "weather/temperature",
+                "type": "str"
+            },
+            {
+                "label": "Weather Station Humidity",
+                "value": "weather/humidity",
+                "type": "str"
+            },
+            {
+                "label": "Weather Station Pressure",
+                "value": "weather/pressure",
+                "type": "str"
+            },
+            {
+                "label": "PM 1",
+                "value": "weather/pm1",
+                "type": "str"
+            },
+            {
+                "label": "PM 2.5",
+                "value": "weather/pm2.5",
+                "type": "str"
+            },
+            {
+                "label": "PM 10",
+                "value": "weather/pm10",
+                "type": "str"
+            },
+            {
+                "label": "Light Intensity",
+                "value": "weather/light",
+                "type": "str"
+            },
+            {
+                "label": "Infrared Intensity",
+                "value": "weather/infrared",
+                "type": "str"
+            },
+            {
+                "label": "UVI",
+                "value": "weather/uvi",
+                "type": "str"
+            },
+            {
+                "label": "UV Index",
+                "value": "weather/uvindex",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "datasource",
+        "x": 534,
+        "y": 367,
+        "wires": [
+            [
+                "acc02958a45c4bec"
+            ]
+        ]
+    },
+    {
+        "id": "f4ee1a11cb3b30f0",
+        "type": "ui_dropdown",
+        "z": "83c2267e41e05b83",
+        "name": "Period",
+        "label": "",
+        "group": "55c58aebf9687d5f",
+        "order": 4,
+        "width": "4",
+        "height": "1",
+        "passthru": false,
+        "options": [
+            {
+                "label": "Today",
+                "value": "today",
+                "type": "str"
+            },
+            {
+                "label": "Yesterday",
+                "value": "yesterday",
+                "type": "str"
+            },
+            {
+                "label": "This week",
+                "value": "thisweek",
+                "type": "str"
+            },
+            {
+                "label": "Last week",
+                "value": "lastweek",
+                "type": "str"
+            },
+            {
+                "label": "Last 24 hours",
+                "value": "last24h",
+                "type": "str"
+            },
+            {
+                "label": "Last 7 days",
+                "value": "last7d",
+                "type": "str"
+            },
+            {
+                "label": "Last 30 days",
+                "value": "last30d",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "period",
+        "x": 513,
+        "y": 410,
+        "wires": [
+            [
+                "acc02958a45c4bec"
+            ]
+        ]
+    },
+    {
+        "id": "ccc992b018fc6737",
+        "type": "ui_dropdown",
+        "z": "83c2267e41e05b83",
+        "name": "Aggregate source",
+        "label": "",
+        "group": "55c58aebf9687d5f",
+        "order": 2,
+        "width": "5",
+        "height": "1",
+        "passthru": false,
+        "options": [
+            {
+                "label": "[Remove all]",
+                "value": "delete",
+                "type": "str"
+            },
+            {
+                "label": "Miflora temperature Max",
+                "value": "miflora/temp_max",
+                "type": "str"
+            },
+            {
+                "label": "Miflora battery level Min",
+                "value": "miflora/battery_min",
+                "type": "str"
+            },
+            {
+                "label": "Miflora soil moisture",
+                "value": "miflora/moisture",
+                "type": "str"
+            },
+            {
+                "label": "Solar power Max",
+                "value": "growatt/power_max",
+                "type": "str"
+            },
+            {
+                "label": "Solar daily generation",
+                "value": "growatt/today",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "aggrsource",
+        "x": 553,
+        "y": 325,
+        "wires": [
+            [
+                "acc02958a45c4bec"
+            ]
+        ]
+    },
+    {
+        "id": "e34acfc678eee86c",
+        "type": "ui_text",
+        "z": "83c2267e41e05b83",
+        "group": "f7f6fd37b172ca36",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "name": "Chart title",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "x": 995.2500152587891,
+        "y": 506.25000953674316,
+        "wires": []
+    },
+    {
+        "id": "82e19c9600a09c28",
+        "type": "ui_chart",
+        "z": "83c2267e41e05b83",
+        "name": "Chart",
+        "group": "f7f6fd37b172ca36",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "dd HH:mm",
+        "interpolate": "linear",
+        "nodata": "",
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "1",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "604800",
+        "cutout": "",
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "x": 1050,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "444242b101d782d4",
+        "type": "sqlite",
+        "z": "83c2267e41e05b83",
+        "mydb": "1c25415d.b8427f",
+        "sql": "",
+        "name": "DB",
+        "x": 503.75,
+        "y": 554.25,
+        "wires": [
+            [
+                "f958bcce73781d01"
+            ]
+        ]
+    },
+    {
+        "id": "a6c1122b2b0c0cd9",
+        "type": "function",
+        "z": "83c2267e41e05b83",
+        "name": "Chart Prep (old)",
+        "func": "var msg2 = [];\n\nif (msg.payload[0].length>0) {\n    // this is the logic when there are multiple data sets are received\n    for (var i=0; i<msg.payload.length; i++) {\n        var output = [];\n        for (var j=0; j<msg.payload[i].length; j++) {\n            output.push([msg.payload[i][j].epoch, msg.payload[i][j].value]);\n        }\n        msg2.push({ key: msg.payload[i][0].device+\"/\"+msg.payload[i][0].sensor, values : output});\n        //msg2.push({ key: \"test\", values : output});\n    }\n} \n\nmsg.payload=msg2;\n//msg.payload = [ { key: \"Power\", values : output} ];\n//msg.topic = \"Power\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 840,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "28a375b89cdbd823",
+        "type": "debug",
+        "z": "83c2267e41e05b83",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "f5842e88671d81ad",
+        "type": "inject",
+        "z": "83c2267e41e05b83",
+        "name": "1 data series",
+        "props": [
+            {
+                "p": "complete",
+                "v": "true",
+                "vt": "bool"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SELECT * FROM sensor_data WHERE device='miflora' AND sensor='sunlight' AND epoch >= 1636412400000 AND epoch <= 1636498800000",
+        "x": 330,
+        "y": 600,
+        "wires": [
+            [
+                "444242b101d782d4"
+            ]
+        ]
+    },
+    {
+        "id": "1295823cae92b77b",
+        "type": "debug",
+        "z": "83c2267e41e05b83",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1030,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "5ffa2acf2eb69fd3",
+        "type": "inject",
+        "z": "83c2267e41e05b83",
+        "name": "2nd data (press first)",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "SELECT * FROM sensor_data WHERE device='weather' AND sensor='humidity' AND epoch >= 1636412400000 AND epoch <= 1636498800000",
+        "x": 310,
+        "y": 640,
+        "wires": [
+            [
+                "444242b101d782d4"
+            ]
+        ]
+    },
+    {
+        "id": "55c58aebf9687d5f",
+        "type": "ui_group",
+        "name": "Filters",
+        "tab": "f2f90fa39dff9b49",
+        "order": 1,
+        "disp": true,
+        "width": "24"
+    },
+    {
+        "id": "f7f6fd37b172ca36",
+        "type": "ui_group",
+        "name": "Report",
+        "tab": "f2f90fa39dff9b49",
+        "order": 2,
+        "disp": false,
+        "width": "24"
+    },
+    {
+        "id": "1c25415d.b8427f",
+        "type": "sqlitedb",
+        "db": "/home/nygma/sqlite/nodered",
+        "mode": "RW"
+    },
+    {
+        "id": "f2f90fa39dff9b49",
+        "type": "ui_tab",
+        "name": "Report (New)",
+        "icon": "event_note",
+        "order": 12
+    }
+]
