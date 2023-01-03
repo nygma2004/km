@@ -747,7 +747,7 @@
         "type": "function",
         "z": "74f191ff.db063",
         "name": "Handle file actions",
-        "func": "switch (msg.topic) {\n    case (\"delete\"):\n        msg.file = context.get(\"lastfile\");\n        if (msg.file!==undefined) {\n            msg.filename = msg.file.name;\n            return [msg,null];\n        }\n        break;\n    case (\"download\"):\n        msg.file = context.get(\"lastfile\");\n        if (msg.file !== undefined) {\n            //msg.template = \"<script>window.location.href = \\\"/download?filename=\"+msg.file.name+\"\\\";</script>\";\n            msg.template = \"<script>window.open('/download?filename=\" + msg.file.name + \"', '_blank');</script>\";\n            return [null, msg];\n        }\n        break;\n    default:\n        context.set(\"lastfile\", msg.payload);\n}",
+        "func": "switch (msg.topic) {\n    case (\"delete\"):\n        msg.file = context.get(\"lastfile\");\n        if (msg.file!==undefined) {\n            msg.filename = msg.file.name;\n            return [msg,null];\n        }\n        break;\n    case (\"download\"):\n        msg.file = context.get(\"lastfile\");\n        if (msg.file !== undefined) {\n            //msg.template = \"<script>window.location.href = \\\"/download?filename=\"+msg.file.name+\"\\\";</script>\";\n            msg.template = \"<script>window.open('/download?filename=\" + encodeURIComponent(msg.file.name) + \"', '_blank');</script>\";\n            return [null, msg];\n        }\n        break;\n    default:\n        context.set(\"lastfile\", msg.payload);\n}",
         "outputs": 2,
         "noerr": 0,
         "initialize": "",
