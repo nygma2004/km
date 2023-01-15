@@ -1,0 +1,61 @@
+modbus:
+  - name: "remoteIO"
+    type: tcp
+    host: 192.168.1.220
+    port: 502
+    lights:
+      - name: "Output 1"
+        slave: 1
+        address: 0
+        scan_interval: 5
+        write_type: coil
+        verify:
+      - name: "Output 3"
+        slave: 1
+        address: 2
+        scan_interval: 5
+        write_type: coil
+        verify:
+    fans:
+      - name: "Output 2"
+        slave: 1
+        address: 1
+        scan_interval: 5
+        write_type: coil
+        verify:
+    switches:
+      - name: "Output 4"
+        slave: 1
+        address: 3
+        scan_interval: 5
+        write_type: coil
+        verify:
+    sensors:
+      - name: "Raw value"
+        slave: 1
+        address: 0
+        input_type: input
+      - name: "Modbus Humidity"
+        slave: 50
+        address: 0
+        input_type: input
+        device_class: humidity
+        precision: 1
+        scale: 0.1
+        count: 1
+        unit_of_measurement: '%'
+      - name: "Modbus Temperature"
+        slave: 50
+        address: 1
+        input_type: input
+        count: 1
+        device_class: temperature
+        precision: 1
+        scale: 0.1
+        unit_of_measurement: C
+template:
+    sensor:
+      - name: "Water tank"
+        device_class: volume
+        unit_of_measurement: L
+        state: "{{ 0+((300-0)/(4000-1000))*(states('sensor.raw_value')|int(0)-1000) }}"
