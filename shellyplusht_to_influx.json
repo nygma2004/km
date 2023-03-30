@@ -1,0 +1,137 @@
+[
+    {
+        "id": "288343b16a232ea3",
+        "type": "comment",
+        "z": "9d6045f175be2d26",
+        "name": "Shelly Plus H&T",
+        "info": "",
+        "x": 120,
+        "y": 1980,
+        "wires": []
+    },
+    {
+        "id": "6a169986feedc9be",
+        "type": "function",
+        "z": "9d6045f175be2d26",
+        "name": "Convert to Influx",
+        "func": "\nlet record = {\n    \"measurement\": \"shelly\",\n    \"tags\": {\n        \"device\": \"plush&t\"\n    },\n    \"fields\": {\n        \"temperature\": msg.payload.params[\"temperature:0\"].tC,\n        \"humidity\": msg.payload.params[\"humidity:0\"].rh,\n        \"battery\": msg.payload.params[\"devicepower:0\"].battery.percent\n    }\n};\n\n\nmsg.payload = [record];\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 2040,
+        "wires": [
+            [
+                "cc88d235d852298c"
+            ]
+        ]
+    },
+    {
+        "id": "cc88d235d852298c",
+        "type": "influxdb batch",
+        "z": "9d6045f175be2d26",
+        "influxdb": "2dce016f48a38240",
+        "precision": "",
+        "retentionPolicy": "",
+        "name": "Log bucket",
+        "database": "database",
+        "precisionV18FluxV20": "ns",
+        "retentionPolicyV18Flux": "",
+        "org": "nygmatech",
+        "bucket": "log",
+        "x": 950,
+        "y": 2040,
+        "wires": []
+    },
+    {
+        "id": "f54d5dd169381517",
+        "type": "mqtt in",
+        "z": "9d6045f175be2d26",
+        "name": "",
+        "topic": "shellyplusht/events/rpc",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "cea5258a.b34038",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 2040,
+        "wires": [
+            [
+                "8fe6dc17c5da627c"
+            ]
+        ]
+    },
+    {
+        "id": "8fe6dc17c5da627c",
+        "type": "switch",
+        "z": "9d6045f175be2d26",
+        "name": "NotifyFullStatus",
+        "property": "payload.method",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "NotifyFullStatus",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 500,
+        "y": 2040,
+        "wires": [
+            [
+                "6a169986feedc9be"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "2dce016f48a38240",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "database",
+        "name": "InfluxDB",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://localhost:8086",
+        "rejectUnauthorized": false
+    },
+    {
+        "id": "cea5258a.b34038",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "192.168.1.80",
+        "port": "1883",
+        "clientid": "node-red",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    }
+]
