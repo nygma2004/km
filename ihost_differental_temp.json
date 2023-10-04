@@ -1,0 +1,500 @@
+[
+    {
+        "id": "f0407155fade77bb",
+        "type": "tab",
+        "label": "Differential Temp",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "92a2129bf40b5afc",
+        "type": "event-state",
+        "z": "f0407155fade77bb",
+        "name": "Old temp sensor",
+        "server": "3bd64653f454c56c",
+        "list": "",
+        "category": "",
+        "device": "00124b001b781b39",
+        "state": "temperature",
+        "x": 140,
+        "y": 160,
+        "wires": [
+            [
+                "51f582777e5e7987"
+            ]
+        ]
+    },
+    {
+        "id": "da95d60c886d1306",
+        "type": "debug",
+        "z": "f0407155fade77bb",
+        "name": "debug 4",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "88b7b8489bc2be33",
+        "type": "event-state",
+        "z": "f0407155fade77bb",
+        "name": "New temp Sensor",
+        "server": "3bd64653f454c56c",
+        "list": "",
+        "category": "",
+        "device": "84ba20fffed488f2",
+        "state": "temperature",
+        "x": 150,
+        "y": 220,
+        "wires": [
+            [
+                "97f43118422716f0"
+            ]
+        ]
+    },
+    {
+        "id": "6ee235ef471d41f7",
+        "type": "debug",
+        "z": "f0407155fade77bb",
+        "name": "debug 5",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "51f582777e5e7987",
+        "type": "json",
+        "z": "f0407155fade77bb",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 350,
+        "y": 160,
+        "wires": [
+            [
+                "cdc1558362c0e898"
+            ]
+        ]
+    },
+    {
+        "id": "97f43118422716f0",
+        "type": "json",
+        "z": "f0407155fade77bb",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 350,
+        "y": 220,
+        "wires": [
+            [
+                "d681d096c1fddbbb"
+            ]
+        ]
+    },
+    {
+        "id": "cdc1558362c0e898",
+        "type": "change",
+        "z": "f0407155fade77bb",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "outside",
+                "pt": "flow",
+                "to": "payload.payload.temperature.temperature",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 160,
+        "wires": [
+            [
+                "da95d60c886d1306",
+                "a61fb84e44d50efa"
+            ]
+        ]
+    },
+    {
+        "id": "d681d096c1fddbbb",
+        "type": "change",
+        "z": "f0407155fade77bb",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "inside",
+                "pt": "flow",
+                "to": "payload.payload.temperature.temperature",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 220,
+        "wires": [
+            [
+                "6ee235ef471d41f7",
+                "a61fb84e44d50efa"
+            ]
+        ]
+    },
+    {
+        "id": "ddcd48fa218af570",
+        "type": "inject",
+        "z": "f0407155fade77bb",
+        "name": "Hysteresis",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 270,
+        "y": 100,
+        "wires": [
+            [
+                "fd063094c0a8a245"
+            ]
+        ]
+    },
+    {
+        "id": "fd063094c0a8a245",
+        "type": "change",
+        "z": "f0407155fade77bb",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "hysteresis",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 470,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e9f60d76551d18a3",
+        "type": "register-device",
+        "z": "f0407155fade77bb",
+        "name": "Fan Switch",
+        "server": "3bd64653f454c56c",
+        "device_id": "b384ce89-f5b8-4da4-8d3d-9bf3c16009df",
+        "device_name": "Fan Switch",
+        "category": "switch",
+        "capabilities": "{\"toggleNum\":\"1\",\"values\":[\"power\"]}",
+        "manufacturer": "NodeRed",
+        "model": "F1",
+        "firmware_version": "1.0.0",
+        "service_address": "192.168.1.109",
+        "tags": "{}",
+        "state": "{}",
+        "x": 460,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8c9a8c35eda49f55",
+        "type": "inject",
+        "z": "f0407155fade77bb",
+        "name": "Initialize",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 260,
+        "y": 40,
+        "wires": [
+            [
+                "e9f60d76551d18a3"
+            ]
+        ]
+    },
+    {
+        "id": "5cdcd0e5dc19192a",
+        "type": "change",
+        "z": "f0407155fade77bb",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "fanstate",
+                "pt": "flow",
+                "to": "payload.payload.power.powerState",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 440,
+        "wires": [
+            [
+                "afda173a72c3e0cf"
+            ]
+        ]
+    },
+    {
+        "id": "afda173a72c3e0cf",
+        "type": "debug",
+        "z": "f0407155fade77bb",
+        "name": "debug 6",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 700,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "a61fb84e44d50efa",
+        "type": "switch",
+        "z": "f0407155fade77bb",
+        "name": "Fan state",
+        "property": "fanstate",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "on",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 180,
+        "y": 340,
+        "wires": [
+            [
+                "6f76ce3f98d8b22d"
+            ],
+            [
+                "b2f747d4f8993459"
+            ]
+        ]
+    },
+    {
+        "id": "b6a52357f99378f1",
+        "type": "event-state",
+        "z": "f0407155fade77bb",
+        "name": "Fan State",
+        "server": "3bd64653f454c56c",
+        "list": "",
+        "category": "",
+        "device": "8a2138e6-0142-4909-ad36-1cbe21f9269b",
+        "state": "power",
+        "x": 140,
+        "y": 440,
+        "wires": [
+            [
+                "c4af5f95d8f5f819"
+            ]
+        ]
+    },
+    {
+        "id": "c4af5f95d8f5f819",
+        "type": "json",
+        "z": "f0407155fade77bb",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 310,
+        "y": 440,
+        "wires": [
+            [
+                "5cdcd0e5dc19192a"
+            ]
+        ]
+    },
+    {
+        "id": "b2f747d4f8993459",
+        "type": "switch",
+        "z": "f0407155fade77bb",
+        "name": "Too warm inside",
+        "property": "$flowContext(\"inside\") + $flowContext(\"hysteresis\") > $flowContext(\"outside\")",
+        "propertyType": "jsonata",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 420,
+        "y": 360,
+        "wires": [
+            [
+                "37d2fd0240daea50"
+            ]
+        ]
+    },
+    {
+        "id": "6f76ce3f98d8b22d",
+        "type": "switch",
+        "z": "f0407155fade77bb",
+        "name": "Too warm outside",
+        "property": "$flowContext(\"outside\") > $flowContext(\"inside\")",
+        "propertyType": "jsonata",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 430,
+        "y": 320,
+        "wires": [
+            [
+                "2cf98a6d90923072"
+            ]
+        ]
+    },
+    {
+        "id": "2cf98a6d90923072",
+        "type": "control-device",
+        "z": "f0407155fade77bb",
+        "name": "Turn off fan",
+        "server": "3bd64653f454c56c",
+        "list": "{\"type\":\"single\",\"single\":\"off\",\"deviceId\":\"8a2138e6-0142-4909-ad36-1cbe21f9269b\"}",
+        "category": "switch",
+        "device": "8a2138e6-0142-4909-ad36-1cbe21f9269b",
+        "action": "",
+        "x": 650,
+        "y": 320,
+        "wires": [
+            [
+                "1e34e6e035bccf60"
+            ]
+        ]
+    },
+    {
+        "id": "37d2fd0240daea50",
+        "type": "control-device",
+        "z": "f0407155fade77bb",
+        "name": "Turn on fan",
+        "server": "3bd64653f454c56c",
+        "list": "{\"type\":\"single\",\"single\":\"on\",\"deviceId\":\"8a2138e6-0142-4909-ad36-1cbe21f9269b\"}",
+        "category": "switch",
+        "device": "8a2138e6-0142-4909-ad36-1cbe21f9269b",
+        "action": "",
+        "x": 650,
+        "y": 360,
+        "wires": [
+            [
+                "0773437dd9a43828"
+            ]
+        ]
+    },
+    {
+        "id": "1e34e6e035bccf60",
+        "type": "debug",
+        "z": "f0407155fade77bb",
+        "name": "debug 7",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "0773437dd9a43828",
+        "type": "debug",
+        "z": "f0407155fade77bb",
+        "name": "debug 8",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "3bd64653f454c56c",
+        "type": "api-server",
+        "name": "iHost",
+        "ip": " 192.168.1.109",
+        "token": "c63f92a1-ba08-4084-88bf-2a39a77e68f4"
+    }
+]
