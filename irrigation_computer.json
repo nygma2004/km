@@ -1,0 +1,885 @@
+[
+    {
+        "id": "efd0c41f0ef91533",
+        "type": "comment",
+        "z": "151def52ea276427",
+        "name": "Irrigation computer",
+        "info": "# Irrigation Computer function node\n\n## Inputs\n\nThe function node expects the following data\n\n`msg.topic === \"settings\"`\nThis should contain the settings for the computer to function.\nThe main object in the settings is `temperatures`. This is an array of objects where in each object there is a `temperature` field and `waterneeded` field. This means that if the `temperature` for the day exceeds this temperature the lawn need `waterneeded` amount of water.\n\n`msg.topic === \"temperature\"`\n`msg.payload` should contain the outside temperature\n\n`msg.topic === \"rainfall\"`\n`msg.payload` should contain the rainfall for the last 24 hours\n\n`msg.topic === \"irrigation\"`\n`msg.payload` should contain the amount of water irrigated out to the lawn\n\n`msg.topic === \"calculate\"`\nThis message will run the water calculation and decide is watering is needed. \n\n## Output\n\nThe data on the first and the second output is the same. It sends out the complete `data` which is also stored in the context.\nThere is a message sent out on the first port every time data is updated. This can be used to update UI. The second port only sends out a message if the irrigation needs to be started.",
+        "x": 3030,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "a215d6ce142ade89",
+        "type": "function",
+        "z": "151def52ea276427",
+        "name": "Irrigation Computer",
+        "func": "function AddMessage(data, text, maxmessages) {\n    if (data.messages.length === maxmessages) {\n        data.messages.pop();\n    }\n    let now = new Date();\n    data.messages.unshift({\"timestamp\": now.getTime(), \"text\": text});\n    data.msgtxt = \"\";\n    for (let i = 0; i < data.messages.length; i++) {\n        let timestamp = new Date(data.messages[i].timestamp)\n        data.msgtxt += timestamp.toLocaleString() + \" | \" + data.messages[i].text + \"<br/>\";\n    }\n}\n\nlet secondoutput = null;\n\n// Process the settings message and store it\nif (msg.topic===\"settings\") {\n    context.set(\"settings\",msg.payload);\n    return;\n}\n\nlet data = context.get(\"data\");\nif (data === undefined) {\n    data = {\n        \"maxtemp\": -100.0, \"rainfall\": 0.0, \"tempcount\": 0, \"raincount\": 0, \"waterbalance\": 0, \"chanceofrain\": 0, \"messages\": []};\n}\n\n// Check that we have all the data\nlet settings = context.get(\"settings\");\nif (settings === undefined) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Settings missing\" });\n    return;\n}\n\n// Process the temperature message\nif (msg.topic===\"temperature\") {\n    data.currenttemp = msg.payload;\n    if (msg.payload > data.maxtemp) {\n        data.maxtemp = msg.payload;\n        data.tempcount++;\n    }\n    context.set(\"data\", data);\n}\n\n// Process the rainfall message\nif (msg.topic === \"rainfall\") {\n    data.rainfall = msg.payload;\n    data.raincount++;\n    context.set(\"data\", data);\n}\n\n// Process the chance of rain message\nif (msg.topic === \"chanceofrain\") {\n    data.chanceofrain = msg.payload;\n    context.set(\"data\", data);\n}\n\n// Process the irrigation message\nif (msg.topic === \"irrigation\") {\n    data.waterbalance += msg.payload;\n    AddMessage(data, \"Adding water from irrigation, new balance: \" + data.waterbalance, settings.maxmessages);\n    context.set(\"data\", data);\n}\n\ndata.waterneeded = 0;\n\n// Calculate the water needed\nfor (let i=0;i<settings.temperatures.length;i++) {\n    if (data.maxtemp > settings.temperatures[i].temperature) {\n        data.waterneeded = settings.temperatures[i].waterneed;\n        break;\n    }\n}\n\n// Run the calculation\nif (msg.topic === \"calculate\") {\n    if (data.tempcount < 10) {\n        AddMessage(data, \"WARNING: temperature reading count zero or low (\" + data.tempcount + \"). Calculation could be incorrect.\", settings.maxmessages);\n    }\n    if (data.raincount === 0) {\n        AddMessage(data, \"WARNING: rain reading count zero. Calculation could be incorrect.\", settings.maxmessages);\n    }\n    data.waterbalance = data.waterbalance + data.rainfall - data.waterneeded;\n    data.waterbalance = Math.round(data.waterbalance * 10) / 10;\n    AddMessage(data, \"New water balance calculated: \" + data.waterbalance + \". +\" + data.rainfall + \" from rainfall and -\" + data.waterneeded + \" from water needed\", settings.maxmessages);\n    if (data.waterbalance <= 0) {\n        if (data.changeofrain > settings.changeofrain_delay) {\n            AddMessage(data, \"Chance of rain is high, irrigation delayed\");    \n        } else {\n            AddMessage(data, \"Watering needed, starting irrigation\");\n            secondoutput = data;\n        }\n    }\n    // reset values\n    data.maxtemp = data.currenttemp;\n    // You may need to reset this value as well\n    // data.rainfall = 0;\n    context.set(\"data\", data);\n}\n\nnode.status({ fill: \"green\", shape: \"ring\", text: \"Max temp: \" + data.maxtemp + \" | Rain today: \" + data.rainfall + \" | Water needed: \" + data.waterneeded + \" | Water balance: \" + data.waterbalance});\n\nreturn [{ \"topic\": \"irrigation\", \"payload\": data }, secondoutput];",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 3420,
+        "y": 1520,
+        "wires": [
+            [
+                "0d1909075552c0ba"
+            ],
+            [
+                "18d2a9f617530801"
+            ]
+        ]
+    },
+    {
+        "id": "cc2d1d4c86e3b444",
+        "type": "inject",
+        "z": "151def52ea276427",
+        "name": "Settings",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "settings",
+        "payload": "{\"temperatures\":[{\"temperature\":35,\"waterneed\":8},{\"temperature\":30,\"waterneed\":6},{\"temperature\":25,\"waterneed\":4},{\"temperature\":20,\"waterneed\":3},{\"temperature\":15,\"waterneed\":2}],\"changeofrain_delay\":70,\"maxmessages\":50}",
+        "payloadType": "json",
+        "x": 3070,
+        "y": 1480,
+        "wires": [
+            [
+                "a215d6ce142ade89"
+            ]
+        ]
+    },
+    {
+        "id": "2989ea77ac0583d2",
+        "type": "change",
+        "z": "151def52ea276427",
+        "name": "Temperature",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "temperature",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "msg433.TEMP",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3150,
+        "y": 1540,
+        "wires": [
+            [
+                "a215d6ce142ade89"
+            ]
+        ]
+    },
+    {
+        "id": "d1c3a351e5016714",
+        "type": "change",
+        "z": "151def52ea276427",
+        "name": "Rainfall",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "rainfall",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.today",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3160,
+        "y": 1580,
+        "wires": [
+            [
+                "a215d6ce142ade89"
+            ]
+        ]
+    },
+    {
+        "id": "aee26bbc90e09ab0",
+        "type": "link in",
+        "z": "151def52ea276427",
+        "name": "Irrigation Computer Temperature In",
+        "links": [
+            "0c312111b4c24800"
+        ],
+        "x": 3015,
+        "y": 1540,
+        "wires": [
+            [
+                "2989ea77ac0583d2"
+            ]
+        ]
+    },
+    {
+        "id": "4ed0bced4e4c4077",
+        "type": "link in",
+        "z": "151def52ea276427",
+        "name": "Irrigation Computer Rainfall In",
+        "links": [
+            "01c91968850ae0cd"
+        ],
+        "x": 3015,
+        "y": 1580,
+        "wires": [
+            [
+                "d1c3a351e5016714"
+            ]
+        ]
+    },
+    {
+        "id": "aa45a40d1752a3dc",
+        "type": "change",
+        "z": "151def52ea276427",
+        "name": "Irrigation",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "irrigation",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "8",
+                "tot": "num"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3160,
+        "y": 1660,
+        "wires": [
+            [
+                "a215d6ce142ade89"
+            ]
+        ]
+    },
+    {
+        "id": "0d92b15ca7f9eb4f",
+        "type": "inject",
+        "z": "151def52ea276427",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 2980,
+        "y": 1660,
+        "wires": [
+            [
+                "aa45a40d1752a3dc"
+            ]
+        ]
+    },
+    {
+        "id": "cb9091330e9924ee",
+        "type": "inject",
+        "z": "151def52ea276427",
+        "name": "Calculate",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "00 23 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "calculate",
+        "payload": "",
+        "payloadType": "date",
+        "x": 3150,
+        "y": 1720,
+        "wires": [
+            [
+                "a215d6ce142ade89"
+            ]
+        ]
+    },
+    {
+        "id": "7bc3fd2d7939255b",
+        "type": "ui_text",
+        "z": "151def52ea276427",
+        "group": "ca8b0b77252e1f4a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Max temperature",
+        "format": "{{msg.payload.maxtemp}} &deg;C",
+        "layout": "row-spread",
+        "className": "",
+        "x": 4150,
+        "y": 1380,
+        "wires": []
+    },
+    {
+        "id": "0cdb2b848e4c4dd3",
+        "type": "ui_text",
+        "z": "151def52ea276427",
+        "group": "ca8b0b77252e1f4a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Rainfall today",
+        "format": "{{msg.payload.rainfall}} mm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 4140,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "236d8ca3e8e62e50",
+        "type": "ui_text",
+        "z": "151def52ea276427",
+        "group": "ca8b0b77252e1f4a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Water needed",
+        "format": "{{msg.payload.waterneeded}} mm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 4140,
+        "y": 1460,
+        "wires": []
+    },
+    {
+        "id": "b02834afcfcd99e5",
+        "type": "ui_text",
+        "z": "151def52ea276427",
+        "group": "ca8b0b77252e1f4a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Water balance",
+        "format": "{{msg.payload.waterbalance}} mm",
+        "layout": "row-spread",
+        "className": "",
+        "x": 4140,
+        "y": 1500,
+        "wires": []
+    },
+    {
+        "id": "9f97d73917d23144",
+        "type": "ui_text",
+        "z": "151def52ea276427",
+        "group": "ca8b0b77252e1f4a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Temp data count",
+        "format": "{{msg.payload.tempcount}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 4150,
+        "y": 1540,
+        "wires": []
+    },
+    {
+        "id": "ee6a723ce6f6a35b",
+        "type": "ui_text",
+        "z": "151def52ea276427",
+        "group": "ca8b0b77252e1f4a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Rain data count",
+        "format": "{{msg.payload.raincount}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 4140,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "9fccdc5f12aa87b7",
+        "type": "ui_chart",
+        "z": "151def52ea276427",
+        "name": "",
+        "group": "35b2a1df3529e93c",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Irrigation chart",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "5",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "86400",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#00a33f",
+            "#ff7f0e",
+            "#b80062",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 4480,
+        "y": 1720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8af5f8334d8a1721",
+        "type": "change",
+        "z": "151def52ea276427",
+        "name": "Current temp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.currenttemp",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Current temperature",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3910,
+        "y": 1680,
+        "wires": [
+            [
+                "327e80e9da295330"
+            ]
+        ]
+    },
+    {
+        "id": "bf7c7a7bc2548134",
+        "type": "change",
+        "z": "151def52ea276427",
+        "name": "Rainfall",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.rainfall",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Rainfall",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3900,
+        "y": 1720,
+        "wires": [
+            [
+                "37f352d76b00780c"
+            ]
+        ]
+    },
+    {
+        "id": "372f1bc17d6a8d97",
+        "type": "change",
+        "z": "151def52ea276427",
+        "name": "Water Balance",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.waterbalance",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Water balance",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3920,
+        "y": 1760,
+        "wires": [
+            [
+                "552cb52c3da39038"
+            ]
+        ]
+    },
+    {
+        "id": "327e80e9da295330",
+        "type": "rbe",
+        "z": "151def52ea276427",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 4090,
+        "y": 1680,
+        "wires": [
+            [
+                "e90617e450dccee1"
+            ]
+        ]
+    },
+    {
+        "id": "37f352d76b00780c",
+        "type": "rbe",
+        "z": "151def52ea276427",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 4090,
+        "y": 1720,
+        "wires": [
+            [
+                "9fccdc5f12aa87b7"
+            ]
+        ]
+    },
+    {
+        "id": "552cb52c3da39038",
+        "type": "rbe",
+        "z": "151def52ea276427",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 4090,
+        "y": 1760,
+        "wires": [
+            [
+                "9fccdc5f12aa87b7"
+            ]
+        ]
+    },
+    {
+        "id": "3b135be690882762",
+        "type": "ui_template",
+        "z": "151def52ea276427",
+        "group": "32e68baede1af094",
+        "name": "Messages",
+        "order": 0,
+        "width": "24",
+        "height": "10",
+        "format": "<div ng-bind-html=\"msg.payload\" height=\"100%\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 4110,
+        "y": 1820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f4244fb203229d2e",
+        "type": "change",
+        "z": "151def52ea276427",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.msgtxt",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3920,
+        "y": 1820,
+        "wires": [
+            [
+                "3b135be690882762"
+            ]
+        ]
+    },
+    {
+        "id": "0badef8f026bea2a",
+        "type": "debug",
+        "z": "151def52ea276427",
+        "name": "Do the watering",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 3890,
+        "y": 1880,
+        "wires": []
+    },
+    {
+        "id": "77aebd2258cdcad0",
+        "type": "delay",
+        "z": "151def52ea276427",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "6",
+        "timeoutUnits": "hours",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 3870,
+        "y": 1940,
+        "wires": [
+            [
+                "edfd8a8d76e8164a"
+            ]
+        ]
+    },
+    {
+        "id": "11c4c3ba57f2585f",
+        "type": "change",
+        "z": "151def52ea276427",
+        "name": "Chance of rain",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "chanceofrain",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "msg.payload.daily[1].pop * 100",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 3140,
+        "y": 1620,
+        "wires": [
+            [
+                "a215d6ce142ade89"
+            ]
+        ]
+    },
+    {
+        "id": "8f0113bae7337379",
+        "type": "link in",
+        "z": "151def52ea276427",
+        "name": "Irrigation Computer Chance of Rain In",
+        "links": [
+            "cdbec05f698bacc5"
+        ],
+        "x": 3015,
+        "y": 1620,
+        "wires": [
+            [
+                "11c4c3ba57f2585f"
+            ]
+        ]
+    },
+    {
+        "id": "0c4b0f8a44df6ce5",
+        "type": "ui_text",
+        "z": "151def52ea276427",
+        "group": "ca8b0b77252e1f4a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Change of rain",
+        "format": "{{msg.payload.chanceofrain}} %",
+        "layout": "row-spread",
+        "className": "",
+        "x": 4140,
+        "y": 1620,
+        "wires": []
+    },
+    {
+        "id": "e90617e450dccee1",
+        "type": "delay",
+        "z": "151def52ea276427",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "15",
+        "rateUnits": "minute",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 4260,
+        "y": 1680,
+        "wires": [
+            [
+                "9fccdc5f12aa87b7"
+            ]
+        ]
+    },
+    {
+        "id": "f52af2b7b5728bd0",
+        "type": "ui_text",
+        "z": "151def52ea276427",
+        "group": "ca8b0b77252e1f4a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Current temperature",
+        "format": "{{msg.payload.currenttemp}} &deg;C",
+        "layout": "row-spread",
+        "className": "",
+        "x": 4380,
+        "y": 1620,
+        "wires": []
+    },
+    {
+        "id": "f629801a56a81fa5",
+        "type": "ui_text",
+        "z": "151def52ea276427",
+        "group": "ca8b0b77252e1f4a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Spacer",
+        "label": "",
+        "format": "",
+        "layout": "row-spread",
+        "className": "",
+        "x": 4340,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "023472eeec39e788",
+        "type": "ui_text",
+        "z": "151def52ea276427",
+        "group": "ca8b0b77252e1f4a",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Spacer",
+        "label": "",
+        "format": "",
+        "layout": "row-spread",
+        "className": "",
+        "x": 4340,
+        "y": 1540,
+        "wires": []
+    },
+    {
+        "id": "0d1909075552c0ba",
+        "type": "junction",
+        "z": "151def52ea276427",
+        "x": 3760,
+        "y": 1500,
+        "wires": [
+            [
+                "7bc3fd2d7939255b",
+                "0cdb2b848e4c4dd3",
+                "236d8ca3e8e62e50",
+                "b02834afcfcd99e5",
+                "9f97d73917d23144",
+                "ee6a723ce6f6a35b",
+                "8af5f8334d8a1721",
+                "bf7c7a7bc2548134",
+                "372f1bc17d6a8d97",
+                "f4244fb203229d2e",
+                "0c4b0f8a44df6ce5",
+                "f52af2b7b5728bd0"
+            ]
+        ]
+    },
+    {
+        "id": "18d2a9f617530801",
+        "type": "junction",
+        "z": "151def52ea276427",
+        "x": 3740,
+        "y": 1520,
+        "wires": [
+            [
+                "0badef8f026bea2a",
+                "77aebd2258cdcad0"
+            ]
+        ]
+    },
+    {
+        "id": "edfd8a8d76e8164a",
+        "type": "junction",
+        "z": "151def52ea276427",
+        "x": 3320,
+        "y": 1940,
+        "wires": [
+            [
+                "aa45a40d1752a3dc"
+            ]
+        ]
+    },
+    {
+        "id": "ca8b0b77252e1f4a",
+        "type": "ui_group",
+        "name": "Calculation Data",
+        "tab": "b487991f2b7fc541",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "35b2a1df3529e93c",
+        "type": "ui_group",
+        "name": "Chart",
+        "tab": "b487991f2b7fc541",
+        "order": 2,
+        "disp": true,
+        "width": "18",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "32e68baede1af094",
+        "type": "ui_group",
+        "name": "Messages",
+        "tab": "b487991f2b7fc541",
+        "order": 3,
+        "disp": true,
+        "width": "24",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "b487991f2b7fc541",
+        "type": "ui_tab",
+        "name": "Irrigation",
+        "icon": "wi-wu-chancerain",
+        "disabled": false,
+        "hidden": false
+    }
+]
