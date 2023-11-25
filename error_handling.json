@@ -1,0 +1,780 @@
+[
+    {
+        "id": "1973dab93236fd21",
+        "type": "comment",
+        "z": "17f6ed58.217203",
+        "name": "Error Logging",
+        "info": "",
+        "x": 110,
+        "y": 2900,
+        "wires": []
+    },
+    {
+        "id": "7fe854a67dcfacab",
+        "type": "inject",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 2940,
+        "wires": [
+            [
+                "3690d30a4837d7b1"
+            ]
+        ]
+    },
+    {
+        "id": "9008b425e38f97d0",
+        "type": "inject",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 2980,
+        "wires": [
+            [
+                "52e0d8a8e967839b"
+            ]
+        ]
+    },
+    {
+        "id": "3690d30a4837d7b1",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "Error 1",
+        "func": "let foo = 1;\n\nfoo = null;\n\nmsg.payload = foo.length;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 2940,
+        "wires": [
+            [
+                "eab1e8a2faa84f81"
+            ]
+        ]
+    },
+    {
+        "id": "52e0d8a8e967839b",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "Error 2",
+        "func": "let foo = 1;\n\nfoo = null;\n\nmsg.payload = foo.length;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 2980,
+        "wires": [
+            [
+                "bb4e7d1a93da0176"
+            ]
+        ]
+    },
+    {
+        "id": "eab1e8a2faa84f81",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "debug 65",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 470,
+        "y": 2940,
+        "wires": []
+    },
+    {
+        "id": "bb4e7d1a93da0176",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "debug 66",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 470,
+        "y": 2980,
+        "wires": []
+    },
+    {
+        "id": "0e39e131748bfc50",
+        "type": "catch",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "scope": [
+            "3690d30a4837d7b1",
+            "52e0d8a8e967839b",
+            "3443ccbba2b44130",
+            "79eb9eeb4a01c5da"
+        ],
+        "uncaught": false,
+        "x": 140,
+        "y": 3200,
+        "wires": [
+            [
+                "c98636ef939e5302",
+                "f1ecbb289b170ec1",
+                "bdc5116bd826b30e"
+            ]
+        ]
+    },
+    {
+        "id": "c98636ef939e5302",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "Exception data",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 350,
+        "y": 3140,
+        "wires": []
+    },
+    {
+        "id": "f1ecbb289b170ec1",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "Aggregated Error Collection",
+        "func": "let errors = flow.get(\"errors_summary\");\nif (errors===undefined) {\n    errors = [];\n}\n\nif (msg.topic===\"reset\") {\n    errors = [];\n    flow.set(\"errors_summary\", errors);\n    msg.payload = errors;\n    return msg;\n}\n\nlet now = new Date();\nlet key = msg.error.source.name + \"|\" + msg.error.message;\n\nlet found = false;\nfor (let i=0;i<errors.length;i++) {\n    if (errors[i].key === key) {\n        // if match is found, increase the counter and update the time\n        errors[i].count++;\n        errors[i].timestamp = now.getTime();\n        errors[i].time = now.toLocaleString();\n        found = true;\n        break;\n    }\n}\n\n// This error is not logged before, create it\nif (!found) {\n    errors.push({ \"key\": key, \"timestamp\": now.getTime(), \"message\": msg.error.message, \"source\": msg.error.source.name, \"type\": msg.error.source.type, \"count\": 1, \"time\" : now.toLocaleString()});\n}\n\nflow.set(\"errors_summary\", errors);\n\nmsg.payload = errors;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 3200,
+        "wires": [
+            [
+                "0028730aeb281471",
+                "ead58cc155e57228"
+            ]
+        ]
+    },
+    {
+        "id": "0028730aeb281471",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "Summary output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 690,
+        "y": 3140,
+        "wires": []
+    },
+    {
+        "id": "e95c3cf0b79e451d",
+        "type": "inject",
+        "z": "17f6ed58.217203",
+        "name": "Reset logs",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "reset",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 3260,
+        "wires": [
+            [
+                "f1ecbb289b170ec1",
+                "bdc5116bd826b30e"
+            ]
+        ]
+    },
+    {
+        "id": "00d5082ae5229df6",
+        "type": "inject",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 3020,
+        "wires": [
+            [
+                "3443ccbba2b44130"
+            ]
+        ]
+    },
+    {
+        "id": "3443ccbba2b44130",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "node.warn",
+        "func": "node.warn(\"This is my warning\");\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 3020,
+        "wires": [
+            [
+                "142f1b26505ff65d"
+            ]
+        ]
+    },
+    {
+        "id": "142f1b26505ff65d",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "debug 70",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 470,
+        "y": 3020,
+        "wires": []
+    },
+    {
+        "id": "9193d8cf5499881c",
+        "type": "inject",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 3060,
+        "wires": [
+            [
+                "79eb9eeb4a01c5da"
+            ]
+        ]
+    },
+    {
+        "id": "79eb9eeb4a01c5da",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "node.error",
+        "func": "msg.payload = \"error content\";\nnode.error(\"This is my error\", msg);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 3060,
+        "wires": [
+            [
+                "c084bdd9595eeffe"
+            ]
+        ]
+    },
+    {
+        "id": "c084bdd9595eeffe",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "debug 71",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 470,
+        "y": 3060,
+        "wires": []
+    },
+    {
+        "id": "bdc5116bd826b30e",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "Individual Error Collection",
+        "func": "const collectionsize = 10; // define the number of error to be collected. Once limit is reached, older error is deleted.\n\nlet errors = flow.get(\"errors_all\");\nif (errors===undefined) {\n    errors = [];\n}\n\nif (msg.topic===\"reset\") {\n    errors = [];\n    flow.set(\"errors_all\", errors);\n    msg.payload = errors;\n    return msg;\n}\n\nlet now = new Date();\n\nif (errors.length >= collectionsize) {\n    errors.shift();\n}\n\nerrors.push({ \"timestamp\": now.getTime(), \"message\": msg.error.message, \"source\": msg.error.source.name, \"type\": msg.error.source.type, \"time\": now.toLocaleString()});\n\nflow.set(\"errors_all\", errors);\n\nmsg.payload = errors;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 3260,
+        "wires": [
+            [
+                "68fbc2435cb62028",
+                "e017aa84435199cf"
+            ]
+        ]
+    },
+    {
+        "id": "68fbc2435cb62028",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "All output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 670,
+        "y": 3320,
+        "wires": []
+    },
+    {
+        "id": "ead58cc155e57228",
+        "type": "template",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table>\n    <tr><th>Last Occurance</th><th>Count</th><th>Message</th><th>Source</th><th>Node Type</th></tr>\n    {{#payload}}\n        <tr class=\"\">\n            <td>{{time}}</td>\n            <td>{{count}}</td>\n            <td>{{message}}</td>\n            <td>{{source}}</td>\n            <td>{{type}}</td>\n        </tr>\n    {{/payload}}\n</table>\n",
+        "output": "str",
+        "x": 660,
+        "y": 3200,
+        "wires": [
+            [
+                "016f470b36994160"
+            ]
+        ]
+    },
+    {
+        "id": "e017aa84435199cf",
+        "type": "template",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table>\n    <tr><th>Time</th><th>Message</th><th>Source</th><th>Node Type</th></tr>\n    {{#payload}}\n        <tr class=\"\">\n            <td>{{time}}</td>\n            <td>{{message}}</td>\n            <td>{{source}}</td>\n            <td>{{type}}</td>\n        </tr>\n    {{/payload}}\n</table>\n\n",
+        "output": "str",
+        "x": 660,
+        "y": 3260,
+        "wires": [
+            [
+                "2e653e0f5c8a58c7"
+            ]
+        ]
+    },
+    {
+        "id": "016f470b36994160",
+        "type": "ui_template",
+        "z": "17f6ed58.217203",
+        "group": "1d99668c76507897",
+        "name": "",
+        "order": 0,
+        "width": "24",
+        "height": "10",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 840,
+        "y": 3200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2e653e0f5c8a58c7",
+        "type": "ui_template",
+        "z": "17f6ed58.217203",
+        "group": "9b59378417275542",
+        "name": "",
+        "order": 0,
+        "width": "24",
+        "height": "10",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 840,
+        "y": 3260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ccf160c793757599",
+        "type": "inject",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 3440,
+        "wires": [
+            [
+                "07e0d32cb4258693"
+            ]
+        ]
+    },
+    {
+        "id": "07e0d32cb4258693",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "Summary file",
+        "func": "// Get the current time and convert it to text\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\n\n// Generate out file name pattern\nmsg.fname = \"error_summary_\"+ yyyy + mm + dd + \".csv\";\n// Full filename with path for the file node later\nmsg.filename = \"/home/nygma/\"+ msg.fname;\nmsg.email = {};\nmsg.email.summaryfilename = msg.filename;\nmsg.email.todaytext = now.toLocaleDateString();\n\nlet errors = flow.get(\"errors_summary\");\nmsg.email.summarycontent = errors;\n\n// Check if error log exists at all\nif (errors !== undefined) {\n    // Check if we have any errors\n    if (errors.length>0) {\n        msg.payload = errors;\n        node.status({ fill: \"blue\", shape: \"ring\", text: msg.fname });\n        return msg;\n    }\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 3440,
+        "wires": [
+            [
+                "6f80908adbdef069"
+            ]
+        ]
+    },
+    {
+        "id": "99696ae7c586952d",
+        "type": "file",
+        "z": "17f6ed58.217203",
+        "name": "Summary file create",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 680,
+        "y": 3440,
+        "wires": [
+            [
+                "c8592f1e848400d4"
+            ]
+        ]
+    },
+    {
+        "id": "6f80908adbdef069",
+        "type": "csv",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,time,message,source,type,count",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 490,
+        "y": 3440,
+        "wires": [
+            [
+                "99696ae7c586952d"
+            ]
+        ]
+    },
+    {
+        "id": "c8592f1e848400d4",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "All errors file",
+        "func": "// Get the current time and convert it to text\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\n\n// Generate out file name pattern\nmsg.fname = \"error_all_\"+ yyyy + mm + dd + \".csv\";\n// Full filename with path for the file node later\nmsg.filename = \"/home/nygma/\"+ msg.fname;\nmsg.email.allerrorsfilename = msg.filename;\nmsg.email.allerrorsfilenameonly = msg.fname;\n\nlet errors = flow.get(\"errors_all\");\n\n// Check if error log exists at all\nif (errors !== undefined) {\n    // Check if we have any errors\n    if (errors.length>0) {\n        msg.payload = errors;\n        node.status({ fill: \"blue\", shape: \"ring\", text: msg.fname });\n        return msg;\n    }\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 3520,
+        "wires": [
+            [
+                "1d7a03ffae1177f4"
+            ]
+        ]
+    },
+    {
+        "id": "b08033009ac93bc6",
+        "type": "file",
+        "z": "17f6ed58.217203",
+        "name": "All errors file create",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 670,
+        "y": 3520,
+        "wires": [
+            [
+                "136441054a80ed03"
+            ]
+        ]
+    },
+    {
+        "id": "1d7a03ffae1177f4",
+        "type": "csv",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,time,message,source,type",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 490,
+        "y": 3520,
+        "wires": [
+            [
+                "b08033009ac93bc6"
+            ]
+        ]
+    },
+    {
+        "id": "fd1fc8dc84ab8896",
+        "type": "change",
+        "z": "17f6ed58.217203",
+        "name": "Set up the email",
+        "rules": [
+            {
+                "t": "set",
+                "p": "attachments",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "attachments.path",
+                "pt": "msg",
+                "to": "email.allerrorsfilename",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "attachments.filename",
+                "pt": "msg",
+                "to": "email.allerrorsfilenameonly",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "\"Error report - \" & msg.email.todaytext",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 3600,
+        "wires": [
+            [
+                "c674060fa6f5f897"
+            ]
+        ]
+    },
+    {
+        "id": "c674060fa6f5f897",
+        "type": "e-mail",
+        "z": "17f6ed58.217203",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "secure": true,
+        "tls": true,
+        "name": "csongor.varga@gmail.com",
+        "dname": "Gmail",
+        "x": 730,
+        "y": 3600,
+        "wires": []
+    },
+    {
+        "id": "136441054a80ed03",
+        "type": "template",
+        "z": "17f6ed58.217203",
+        "name": "Email Body",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<head>\n</head>\n\n\n<body>\n    <h1>Error Summary - {{email.todaytext}} </h1>\n    <p>\n        <table border=\"1\">\n        <tr><th>Last Occurance</th><th>Count</th><th>Message</th><th>Source</th><th>Node Type</th></tr>\n        <tbody>\n            {{#email.summarycontent}}\n                <tr>\n                    <td>{{time}}</td>\n                    <td>{{count}}</td>\n                    <td>{{message}}</td>\n                    <td>{{source}}</td>\n                    <td>{{type}}</td>\n                </tr>\n            {{/email.summarycontent}}\n        </tbody>\n        </table>\n    </p>\n    <p>Please find the detailed error report in the attachment</p>\n \n </body>",
+        "x": 350,
+        "y": 3600,
+        "wires": [
+            [
+                "fd1fc8dc84ab8896"
+            ]
+        ]
+    },
+    {
+        "id": "be1ac7857ed6d172",
+        "type": "change",
+        "z": "17f6ed58.217203",
+        "name": "Reset",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "reset",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 130,
+        "y": 3320,
+        "wires": [
+            [
+                "f1ecbb289b170ec1",
+                "bdc5116bd826b30e"
+            ]
+        ]
+    },
+    {
+        "id": "1d99668c76507897",
+        "type": "ui_group",
+        "name": "Aggregated Errors",
+        "tab": "fc0d1c03dd805146",
+        "order": 1,
+        "disp": true,
+        "width": "24",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9b59378417275542",
+        "type": "ui_group",
+        "name": "All Errors",
+        "tab": "fc0d1c03dd805146",
+        "order": 2,
+        "disp": true,
+        "width": "24",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "fc0d1c03dd805146",
+        "type": "ui_tab",
+        "name": "Error Handling",
+        "icon": "error",
+        "disabled": false,
+        "hidden": false
+    }
+]
