@@ -1,0 +1,649 @@
+[
+    {
+        "id": "381013057a6ba753",
+        "type": "comment",
+        "z": "17f6ed58.217203",
+        "name": "Status Logging",
+        "info": "",
+        "x": 120,
+        "y": 3700,
+        "wires": []
+    },
+    {
+        "id": "6e0a04131ea7e418",
+        "type": "inject",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 3740,
+        "wires": [
+            [
+                "484b16f0cbe2794d"
+            ]
+        ]
+    },
+    {
+        "id": "50d544f16f40364e",
+        "type": "inject",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 3800,
+        "wires": [
+            [
+                "6370266eaddca0bc"
+            ]
+        ]
+    },
+    {
+        "id": "484b16f0cbe2794d",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "Node 1",
+        "func": "node.status({fill:\"red\",shape:\"ring\",text:\"Message 1\"});\nnode.status({ fill: \"green\", shape: \"ring\", text: \"Message 1\" });\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 3740,
+        "wires": [
+            [
+                "d7a2a22a92a05dd6"
+            ]
+        ]
+    },
+    {
+        "id": "6370266eaddca0bc",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "Another node",
+        "func": "node.status({ fill: \"grey\", shape: \"dot\", text: \"Connected\" });\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 3800,
+        "wires": [
+            [
+                "cf82f30e28df65e7"
+            ]
+        ]
+    },
+    {
+        "id": "d7a2a22a92a05dd6",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "debug 74",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 460,
+        "y": 3740,
+        "wires": []
+    },
+    {
+        "id": "cf82f30e28df65e7",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "debug 75",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 3800,
+        "wires": []
+    },
+    {
+        "id": "01829e1e95ac8e71",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "Exception data",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 350,
+        "y": 3940,
+        "wires": []
+    },
+    {
+        "id": "a11e05a225f0fa6a",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "Aggregated Status Collection",
+        "func": "let status = flow.get(\"status_summary\");\nif (status===undefined) {\n    status = [];\n}\n\nif (msg.topic===\"reset\") {\n    status = [];\n    flow.set(\"status_summary\", status);\n    msg.payload = status;\n    return msg;\n}\n\nlet now = new Date();\nlet key = msg.status.fill + \"|\" + msg.status.shape + \"|\" + msg.status.source.name;\n\nlet found = false;\nfor (let i=0;i<status.length;i++) {\n    if (status[i].key === key) {\n        // if match is found, increase the counter and update the time\n        status[i].count++;\n        status[i].timestamp = now.getTime();\n        status[i].time = now.toLocaleString();\n        status[i].text = msg.status.text;\n        found = true;\n        break;\n    }\n}\n\n// This error is not logged before, create it\nif (!found) {\n    status.push({ \"key\": key, \"timestamp\": now.getTime(), \"fill\": msg.status.fill, \"shape\": msg.status.shape, \"text\": msg.status.text, \"source\": msg.status.source.name, \"type\": msg.status.source.type, \"count\": 1, \"time\" : now.toLocaleString()});\n}\n\nflow.set(\"status_summary\", status);\n\nmsg.payload = status;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 4000,
+        "wires": [
+            [
+                "eee56a1f351a8f0a",
+                "d92a43e174fd0f2b"
+            ]
+        ]
+    },
+    {
+        "id": "eee56a1f351a8f0a",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "Summary output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 690,
+        "y": 3940,
+        "wires": []
+    },
+    {
+        "id": "3f7bc695d73fc881",
+        "type": "inject",
+        "z": "17f6ed58.217203",
+        "name": "Reset logs",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "reset",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 4060,
+        "wires": [
+            [
+                "a11e05a225f0fa6a",
+                "89a01d69412c0e0c"
+            ]
+        ]
+    },
+    {
+        "id": "89a01d69412c0e0c",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "Individual Status Collection",
+        "func": "const collectionsize = 10; // define the number of error to be collected. Once limit is reached, older error is deleted.\n\nlet status = flow.get(\"status_all\");\nif (status===undefined) {\n    status = [];\n}\n\nif (msg.topic===\"reset\") {\n    status = [];\n    flow.set(\"status_all\", status);\n    msg.payload = status;\n    return msg;\n}\n\nlet now = new Date();\n\nif (status.length >= collectionsize) {\n    status.shift();\n}\n\nstatus.push({ \"timestamp\": now.getTime(), \"fill\": msg.status.fill, \"shape\": msg.status.shape, \"text\": msg.status.text, \"source\": msg.status.source.name, \"type\": msg.status.source.type, \"time\": now.toLocaleString() });\n\nflow.set(\"status_all\", status);\n\nmsg.payload = status;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 4060,
+        "wires": [
+            [
+                "d0f4530d3e170e7e",
+                "0654aa3e4f719265"
+            ]
+        ]
+    },
+    {
+        "id": "d0f4530d3e170e7e",
+        "type": "debug",
+        "z": "17f6ed58.217203",
+        "name": "All output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 670,
+        "y": 4120,
+        "wires": []
+    },
+    {
+        "id": "d92a43e174fd0f2b",
+        "type": "template",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table>\n    <tr><th>Last Occurance</th><th>Count</th><th>Fill</th><th>Shape</th><th>Text</th><th>Source</th><th>Node Type</th></tr>\n    {{#payload}}\n        <tr class=\"\">\n            <td>{{time}}</td>\n            <td>{{count}}</td>\n            <td>{{fill}}</td>\n            <td>{{shape}}</td>\n            <td>{{text}}</td>\n            <td>{{source}}</td>\n            <td>{{type}}</td>\n        </tr>\n    {{/payload}}\n</table>\n",
+        "output": "str",
+        "x": 660,
+        "y": 4000,
+        "wires": [
+            [
+                "3290d6a94cabf7e7"
+            ]
+        ]
+    },
+    {
+        "id": "0654aa3e4f719265",
+        "type": "template",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table>\n    <tr><th>Time</th><th>Fill</th><th>Shape</th><th>Text</th><th>Source</th><th>Node Type</th></tr>\n    {{#payload}}\n        <tr class=\"\">\n            <td>{{time}}</td>\n            <td>{{fill}}</td>\n            <td>{{shape}}</td>\n            <td>{{text}}</td>\n            <td>{{source}}</td>\n            <td>{{type}}</td>\n        </tr>\n    {{/payload}}\n</table>\n\n",
+        "output": "str",
+        "x": 660,
+        "y": 4060,
+        "wires": [
+            [
+                "70b121335be6ab8b"
+            ]
+        ]
+    },
+    {
+        "id": "3290d6a94cabf7e7",
+        "type": "ui_template",
+        "z": "17f6ed58.217203",
+        "group": "8be0a783c25b7c66",
+        "name": "",
+        "order": 0,
+        "width": "24",
+        "height": "10",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 840,
+        "y": 4000,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "70b121335be6ab8b",
+        "type": "ui_template",
+        "z": "17f6ed58.217203",
+        "group": "0bbfe8d835f43144",
+        "name": "",
+        "order": 0,
+        "width": "24",
+        "height": "10",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 840,
+        "y": 4060,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "63be4c619a3895cc",
+        "type": "inject",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 4240,
+        "wires": [
+            [
+                "6cb68c71933d06cd"
+            ]
+        ]
+    },
+    {
+        "id": "6cb68c71933d06cd",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "Summary file",
+        "func": "// Get the current time and convert it to text\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\n\n// Generate out file name pattern\nmsg.fname = \"status_summary_\"+ yyyy + mm + dd + \".csv\";\n// Full filename with path for the file node later\nmsg.filename = \"/home/nygma/\"+ msg.fname;\nmsg.email = {};\nmsg.email.summaryfilename = msg.filename;\nmsg.email.todaytext = now.toLocaleDateString();\n\nlet status = flow.get(\"status_summary\");\nmsg.email.summarycontent = status;\n\n// Check if status log exists at all\nif (status !== undefined) {\n    // Check if we have any statuss\n    if (status.length>0) {\n        msg.payload = status;\n        node.status({ fill: \"blue\", shape: \"ring\", text: msg.fname });\n        return msg;\n    }\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 4240,
+        "wires": [
+            [
+                "a0900d1b7b3d585d"
+            ]
+        ]
+    },
+    {
+        "id": "ca11c87e80c05b2a",
+        "type": "file",
+        "z": "17f6ed58.217203",
+        "name": "Summary file create",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 680,
+        "y": 4240,
+        "wires": [
+            [
+                "a9f7ea4a3dff29c8"
+            ]
+        ]
+    },
+    {
+        "id": "a0900d1b7b3d585d",
+        "type": "csv",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,time,fill,shape,text,source,type,count",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 490,
+        "y": 4240,
+        "wires": [
+            [
+                "ca11c87e80c05b2a"
+            ]
+        ]
+    },
+    {
+        "id": "a9f7ea4a3dff29c8",
+        "type": "function",
+        "z": "17f6ed58.217203",
+        "name": "All statuses",
+        "func": "// Get the current time and convert it to text\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\n\n// Generate out file name pattern\nmsg.fname = \"status_all_\"+ yyyy + mm + dd + \".csv\";\n// Full filename with path for the file node later\nmsg.filename = \"/home/nygma/\"+ msg.fname;\nmsg.email.allstatusfilename = msg.filename;\nmsg.email.allstatusfilenameonly = msg.fname;\n\nlet status = flow.get(\"status_all\");\n\n// Check if status log exists at all\nif (status !== undefined) {\n    // Check if we have any statuss\n    if (status.length>0) {\n        msg.payload = status;\n        node.status({ fill: \"blue\", shape: \"ring\", text: msg.fname });\n        return msg;\n    }\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 4320,
+        "wires": [
+            [
+                "261c90b6b02c5496"
+            ]
+        ]
+    },
+    {
+        "id": "4e05d729987af438",
+        "type": "file",
+        "z": "17f6ed58.217203",
+        "name": "All statuses file create",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 680,
+        "y": 4320,
+        "wires": [
+            [
+                "ae5ad920e3bae6d6"
+            ]
+        ]
+    },
+    {
+        "id": "261c90b6b02c5496",
+        "type": "csv",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,time,message,source,type",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 490,
+        "y": 4320,
+        "wires": [
+            [
+                "4e05d729987af438"
+            ]
+        ]
+    },
+    {
+        "id": "02976111d0ca88c4",
+        "type": "change",
+        "z": "17f6ed58.217203",
+        "name": "Set up the email",
+        "rules": [
+            {
+                "t": "set",
+                "p": "attachments",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "attachments.path",
+                "pt": "msg",
+                "to": "email.allstatusfilename",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "attachments.filename",
+                "pt": "msg",
+                "to": "email.allstatusfilenameonly",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "\"Status report - \" & msg.email.todaytext",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 4400,
+        "wires": [
+            [
+                "9bede105cf16cd5a"
+            ]
+        ]
+    },
+    {
+        "id": "9bede105cf16cd5a",
+        "type": "e-mail",
+        "z": "17f6ed58.217203",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "secure": true,
+        "tls": true,
+        "name": "csongor.varga@gmail.com",
+        "dname": "Gmail",
+        "x": 730,
+        "y": 4400,
+        "wires": []
+    },
+    {
+        "id": "ae5ad920e3bae6d6",
+        "type": "template",
+        "z": "17f6ed58.217203",
+        "name": "Email Body",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<head>\n</head>\n\n\n<body>\n    <h1>Status Update Summary - {{email.todaytext}} </h1>\n    <p>\n        <table border=\"1\">\n        <tr><th>Last Occurance</th><th>Count</th><th>Fill</th><th>Shape</th><th>Text</th><th>Source</th><th>Node Type</th></tr>\n        <tbody>\n            {{#email.summarycontent}}\n                <tr>\n                    <td>{{time}}</td>\n                    <td>{{count}}</td>\n                    <td>{{fill}}</td>\n                    <td>{{shape}}</td>\n                    <td>{{text}}</td>\n                    <td>{{source}}</td>\n                    <td>{{type}}</td>\n                </tr>\n            {{/email.summarycontent}}\n        </tbody>\n        </table>\n    </p>\n    <p>Please find the detailed status report in the attachment</p>\n \n </body>",
+        "x": 350,
+        "y": 4400,
+        "wires": [
+            [
+                "02976111d0ca88c4"
+            ]
+        ]
+    },
+    {
+        "id": "a06585c3c487959a",
+        "type": "change",
+        "z": "17f6ed58.217203",
+        "name": "Reset",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "reset",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 130,
+        "y": 4120,
+        "wires": [
+            [
+                "a11e05a225f0fa6a",
+                "89a01d69412c0e0c"
+            ]
+        ]
+    },
+    {
+        "id": "85760d6b449ad198",
+        "type": "status",
+        "z": "17f6ed58.217203",
+        "name": "",
+        "scope": [
+            "484b16f0cbe2794d",
+            "6370266eaddca0bc"
+        ],
+        "x": 160,
+        "y": 4000,
+        "wires": [
+            [
+                "a11e05a225f0fa6a",
+                "89a01d69412c0e0c",
+                "01829e1e95ac8e71"
+            ]
+        ]
+    },
+    {
+        "id": "8be0a783c25b7c66",
+        "type": "ui_group",
+        "name": "Aggregate Status Messages",
+        "tab": "06588ca5fd940197",
+        "order": 1,
+        "disp": true,
+        "width": "24",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0bbfe8d835f43144",
+        "type": "ui_group",
+        "name": "All Status Messages",
+        "tab": "06588ca5fd940197",
+        "order": 2,
+        "disp": true,
+        "width": "24",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "06588ca5fd940197",
+        "type": "ui_tab",
+        "name": "Status Collection",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
