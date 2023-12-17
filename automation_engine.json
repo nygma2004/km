@@ -1,0 +1,979 @@
+[
+    {
+        "id": "dd535f73e60cae86",
+        "type": "tab",
+        "label": "Automation Engine",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "9abb35e9b7955a5a",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "Settings",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 140,
+        "y": 60,
+        "wires": [
+            [
+                "ddff2f6eba4946b9"
+            ]
+        ]
+    },
+    {
+        "id": "ddff2f6eba4946b9",
+        "type": "change",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "settings",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 340,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ced1ee2a662bfa13",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "Sample data",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "data",
+        "payload": "{ \"id\": \"temp\", \"name\": \"temperature\", \"type\": \"number\", \"value\": 15 }",
+        "payloadType": "json",
+        "x": 210,
+        "y": 260,
+        "wires": [
+            [
+                "b7118d1dc8f62527",
+                "ef42ee4db43ae8e5"
+            ]
+        ]
+    },
+    {
+        "id": "b7118d1dc8f62527",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Automation Engine",
+        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({fill:\"red\",shape:\"ring\",text:\"Missing settings\"});\n    return;\n}\nlet rules = flow.get(\"rules\");\nif (rules === undefined) {\n    rules = [];\n}\n\nlet datacache = flow.get(\"datacache\");\nif (datacache === undefined) {\n    datacache = {};\n}\n\nif (msg.topic === \"data\") {\n    datacache[msg.payload.id] = msg.payload;\n    flow.set(\"datacache\", datacache);\n\n\n    for (let i = 0; i < rules.length; i++) {\n        let rule = rules[i];\n        node.status({ fill: \"grey\", shape: \"dot\", text: \"0| Checking \" + rule.name });\n        // Check if the current data is listed in the conditions\n        if (rule.conditions.filter(e => e.operand === msg.payload.id).length > 0) {\n            node.status({fill:\"grey\",shape:\"dot\",text:\"1| Evaluating rule \"+rule.name});\n            let condition_or = false;\n            let condition_and = true;\n            // evaluate conditions\n            for (let j = 0; j < rule.conditions.length; j++) {\n                let condition = rule.conditions[j];\n                node.status({ fill: \"grey\", shape: \"dot\", text: \"2| Check condition \" + j });\n                let data = datacache[condition.operand];\n                // if data does not exists, evaluate to true - most to allow initial states\n                if (data === undefined) {\n                    condition_or = true;\n                    node.status({ fill: \"grey\", shape: \"dot\", text: \"2| \"+ condition.operand + \" data missing, evaluating to true\" });\n                    break;\n                }\n                node.status({ fill: \"grey\", shape: \"dot\", text: \"3| \" + condition.operand + \" condition: \" + data.value+ \" \" + condition.operator + \" \"+ condition.value});\n                switch(condition.operator) {\n                    case \"GT\": \n                        if (data.value > condition.value) {\n                            condition_or = true;\n                            node.status({ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition true\" });\n                        } else {\n                            condition_and = false;\n                            node.status({ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition false\" });\n                        }\n                        break;\n                    case \"LT\":\n                        if (data.value < condition.value) {\n                            condition_or = true;\n                            node.status({ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition true\" });\n                        } else {\n                            condition_and = false;\n                            node.status({ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition false\" });\n                        }\n                        break;\n                    case \"EQ\":\n                        if (data.value === condition.value) {\n                            condition_or = true;\n                            node.status({ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition true\" });\n                        } else {\n                            condition_and = false;\n                            node.status({ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition false\" });\n                        }\n                        break;\n                    default: node.status({ fill: \"red\", shape: \"ring\", text: \"4| Unknown condition operator \"+ condition.operator});\n                } // end switch\n            } // end for j loop\n            // All the rules are evaluated\n            let passed = false;\n            if ((rule.operator === \"AND\") && (condition_and)) { passed = true }\n            if ((rule.operator === \"OR\") && (condition_or)) { passed = true }\n            node.status({ fill: \"grey\", shape: \"dot\", text: \"5| \" + rule.name + \": Condition result: \" + passed});\n\n            // Execute the actions\n            if (passed) { \n                for (let k=0; k<rule.actions.length; k++) { \n                    let action = rule.actions[k];\n                    node.status({ fill: \"grey\", shape: \"dot\", text: \"6| Starting action \" + action.type });\n                    switch (action.type) {\n                        case \"setstate\":\n                            datacache[action.state] = {\"id\": action.state, \"name\": action.name, \"type\": \"state\", \"value\": action.value}\n                            flow.set(\"datacache\", datacache);\n                            node.status({ fill: \"grey\", shape: \"dot\", text: \"7| Status set:\" + action.state });\n                            break;\n                        case \"control\":\n                            node.send({\"topic\": action.topic, \"payload\": action.value});\n                            node.status({ fill: \"grey\", shape: \"dot\", text: \"7| Control sent:\" + action.topic });\n                            break;\n                        default: node.status({ fill: \"red\", shape: \"ring\", text: \"7| Unknown action type \" + action.type });\n                    }\n                } // End of action loop\n            }; // End of actions \n\n        } // Condition was found\n    } // End of looping through the rules\n\n\n} // End of processing data message",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 300,
+        "wires": [
+            [
+                "1331ca398aae3494",
+                "50e8e14346358262"
+            ]
+        ]
+    },
+    {
+        "id": "1331ca398aae3494",
+        "type": "debug",
+        "z": "dd535f73e60cae86",
+        "name": "debug 76",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 790,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "7033825860df0449",
+        "type": "link in",
+        "z": "dd535f73e60cae86",
+        "name": "Automation Engine Data Injection",
+        "links": [
+            "9533ba1480dc771e",
+            "708a5dbeeaf6ad79",
+            "162349ebba2dca35",
+            "593c88dfd060d2b1"
+        ],
+        "x": 275,
+        "y": 360,
+        "wires": [
+            [
+                "ef42ee4db43ae8e5",
+                "b7118d1dc8f62527"
+            ]
+        ]
+    },
+    {
+        "id": "878426d38ba8d702",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "Rules",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[{\"name\":\"Washing Starts\",\"operator\":\"AND\",\"conditions\":[{\"operand\":\"washingmachine_power\",\"operator\":\"GT\",\"value\":1500},{\"operand\":\"washingmachine_state\",\"operator\":\"EQ\",\"value\":\"IDLE\"}],\"actions\":[{\"type\":\"setstate\",\"state\":\"washingmachine_state\",\"name\":\"Washingmachine State\",\"value\":\"WASHING\"}]},{\"name\":\"Washing Ends\",\"operator\":\"AND\",\"conditions\":[{\"operand\":\"washingmachine_power\",\"operator\":\"LT\",\"value\":2},{\"operand\":\"washingmachine_state\",\"operator\":\"EQ\",\"value\":\"WASHING\"}],\"actions\":[{\"type\":\"setstate\",\"state\":\"washingmachine_state\",\"name\":\"Washingmachine State\",\"value\":\"IDLE\"},{\"type\":\"control\",\"topic\":\"washing_complete\",\"value\":1}]},{\"name\":\"DayTime Starts\",\"operator\":\"AND\",\"conditions\":[{\"operand\":\"outside_light\",\"operator\":\"GT\",\"value\":400},{\"operand\":\"nighttime_state\",\"operator\":\"EQ\",\"value\":\"NIGHTTIME\"}],\"actions\":[{\"type\":\"setstate\",\"state\":\"nighttime_state\",\"name\":\"Night or Day\",\"value\":\"DAYTIME\"},{\"type\":\"control\",\"topic\":\"daytime_starts\",\"value\":1}]},{\"name\":\"Plant Dry\",\"operator\":\"AND\",\"conditions\":[{\"operand\":\"soil_moisture\",\"operator\":\"LT\",\"value\":10},{\"operand\":\"plant_state\",\"operator\":\"EQ\",\"value\":\"WATERED\"}],\"actions\":[{\"type\":\"setstate\",\"state\":\"plant_state\",\"name\":\"Plant\",\"value\":\"DRY\"},{\"type\":\"control\",\"topic\":\"plant_dry\",\"value\":1}]},{\"name\":\"Plant watered\",\"operator\":\"AND\",\"conditions\":[{\"operand\":\"soil_moisture\",\"operator\":\"GT\",\"value\":30},{\"operand\":\"plant_state\",\"operator\":\"EQ\",\"value\":\"DRY\"}],\"actions\":[{\"type\":\"setstate\",\"state\":\"plant_state\",\"name\":\"Plant\",\"value\":\"WATERED\"},{\"type\":\"control\",\"topic\":\"plant_watered\",\"value\":1}]}]",
+        "payloadType": "json",
+        "x": 130,
+        "y": 120,
+        "wires": [
+            [
+                "ce0d32dd4dcc4471"
+            ]
+        ]
+    },
+    {
+        "id": "ce0d32dd4dcc4471",
+        "type": "change",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "rules",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 330,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "12a7d649080a5796",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Data for Automation Engine",
+        "func": "msg.topic = \"data\";\nlet value = 15;\nmsg.payload = { \"id\": \"temp\", \"name\": \"temperature\", \"type\": \"number\", \"value\": value }\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 180,
+        "y": 540,
+        "wires": [
+            [
+                "9533ba1480dc771e"
+            ]
+        ]
+    },
+    {
+        "id": "9533ba1480dc771e",
+        "type": "link out",
+        "z": "dd535f73e60cae86",
+        "name": "link out 25",
+        "mode": "link",
+        "links": [
+            "7033825860df0449"
+        ],
+        "x": 355,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "194e235473bd73d7",
+        "type": "comment",
+        "z": "dd535f73e60cae86",
+        "name": "Status Logging",
+        "info": "",
+        "x": 120,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "1a958a2bdce43a02",
+        "type": "debug",
+        "z": "dd535f73e60cae86",
+        "name": "Status data",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 340,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "54d90ba4d65cbbe5",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Aggregated Status Collection",
+        "func": "let status = flow.get(\"status_summary\");\nif (status===undefined) {\n    status = [];\n}\n\nif (msg.topic===\"reset\") {\n    status = [];\n    flow.set(\"status_summary\", status);\n    msg.payload = status;\n    return msg;\n}\n\nlet now = new Date();\nlet key = msg.status.fill + \"|\" + msg.status.shape + \"|\" + msg.status.source.name;\n\nlet found = false;\nfor (let i=0;i<status.length;i++) {\n    if (status[i].key === key) {\n        // if match is found, increase the counter and update the time\n        status[i].count++;\n        status[i].timestamp = now.getTime();\n        status[i].time = now.toLocaleString();\n        status[i].text = msg.status.text;\n        found = true;\n        break;\n    }\n}\n\n// This error is not logged before, create it\nif (!found) {\n    status.push({ \"key\": key, \"timestamp\": now.getTime(), \"fill\": msg.status.fill, \"shape\": msg.status.shape, \"text\": msg.status.text, \"source\": msg.status.source.name, \"type\": msg.status.source.type, \"count\": 1, \"time\" : now.toLocaleString()});\n}\n\nflow.set(\"status_summary\", status);\n\nmsg.payload = status;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 1200,
+        "wires": [
+            [
+                "0178365162bf3d41",
+                "d16a3f615b1c64dd"
+            ]
+        ]
+    },
+    {
+        "id": "0178365162bf3d41",
+        "type": "debug",
+        "z": "dd535f73e60cae86",
+        "name": "Summary output",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 690,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "2acff4a8de655a40",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "Reset logs",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "reset",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 1260,
+        "wires": [
+            [
+                "54d90ba4d65cbbe5",
+                "6ed5bbb48cf82bbe"
+            ]
+        ]
+    },
+    {
+        "id": "6ed5bbb48cf82bbe",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Individual Status Collection",
+        "func": "const collectionsize = 100; // define the number of error to be collected. Once limit is reached, older error is deleted.\n\nlet status = flow.get(\"status_all\");\nif (status===undefined) {\n    status = [];\n}\n\nif (msg.topic===\"reset\") {\n    status = [];\n    flow.set(\"status_all\", status);\n    msg.payload = status;\n    return msg;\n}\n\nlet now = new Date();\n\nif (status.length >= collectionsize) {\n    status.shift();\n}\n\nstatus.push({ \"timestamp\": now.getTime(), \"fill\": msg.status.fill, \"shape\": msg.status.shape, \"text\": msg.status.text, \"source\": msg.status.source.name, \"type\": msg.status.source.type, \"time\": now.toLocaleString() });\n\nflow.set(\"status_all\", status);\n\nmsg.payload = status;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 1260,
+        "wires": [
+            [
+                "b7a9ed9cf26f34c2",
+                "5878cdfa6334aa09"
+            ]
+        ]
+    },
+    {
+        "id": "b7a9ed9cf26f34c2",
+        "type": "debug",
+        "z": "dd535f73e60cae86",
+        "name": "All output",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 670,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "d16a3f615b1c64dd",
+        "type": "template",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table>\n    <tr><th>Last Occurance</th><th>Count</th><th>Fill</th><th>Shape</th><th>Text</th><th>Source</th><th>Node Type</th></tr>\n    {{#payload}}\n        <tr class=\"\">\n            <td>{{time}}</td>\n            <td>{{count}}</td>\n            <td>{{fill}}</td>\n            <td>{{shape}}</td>\n            <td>{{text}}</td>\n            <td>{{source}}</td>\n            <td>{{type}}</td>\n        </tr>\n    {{/payload}}\n</table>\n",
+        "output": "str",
+        "x": 660,
+        "y": 1200,
+        "wires": [
+            [
+                "c84e1a313de06b19"
+            ]
+        ]
+    },
+    {
+        "id": "5878cdfa6334aa09",
+        "type": "template",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table>\n    <tr><th>Time</th><th>Fill</th><th>Shape</th><th>Text</th><th>Source</th><th>Node Type</th></tr>\n    {{#payload}}\n        <tr class=\"\">\n            <td>{{time}}</td>\n            <td>{{fill}}</td>\n            <td>{{shape}}</td>\n            <td>{{text}}</td>\n            <td>{{source}}</td>\n            <td>{{type}}</td>\n        </tr>\n    {{/payload}}\n</table>\n\n",
+        "output": "str",
+        "x": 660,
+        "y": 1260,
+        "wires": [
+            [
+                "be98bef28ee43608"
+            ]
+        ]
+    },
+    {
+        "id": "c84e1a313de06b19",
+        "type": "ui_template",
+        "z": "dd535f73e60cae86",
+        "group": "8be0a783c25b7c66",
+        "name": "",
+        "order": 0,
+        "width": "24",
+        "height": "10",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 840,
+        "y": 1200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "be98bef28ee43608",
+        "type": "ui_template",
+        "z": "dd535f73e60cae86",
+        "group": "0bbfe8d835f43144",
+        "name": "",
+        "order": 0,
+        "width": "24",
+        "height": "10",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 840,
+        "y": 1260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7961c23da93a3587",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 1440,
+        "wires": [
+            [
+                "7ba1e10d51a0dd56"
+            ]
+        ]
+    },
+    {
+        "id": "7ba1e10d51a0dd56",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Summary file",
+        "func": "// Get the current time and convert it to text\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\n\n// Generate out file name pattern\nmsg.fname = \"status_summary_\"+ yyyy + mm + dd + \".csv\";\n// Full filename with path for the file node later\nmsg.filename = \"/home/nygma/\"+ msg.fname;\nmsg.email = {};\nmsg.email.summaryfilename = msg.filename;\nmsg.email.todaytext = now.toLocaleDateString();\n\nlet status = flow.get(\"status_summary\");\nmsg.email.summarycontent = status;\n\n// Check if status log exists at all\nif (status !== undefined) {\n    // Check if we have any statuss\n    if (status.length>0) {\n        msg.payload = status;\n        node.status({ fill: \"blue\", shape: \"ring\", text: msg.fname });\n        return msg;\n    }\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 1440,
+        "wires": [
+            [
+                "c4518252837b692a"
+            ]
+        ]
+    },
+    {
+        "id": "0b15d7254c26d5b1",
+        "type": "file",
+        "z": "dd535f73e60cae86",
+        "name": "Summary file create",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 680,
+        "y": 1440,
+        "wires": [
+            [
+                "6a3e5fce89e3225d"
+            ]
+        ]
+    },
+    {
+        "id": "c4518252837b692a",
+        "type": "csv",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,time,fill,shape,text,source,type,count",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 490,
+        "y": 1440,
+        "wires": [
+            [
+                "0b15d7254c26d5b1"
+            ]
+        ]
+    },
+    {
+        "id": "6a3e5fce89e3225d",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "All statuses",
+        "func": "// Get the current time and convert it to text\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\n\n// Generate out file name pattern\nmsg.fname = \"status_all_\"+ yyyy + mm + dd + \".csv\";\n// Full filename with path for the file node later\nmsg.filename = \"/home/nygma/\"+ msg.fname;\nmsg.email.allstatusfilename = msg.filename;\nmsg.email.allstatusfilenameonly = msg.fname;\n\nlet status = flow.get(\"status_all\");\n\n// Check if status log exists at all\nif (status !== undefined) {\n    // Check if we have any statuss\n    if (status.length>0) {\n        msg.payload = status;\n        node.status({ fill: \"blue\", shape: \"ring\", text: msg.fname });\n        return msg;\n    }\n}\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 1520,
+        "wires": [
+            [
+                "2b8075f9721cf747"
+            ]
+        ]
+    },
+    {
+        "id": "2ad6a31d9ce27362",
+        "type": "file",
+        "z": "dd535f73e60cae86",
+        "name": "All statuses file create",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 680,
+        "y": 1520,
+        "wires": [
+            [
+                "182ea9f86ed47d3e"
+            ]
+        ]
+    },
+    {
+        "id": "2b8075f9721cf747",
+        "type": "csv",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "sep": ",",
+        "hdrin": "",
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "timestamp,time,message,source,type",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 490,
+        "y": 1520,
+        "wires": [
+            [
+                "2ad6a31d9ce27362"
+            ]
+        ]
+    },
+    {
+        "id": "be3726a2aca60769",
+        "type": "change",
+        "z": "dd535f73e60cae86",
+        "name": "Set up the email",
+        "rules": [
+            {
+                "t": "set",
+                "p": "attachments",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "attachments.path",
+                "pt": "msg",
+                "to": "email.allstatusfilename",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "attachments.filename",
+                "pt": "msg",
+                "to": "email.allstatusfilenameonly",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "\"Status report - \" & msg.email.todaytext",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 1600,
+        "wires": [
+            [
+                "1007333fd1b66489"
+            ]
+        ]
+    },
+    {
+        "id": "1007333fd1b66489",
+        "type": "e-mail",
+        "z": "dd535f73e60cae86",
+        "server": "smtp.gmail.com",
+        "port": "465",
+        "secure": true,
+        "tls": true,
+        "name": "csongor.varga@gmail.com",
+        "dname": "Gmail",
+        "x": 730,
+        "y": 1600,
+        "wires": []
+    },
+    {
+        "id": "182ea9f86ed47d3e",
+        "type": "template",
+        "z": "dd535f73e60cae86",
+        "name": "Email Body",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<head>\n</head>\n\n\n<body>\n    <h1>Status Update Summary - {{email.todaytext}} </h1>\n    <p>\n        <table border=\"1\">\n        <tr><th>Last Occurance</th><th>Count</th><th>Fill</th><th>Shape</th><th>Text</th><th>Source</th><th>Node Type</th></tr>\n        <tbody>\n            {{#email.summarycontent}}\n                <tr>\n                    <td>{{time}}</td>\n                    <td>{{count}}</td>\n                    <td>{{fill}}</td>\n                    <td>{{shape}}</td>\n                    <td>{{text}}</td>\n                    <td>{{source}}</td>\n                    <td>{{type}}</td>\n                </tr>\n            {{/email.summarycontent}}\n        </tbody>\n        </table>\n    </p>\n    <p>Please find the detailed status report in the attachment</p>\n \n </body>",
+        "x": 350,
+        "y": 1600,
+        "wires": [
+            [
+                "be3726a2aca60769"
+            ]
+        ]
+    },
+    {
+        "id": "be6de02e774bbc4a",
+        "type": "change",
+        "z": "dd535f73e60cae86",
+        "name": "Reset",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "reset",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 130,
+        "y": 1320,
+        "wires": [
+            [
+                "54d90ba4d65cbbe5",
+                "6ed5bbb48cf82bbe"
+            ]
+        ]
+    },
+    {
+        "id": "61ba29290f717746",
+        "type": "status",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "scope": [
+            "b7118d1dc8f62527"
+        ],
+        "x": 160,
+        "y": 1200,
+        "wires": [
+            [
+                "54d90ba4d65cbbe5",
+                "6ed5bbb48cf82bbe",
+                "1a958a2bdce43a02"
+            ]
+        ]
+    },
+    {
+        "id": "3a9b17681be3a912",
+        "type": "template",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<table>\n    <tr><th>Name</th><th>Value</th></tr>\n    {{#payload}}\n        <tr class=\"\">\n            <td>{{name}}</td>\n            <td>{{value}}</td>\n        </tr>\n    {{/payload}}\n</table>\n",
+        "output": "str",
+        "x": 900,
+        "y": 380,
+        "wires": [
+            [
+                "7661260766daf1b0"
+            ]
+        ]
+    },
+    {
+        "id": "7661260766daf1b0",
+        "type": "ui_template",
+        "z": "dd535f73e60cae86",
+        "group": "d082943d35fc7c40",
+        "name": "",
+        "order": 0,
+        "width": "6",
+        "height": "10",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1100,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ef42ee4db43ae8e5",
+        "type": "delay",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 520,
+        "y": 380,
+        "wires": [
+            [
+                "72e8300b2722235c"
+            ]
+        ]
+    },
+    {
+        "id": "72e8300b2722235c",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "function 8",
+        "func": "let datacache = flow.get(\"datacache\");\nif (datacache === undefined) {\n    datacache = {};\n}\n\nlet output = [];\n\nfor (const [key, value] of Object.entries(datacache)) {\n    output.push(value);\n}\n\nmsg.payload = output;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 380,
+        "wires": [
+            [
+                "3a9b17681be3a912"
+            ]
+        ]
+    },
+    {
+        "id": "50e8e14346358262",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Test notification",
+        "func": "msg.payload = { \"service\": 1, \"type\": \"message\", \"content\": \"Automation - \"+msg.topic+\": \"+msg.payload};\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 240,
+        "wires": [
+            [
+                "f07c8d202f242ac0"
+            ]
+        ]
+    },
+    {
+        "id": "f07c8d202f242ac0",
+        "type": "link out",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "86deb2f58b76aa52"
+        ],
+        "x": 955,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "f2a3a58f560a25ab",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "Washing on",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "data",
+        "payload": "{\"id\":\"washingmachine_power\",\"name\":\"Washing Machine Power\",\"type\":\"number\",\"value\":2500}",
+        "payloadType": "json",
+        "x": 210,
+        "y": 180,
+        "wires": [
+            [
+                "b7118d1dc8f62527"
+            ]
+        ]
+    },
+    {
+        "id": "ca281e3988220823",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "Washing off",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "data",
+        "payload": "{\"id\":\"washingmachine_power\",\"name\":\"Washing Machine Power\",\"type\":\"number\",\"value\":1}",
+        "payloadType": "json",
+        "x": 210,
+        "y": 220,
+        "wires": [
+            [
+                "b7118d1dc8f62527"
+            ]
+        ]
+    },
+    {
+        "id": "eb42e3b69b37271a",
+        "type": "comment",
+        "z": "dd535f73e60cae86",
+        "name": "Rule documentation",
+        "info": "# Rule Documentation\n\nRules store the instructions for the Automation Engines which incoming sensor readings to check and what what to do.\nRules are stored as object in an array.\n\nBelow example shows my washing machine cycle, where a high energy consumption sets the washing machine state to \"washing\". If during the washing state the consumption drops below 2, it sets the status back to idle and issues a command which can trigger an email or notification that the washing has been completed.\nTo archieve this 2 rules are needed, the first rule looks for the increase in power consumption to determine if a washing is in progress. The second rule looks for the low consumption to triggere the \"washing completed\" message.\n\n## Rule Header\n\n```\n    {\n        \"name\": \"Washing Starts\",\n        \"operator\": \"AND\",\n```\nAbove is the header of the rule, which contains a name that will be included in the message logs.\nThe `operator` describes if all the conditions need to be met (AND) or only one of the condition needs to be met (OR).\n\n## Rule Conditions\n\n```\n        \"conditions\": [\n```\n`conditions` attribute is an array which lists all the conditions (triggers) for the rule.\n\n```\n            {\n                \"operand\": \"washingmachine_power\",\n                \"operator\": \"GT\",\n                \"value\": 270\n            },\n```\nEach condition has an `operand` which is a data point id that is sent to the node, or a state id which is set by one of the rule.\n`operator` is the condition operator, and current EQ=equal, GT=greather than and LT=less than supported.\n`value` is the value to check against. \nIn the above example the condition is true if the value of the `washingmachine_power` is more than 270.\n\n```\n            {\n                \"operand\": \"washingmachine_state\",\n                \"operator\": \"EQ\",\n                \"value\": \"IDLE\"\n            }\n        ],\n```\nThis is same as above, but in this case the `operand` is a state (which will be defined below), and the value is a string not a number.\n\n## Rule Actions\n\n```\n        \"actions\": [\n```\n`actions` is an array which contains action that are executed if the conditions are met.\n\nFew examples of supported actions:\n\n### Setting state\n\nThis example is used to set internal state that can be used in rule conditions. As in the above example power > 270 is evaluated with the state of IDLE. And power < 2 is only considered if the state is WASHING.\n\n```\n            {\n                \"type\": \"setstate\",\n                \"state\": \"washingmachine_state\",\n                \"name\": \"Washingmachine State\",\n                \"value\": \"WASHING\"\n            }\n```\n`type` is set to `setstate`, `state` and `name` are the id and name of the state. Id can be used on conditions, name is only for logging.\n`value` is the new state value to be set. This can be a number or text. State gets stored in the flow variable `datacache` along with other values. For this reason the state id and data id should be unique.\n\nIMPORTANT: if the state does not exists yet (because let's say Node-Red just restarted), the condition will evaluate to true. This explicitly assumes that this is the initial state. Since the rules are executed in order, make sure the rule with the \"assumed initial state\" is in the list first.\n\n### Sending Commands\n\nThis action sends a message out of the output port of the Automation Engine function node which can be used to control devices, send messages, etc.\n\n```\n            {\n                \"type\": \"control\",\n                \"topic\": \"washing_complete\",\n                \"value\": 1\n            }\n```\n`type` is set to `control`, `topic` is a text and will be used as `msg.topic` of the outgoing message. `value` can be a number or text and will be used as `msg.payload` of the outgoing message.\n\n```\n        ]\n    },\n```\nFinally close the actions array and the rule object.",
+        "x": 540,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "6448dccefec677b8",
+        "type": "comment",
+        "z": "dd535f73e60cae86",
+        "name": "Version History",
+        "info": "# Version 1.0 - First Release\n\n- Core logic\n- Supported conditions: data value, state\n- Supported operators: LT, EQ, GT\n- Supported actions: setstate, control\n- State logging for debugging\n- Simple UI to monitor data",
+        "x": 840,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "4df9e415c5448de6",
+        "type": "comment",
+        "z": "dd535f73e60cae86",
+        "name": "Settings Documentation",
+        "info": "No settings just yet",
+        "x": 580,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "e8eeca745c649671",
+        "type": "comment",
+        "z": "dd535f73e60cae86",
+        "name": "Future Ideas",
+        "info": "- Quite condition checking if operator AND and condition fails\n- Date in conditions\n- Reduce logs\n- Delay as an action",
+        "x": 1070,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "8be0a783c25b7c66",
+        "type": "ui_group",
+        "name": "Aggregate Status Messages",
+        "tab": "809332264a7eff62",
+        "order": 1,
+        "disp": true,
+        "width": "24",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "0bbfe8d835f43144",
+        "type": "ui_group",
+        "name": "All Status Messages",
+        "tab": "809332264a7eff62",
+        "order": 2,
+        "disp": true,
+        "width": "24",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d082943d35fc7c40",
+        "type": "ui_group",
+        "name": "Data List",
+        "tab": "809332264a7eff62",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "809332264a7eff62",
+        "type": "ui_tab",
+        "name": "Automation Engine",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
