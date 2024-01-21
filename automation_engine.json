@@ -8,6 +8,18 @@
         "env": []
     },
     {
+        "id": "ef5d57c4e8a016b7",
+        "type": "junction",
+        "z": "dd535f73e60cae86",
+        "x": 320,
+        "y": 680,
+        "wires": [
+            [
+                "b42f5086b3970235"
+            ]
+        ]
+    },
+    {
         "id": "9abb35e9b7955a5a",
         "type": "inject",
         "z": "dd535f73e60cae86",
@@ -240,7 +252,7 @@
         "name": "Status Logging",
         "info": "",
         "x": 120,
-        "y": 1100,
+        "y": 1780,
         "wires": []
     },
     {
@@ -257,7 +269,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 340,
-        "y": 1140,
+        "y": 1820,
         "wires": []
     },
     {
@@ -272,7 +284,7 @@
         "finalize": "",
         "libs": [],
         "x": 430,
-        "y": 1200,
+        "y": 1880,
         "wires": [
             [
                 "0178365162bf3d41",
@@ -294,7 +306,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 690,
-        "y": 1140,
+        "y": 1820,
         "wires": []
     },
     {
@@ -319,7 +331,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 120,
-        "y": 1260,
+        "y": 1940,
         "wires": [
             [
                 "54d90ba4d65cbbe5",
@@ -339,7 +351,7 @@
         "finalize": "",
         "libs": [],
         "x": 430,
-        "y": 1260,
+        "y": 1940,
         "wires": [
             [
                 "b7a9ed9cf26f34c2",
@@ -361,7 +373,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 670,
-        "y": 1320,
+        "y": 2000,
         "wires": []
     },
     {
@@ -376,7 +388,7 @@
         "template": "<table>\n    <tr><th>Last Occurance</th><th>Count</th><th>Fill</th><th>Shape</th><th>Text</th><th>Source</th><th>Node Type</th></tr>\n    {{#payload}}\n        <tr class=\"\">\n            <td>{{time}}</td>\n            <td>{{count}}</td>\n            <td>{{fill}}</td>\n            <td>{{shape}}</td>\n            <td>{{text}}</td>\n            <td>{{source}}</td>\n            <td>{{type}}</td>\n        </tr>\n    {{/payload}}\n</table>\n",
         "output": "str",
         "x": 660,
-        "y": 1200,
+        "y": 1880,
         "wires": [
             [
                 "c84e1a313de06b19"
@@ -395,7 +407,7 @@
         "template": "<table>\n    <tr><th>Time</th><th>Fill</th><th>Shape</th><th>Text</th><th>Source</th><th>Node Type</th></tr>\n    {{#payload}}\n        <tr class=\"\">\n            <td>{{time}}</td>\n            <td>{{fill}}</td>\n            <td>{{shape}}</td>\n            <td>{{text}}</td>\n            <td>{{source}}</td>\n            <td>{{type}}</td>\n        </tr>\n    {{/payload}}\n</table>\n\n",
         "output": "str",
         "x": 660,
-        "y": 1260,
+        "y": 1940,
         "wires": [
             [
                 "be98bef28ee43608"
@@ -418,7 +430,7 @@
         "templateScope": "local",
         "className": "",
         "x": 840,
-        "y": 1200,
+        "y": 1880,
         "wires": [
             []
         ]
@@ -439,7 +451,7 @@
         "templateScope": "local",
         "className": "",
         "x": 840,
-        "y": 1260,
+        "y": 1940,
         "wires": [
             []
         ]
@@ -466,7 +478,7 @@
         "payload": "",
         "payloadType": "date",
         "x": 120,
-        "y": 1440,
+        "y": 2120,
         "wires": [
             [
                 "7ba1e10d51a0dd56"
@@ -485,7 +497,7 @@
         "finalize": "",
         "libs": [],
         "x": 330,
-        "y": 1440,
+        "y": 2120,
         "wires": [
             [
                 "c4518252837b692a"
@@ -504,7 +516,7 @@
         "overwriteFile": "true",
         "encoding": "none",
         "x": 680,
-        "y": 1440,
+        "y": 2120,
         "wires": [
             [
                 "6a3e5fce89e3225d"
@@ -527,7 +539,7 @@
         "include_empty_strings": "",
         "include_null_values": "",
         "x": 490,
-        "y": 1440,
+        "y": 2120,
         "wires": [
             [
                 "0b15d7254c26d5b1"
@@ -546,7 +558,7 @@
         "finalize": "",
         "libs": [],
         "x": 330,
-        "y": 1520,
+        "y": 2200,
         "wires": [
             [
                 "2b8075f9721cf747"
@@ -565,7 +577,7 @@
         "overwriteFile": "true",
         "encoding": "none",
         "x": 680,
-        "y": 1520,
+        "y": 2200,
         "wires": [
             [
                 "182ea9f86ed47d3e"
@@ -588,7 +600,7 @@
         "include_empty_strings": "",
         "include_null_values": "",
         "x": 490,
-        "y": 1520,
+        "y": 2200,
         "wires": [
             [
                 "2ad6a31d9ce27362"
@@ -636,7 +648,7 @@
         "to": "",
         "reg": false,
         "x": 540,
-        "y": 1600,
+        "y": 2280,
         "wires": [
             [
                 "1007333fd1b66489"
@@ -654,7 +666,7 @@
         "name": "csongor.varga@gmail.com",
         "dname": "Gmail",
         "x": 730,
-        "y": 1600,
+        "y": 2280,
         "wires": []
     },
     {
@@ -668,7 +680,7 @@
         "syntax": "mustache",
         "template": "<head>\n</head>\n\n\n<body>\n    <h1>Status Update Summary - {{email.todaytext}} </h1>\n    <p>\n        <table border=\"1\">\n        <tr><th>Last Occurance</th><th>Count</th><th>Fill</th><th>Shape</th><th>Text</th><th>Source</th><th>Node Type</th></tr>\n        <tbody>\n            {{#email.summarycontent}}\n                <tr>\n                    <td>{{time}}</td>\n                    <td>{{count}}</td>\n                    <td>{{fill}}</td>\n                    <td>{{shape}}</td>\n                    <td>{{text}}</td>\n                    <td>{{source}}</td>\n                    <td>{{type}}</td>\n                </tr>\n            {{/email.summarycontent}}\n        </tbody>\n        </table>\n    </p>\n    <p>Please find the detailed status report in the attachment</p>\n \n </body>",
         "x": 350,
-        "y": 1600,
+        "y": 2280,
         "wires": [
             [
                 "be3726a2aca60769"
@@ -695,7 +707,7 @@
         "to": "",
         "reg": false,
         "x": 130,
-        "y": 1320,
+        "y": 2000,
         "wires": [
             [
                 "54d90ba4d65cbbe5",
@@ -712,7 +724,7 @@
             "b7118d1dc8f62527"
         ],
         "x": 160,
-        "y": 1200,
+        "y": 1880,
         "wires": [
             [
                 "54d90ba4d65cbbe5",
@@ -973,7 +985,7 @@
             "d53d25b55da64e34"
         ],
         "x": 145,
-        "y": 1380,
+        "y": 2060,
         "wires": [
             [
                 "54d90ba4d65cbbe5",
@@ -1021,6 +1033,605 @@
         ],
         "x": 245,
         "y": 500,
+        "wires": []
+    },
+    {
+        "id": "b42f5086b3970235",
+        "type": "uibuilder",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "topic": "",
+        "url": "rulebuilder",
+        "okToGo": true,
+        "fwdInMessages": false,
+        "allowScripts": false,
+        "allowStyles": false,
+        "copyIndex": true,
+        "templateFolder": "blank",
+        "extTemplate": "",
+        "showfolder": false,
+        "reload": false,
+        "sourceFolder": "src",
+        "deployedVersion": "6.8.2",
+        "showMsgUib": false,
+        "title": "",
+        "descr": "",
+        "x": 490,
+        "y": 680,
+        "wires": [
+            [
+                "542d139e5d1393dd",
+                "b8c0b09cc766f266"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "df88891f3b929869",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "Send a msg",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "A Message From Node-RED",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 640,
+        "wires": [
+            [
+                "ef5d57c4e8a016b7"
+            ]
+        ],
+        "info": "Send a simply msg to the front-end.\r\n\r\nThe default front-end template code will display the msg\r\nusing HTML formatting, no coding required."
+    },
+    {
+        "id": "f650ac1311ab2701",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "Toggle Visible Msgs",
+        "props": [
+            {
+                "p": "_uib",
+                "v": "{\"command\":\"showMsg\"}",
+                "vt": "json"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 150,
+        "y": 720,
+        "wires": [
+            [
+                "ef5d57c4e8a016b7"
+            ]
+        ]
+    },
+    {
+        "id": "0126ee7b774a90ed",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "Reload",
+        "props": [
+            {
+                "p": "_ui",
+                "v": "{\"method\":\"reload\"}",
+                "vt": "json"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "reload",
+        "x": 190,
+        "y": 680,
+        "wires": [
+            [
+                "ef5d57c4e8a016b7"
+            ]
+        ],
+        "info": "Sends a pre-formatted msg to the front-end that\r\ncauses the page to reload itself."
+    },
+    {
+        "id": "6e6d4cb7f3cf40c5",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "Toggle Visible Status",
+        "props": [
+            {
+                "p": "_uib",
+                "v": "{\"command\":\"showStatus\"}",
+                "vt": "json"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 150,
+        "y": 760,
+        "wires": [
+            [
+                "ef5d57c4e8a016b7"
+            ]
+        ]
+    },
+    {
+        "id": "ae19a38c056986a4",
+        "type": "uib-element",
+        "z": "dd535f73e60cae86",
+        "name": "Rule list",
+        "topic": "",
+        "elementtype": "html",
+        "parent": "#rulelist",
+        "parentSource": "",
+        "parentSourceType": "str",
+        "elementid": "rule_list_uib",
+        "elementId": "",
+        "elementIdSourceType": "str",
+        "heading": "",
+        "headingSourceType": "str",
+        "headingLevel": "h2",
+        "data": "payload",
+        "dataSourceType": "msg",
+        "position": "last",
+        "positionSourceType": "str",
+        "passthrough": false,
+        "confData": {},
+        "x": 860,
+        "y": 860,
+        "wires": [
+            [
+                "0dba633e1ad88a18"
+            ]
+        ]
+    },
+    {
+        "id": "8ca05a140def546c",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 330,
+        "y": 860,
+        "wires": [
+            [
+                "668f619db096a5d2"
+            ]
+        ]
+    },
+    {
+        "id": "668f619db096a5d2",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Get Rule List",
+        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nif (rules.length===0) {\n    return;\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\nfor (let i = 0; i < rules.length; i++) {\n    rules[i].id = i;\n    // assign icons to the condition trigger types\n    for (let j = 0; j < rules[i].conditions.length; j++) {\n        switch(rules[i].conditions[j].trigger) {\n            case \"data\": \n                rules[i].conditions[j].icon = \"📝\";\n                break;\n            case \"state\":\n                rules[i].conditions[j].icon = \"🔁\";\n                break;\n            case \"time\":\n                rules[i].conditions[j].icon = \"🕒\";\n                break;\n            default:\n                rules[i].conditions[j].icon = \"🔠\";\n        }\n        rules[i].conditions[j].id = j;\n    }\n    // assign icons to the action types\n    for (let j = 0; j < rules[i].actions.length; j++) {\n        switch (rules[i].actions[j].type) {\n            case \"setstate\":\n                rules[i].actions[j].icon = \"📢\";\n                break;\n            case \"control\":\n                rules[i].actions[j].icon = \"📨\";\n                break;\n            default:\n                rules[i].actions[j].icon = \"🔠\";\n        }\n        rules[i].actions[j].id = j;\n    }\n    if (rules[i].selected) {\n        msg.selectedrulename = rules[i].name;\n    }\n\n}\n\nmsg.payload = rules;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 860,
+        "wires": [
+            [
+                "60b01117f354d1ec",
+                "38fdb0468be58ba6",
+                "d402aad04b418547",
+                "9958dfd95401c6c4"
+            ]
+        ]
+    },
+    {
+        "id": "60b01117f354d1ec",
+        "type": "template",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{{#payload}}\n            <div class=\"list-item{{#selected}} selected{{/selected}}\" id=\"rule_{{id}}\" onclick=\"uibuilder.eventSend(event)\">\n                <div class=\"icon\">{{#enabled}}📂{{/enabled}}{{^enabled}}📁{{/enabled}}</div>\n                <div class=\"content\">\n                    <h3>{{name}}</h3>\n                    <p>{{#conditions}}{{icon}}&nbsp;{{/conditions}} → {{#actions}}{{icon}}&nbsp;{{/actions}}</p>\n                </div>\n            </div>\n{{/payload}}\n",
+        "output": "str",
+        "x": 700,
+        "y": 860,
+        "wires": [
+            [
+                "ae19a38c056986a4"
+            ]
+        ]
+    },
+    {
+        "id": "542d139e5d1393dd",
+        "type": "debug",
+        "z": "dd535f73e60cae86",
+        "name": "debug 78",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 720,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "b8c0b09cc766f266",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Process User Input",
+        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n// if (settings.loglevel === undefined) settings.loglevel = 6;\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nlet datacache = flow.get(\"datacache\");\nif (datacache === undefined) {\n    datacache = {};\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\nif (msg._ui.type ===\"eventSend\") {\n    let eventinput = msg._ui.id.split(\"_\");\n\n    // Handle the event if the user clicked on a rule\n    if (eventinput[0]===\"rule\") {\n        node.status({fill:\"green\",shape:\"ring\",text:\"Rule selection\"});\n        let ruleid = parseInt(eventinput[1]);\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Rule selected:\" +ruleid});\n        editor.ruleid = ruleid;\n        delete editor.conditionid;\n        delete editor.conditionid;\n        flow.set(\"editor\",editor);\n        msg.payload = editor;\n        msg.topic = \"ruleselected\";\n        // Set the selected flag on rules structure as well\n        for (let i = 0; i < rules.length; i++) {\n            if (i === editor.ruleid) {\n                rules[i].selected = true;\n            } else {\n                rules[i].selected = false;\n            }            \n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n\n    // Handle the event if the user click on a condition\n    if (eventinput[0] === \"condition\") {\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Condition selection\" });\n        let conditionid = parseInt(eventinput[1]);\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Condition selected:\" + conditionid });\n        editor.conditionid = conditionid;\n        flow.set(\"editor\", editor);\n        msg.payload = editor;\n        msg.topic = \"conditionselected\";\n        // Set the selected flag on conditions structure as well\n        for (let i = 0; i < rules[editor.ruleid].conditions.length; i++) {\n            if (i === editor.conditionid) {\n                rules[editor.ruleid].conditions[i].selected = true;\n            } else {\n                rules[editor.ruleid].conditions[i].selected = false;\n            }\n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n \n    // Handle the event if the user click on an action\n    if (eventinput[0] === \"action\") {\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Action selection\" });\n        let actionid = parseInt(eventinput[1]);\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Action selected:\" + actionid });\n        editor.actionid = actionid;\n        flow.set(\"editor\", editor);\n        msg.payload = editor;\n        msg.topic = \"actionselected\";\n        // Set the selected flag on action structure as well\n        for (let i = 0; i < rules[editor.ruleid].actions.length; i++) {\n            if (i === editor.actionid) {\n                rules[editor.ruleid].actions[i].selected = true;\n            } else {\n                rules[editor.ruleid].actions[i].selected = false;\n            }\n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n\n\n    node.status({ fill: \"red\", shape: \"dot\", text: \"Unhandled event: \" + msg._ui.id });\n}\n\n\n\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 700,
+        "wires": [
+            [
+                "35a5f7d969e0f5b3"
+            ]
+        ]
+    },
+    {
+        "id": "38fdb0468be58ba6",
+        "type": "uib-element",
+        "z": "dd535f73e60cae86",
+        "name": "Rule Name",
+        "topic": "",
+        "elementtype": "html",
+        "parent": "#selectedrulename",
+        "parentSource": "",
+        "parentSourceType": "str",
+        "elementid": "selected_rule_name",
+        "elementId": "",
+        "elementIdSourceType": "str",
+        "heading": "",
+        "headingSourceType": "str",
+        "headingLevel": "h2",
+        "data": "selectedrulename",
+        "dataSourceType": "msg",
+        "position": "last",
+        "positionSourceType": "str",
+        "passthrough": false,
+        "confData": {},
+        "x": 870,
+        "y": 900,
+        "wires": [
+            [
+                "0dba633e1ad88a18"
+            ]
+        ]
+    },
+    {
+        "id": "da38e26f2fe532ea",
+        "type": "link in",
+        "z": "dd535f73e60cae86",
+        "name": "RuleBuilder UIBuilder Input",
+        "links": [
+            "0dba633e1ad88a18",
+            "6c07f6adc9eb6bc5",
+            "a9efb0678baddb7d"
+        ],
+        "x": 225,
+        "y": 800,
+        "wires": [
+            [
+                "ef5d57c4e8a016b7"
+            ]
+        ]
+    },
+    {
+        "id": "0dba633e1ad88a18",
+        "type": "link out",
+        "z": "dd535f73e60cae86",
+        "name": "link out 57",
+        "mode": "link",
+        "links": [
+            "da38e26f2fe532ea"
+        ],
+        "x": 1025,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "35a5f7d969e0f5b3",
+        "type": "switch",
+        "z": "dd535f73e60cae86",
+        "name": "What is the action",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "ruleselected",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "conditionselected",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "actionselected",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 1030,
+        "y": 700,
+        "wires": [
+            [
+                "668f619db096a5d2"
+            ],
+            [
+                "d402aad04b418547"
+            ],
+            [
+                "9958dfd95401c6c4"
+            ]
+        ]
+    },
+    {
+        "id": "f2f50f12d29c52d1",
+        "type": "uib-element",
+        "z": "dd535f73e60cae86",
+        "name": "Condition list",
+        "topic": "",
+        "elementtype": "html",
+        "parent": "#conditionlist",
+        "parentSource": "",
+        "parentSourceType": "str",
+        "elementid": "condition_list_uib",
+        "elementId": "",
+        "elementIdSourceType": "str",
+        "heading": "",
+        "headingSourceType": "str",
+        "headingLevel": "h2",
+        "data": "payload",
+        "dataSourceType": "msg",
+        "position": "last",
+        "positionSourceType": "str",
+        "passthrough": false,
+        "confData": {},
+        "x": 870,
+        "y": 980,
+        "wires": [
+            [
+                "6c07f6adc9eb6bc5"
+            ]
+        ]
+    },
+    {
+        "id": "96fc0e7db46cf492",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 330,
+        "y": 980,
+        "wires": [
+            [
+                "d402aad04b418547"
+            ]
+        ]
+    },
+    {
+        "id": "d402aad04b418547",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Get Condition List",
+        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nif (rules.length===0) {\n    return;\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\nmsg.payload = rules[editor.ruleid].conditions;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 980,
+        "wires": [
+            [
+                "0d966e3b0e7392b3"
+            ]
+        ]
+    },
+    {
+        "id": "0d966e3b0e7392b3",
+        "type": "template",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{{#payload}}\n            <div class=\"list-item{{#selected}} selected{{/selected}}\" id=\"condition_{{id}}\" onclick=\"uibuilder.eventSend(event)\">\n                <div class=\"content\">\n                    <h3>{{trigger}}&nbsp;{{operand}}&nbsp;{{operator}}&nbsp;{{value}}</h3>\n                </div>\n            </div>\n{{/payload}}\n",
+        "output": "str",
+        "x": 700,
+        "y": 980,
+        "wires": [
+            [
+                "f2f50f12d29c52d1"
+            ]
+        ]
+    },
+    {
+        "id": "6c07f6adc9eb6bc5",
+        "type": "link out",
+        "z": "dd535f73e60cae86",
+        "name": "link out 58",
+        "mode": "link",
+        "links": [
+            "da38e26f2fe532ea"
+        ],
+        "x": 1025,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "124b37f0419c3941",
+        "type": "uib-element",
+        "z": "dd535f73e60cae86",
+        "name": "Condition list",
+        "topic": "",
+        "elementtype": "html",
+        "parent": "#actionlist",
+        "parentSource": "",
+        "parentSourceType": "str",
+        "elementid": "action_list_uib",
+        "elementId": "",
+        "elementIdSourceType": "str",
+        "heading": "",
+        "headingSourceType": "str",
+        "headingLevel": "h2",
+        "data": "payload",
+        "dataSourceType": "msg",
+        "position": "last",
+        "positionSourceType": "str",
+        "passthrough": false,
+        "confData": {},
+        "x": 870,
+        "y": 1040,
+        "wires": [
+            [
+                "a9efb0678baddb7d"
+            ]
+        ]
+    },
+    {
+        "id": "c11c07699cd439b3",
+        "type": "inject",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 330,
+        "y": 1040,
+        "wires": [
+            [
+                "9958dfd95401c6c4"
+            ]
+        ]
+    },
+    {
+        "id": "9958dfd95401c6c4",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Get Action List",
+        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nif (rules.length===0) {\n    return;\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\nmsg.payload = rules[editor.ruleid].actions;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 1040,
+        "wires": [
+            [
+                "b031b0d78dc9ae2a"
+            ]
+        ]
+    },
+    {
+        "id": "b031b0d78dc9ae2a",
+        "type": "template",
+        "z": "dd535f73e60cae86",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{{#payload}}\n            <div class=\"list-item{{#selected}} selected{{/selected}}\" id=\"action_{{id}}\" onclick=\"uibuilder.eventSend(event)\">\n                <div class=\"content\">\n                    <h3>{{type}}&nbsp;{{topic}}&nbsp;{{value}}</h3>\n                </div>\n            </div>\n{{/payload}}\n",
+        "output": "str",
+        "x": 700,
+        "y": 1040,
+        "wires": [
+            [
+                "124b37f0419c3941"
+            ]
+        ]
+    },
+    {
+        "id": "a9efb0678baddb7d",
+        "type": "link out",
+        "z": "dd535f73e60cae86",
+        "name": "link out 59",
+        "mode": "link",
+        "links": [
+            "da38e26f2fe532ea"
+        ],
+        "x": 1025,
+        "y": 1040,
         "wires": []
     },
     {
