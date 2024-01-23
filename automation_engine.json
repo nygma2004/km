@@ -15,7 +15,8 @@
         "y": 680,
         "wires": [
             [
-                "b42f5086b3970235"
+                "b42f5086b3970235",
+                "2f43a6e2d75fab3a"
             ]
         ]
     },
@@ -108,7 +109,7 @@
         "type": "function",
         "z": "dd535f73e60cae86",
         "name": "Automation Engine",
-        "func": "function AddMessage(priority, loglevel, message) {\n    if (priority <= loglevel) {\n        node.status(message);\n    }\n}\n\nlet settings = flow.get(\"settings\");\nif (settings === undefined) {\n    AddMessage(0,0,{fill:\"red\",shape:\"ring\",text:\"Missing settings\"});\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\nif (settings.loglevel === undefined) settings.loglevel = 6;\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nlet datacache = flow.get(\"datacache\");\nif (datacache === undefined) {\n    datacache = {};\n}\n\nif ((msg.topic === \"data\") || (msg.topic === \"time\")) {\n    AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"0| Input type: \" + msg.topic });\n    if (msg.topic === \"data\") {\n        datacache[msg.payload.id] = msg.payload;\n        flow.set(\"datacache\", datacache);\n    }\n\n\n    for (let i = 0; i < rules.length; i++) {\n        let rule = rules[i];\n        AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"0| Checking \" + rule.name });\n        if (!rule.enabled) {\n            // Rule is not enabled, skip to the next rule\n            AddMessage(3, settings.loglevel,{ fill: \"green\", shape: \"dot\", text: \"1a| Rule \" + rule.name + \" not enabled.\" });\n            continue;\n        } \n\n        // Check if the current data is listed in the conditions\n        if (((msg.topic === \"data\") && (rule.conditions.filter(e => e.operand === msg.payload.id).length > 0)) || ((msg.topic === \"time\") && (rule.conditions.filter(e => e.trigger === \"time\").length > 0))) {\n            AddMessage(4, settings.loglevel,{fill:\"grey\",shape:\"dot\",text:\"1| Evaluating rule \"+rule.name});\n            let condition_or = false;\n            let condition_and = true;\n            // evaluate conditions\n            for (let j = 0; j < rule.conditions.length; j++) {\n                let condition = rule.conditions[j];\n                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"2| Check condition \" + j + \", trigger:\" +condition.trigger});\n                let data = datacache[condition.operand];\n                switch (condition.trigger) {\n                    case \"time\": \n                        // Data validation\n                        if (condition.value.length !== 5) {\n                            AddMessage(1, settings.loglevel,{ fill: \"red\", shape: \"dot\", text: \"3| Date format incorrect (length)\" });\n                            condition_and = false;\n                            condition_or = false;\n                            break;\n                        }\n                        if (condition.value.split(\":\").length !== 2) {\n                            AddMessage(1, settings.loglevel,{ fill: \"red\", shape: \"dot\", text: \"3| Date format incorrect (hh:mm)\" });\n                            condition_and = false;\n                            condition_or = false;\n                            break;\n                        }\n                        // Construct the current time\n                        let now = new Date();\n                        let hour = \"00000\" + now.getHours();\n                        let minute = \"00000\" + now.getMinutes();\n                        hour = hour.substring(hour.length - 2, hour.length);\n                        minute = minute.substring(minute.length - 2, minute.length);\n\n                        data = { \"id\": \"time\", \"name\": \"time\", \"type\": \"string\", \"value\": hour + \":\" + minute };\n                        break;\n                    case \"data\":\n                    case \"state\":\n                        // if data does not exists, evaluate to true - most to allow initial states\n                        if (data === undefined) {\n                            condition_or = true;\n                            AddMessage(3, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"2| \" + condition.operand + \" data missing, evaluating to true\" });\n                            break;\n                        }\n                        break;\n                    default: AddMessage(1, settings.loglevel,{ fill: \"red\", shape: \"ring\", text: \"4| Unknown condition trigger \" + condition.trigger });\n\n                }\n\n                let breakout = false;\n                if (data !== undefined) {\n                    AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"3| \" + condition.operand + \" condition: \" + data.value+ \" \" + condition.operator + \" \"+ condition.value});\n                \n                    switch(condition.operator) {\n                        case \"GT\": \n                            if (data.value > condition.value) {\n                                condition_or = true;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition true\" });\n                            } else {\n                                condition_and = false;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition false\" });\n                                if (rule.operator === \"AND\") {\n                                    breakout = true;\n                                }\n                            }\n                            break;\n                        case \"LT\":\n                            if (data.value < condition.value) {\n                                condition_or = true;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition true\" });\n                            } else {\n                                condition_and = false;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition false\" });\n                                if (rule.operator === \"AND\") {\n                                    breakout = true;\n                                }\n                            }\n                            break;\n                        case \"EQ\":\n                            if (data.value === condition.value) {\n                                condition_or = true;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition true\" });\n                            } else {\n                                condition_and = false;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition false\" });\n                                if (rule.operator === \"AND\") {\n                                    breakout = true;\n                                }\n                            }\n                            break;\n                        default: AddMessage(1, settings.loglevel,{ fill: \"red\", shape: \"ring\", text: \"4| Unknown condition operator \"+ condition.operator});\n                    } // end switch\n                }\n                // Check if we need to break out from the loop (if a condition failed already and we are in AND mode)\n                if (breakout) {\n                    AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4a| Exit condition checking\" });\n                    break;\n                }\n            } // end for j loop\n            // All the rules are evaluated\n            let passed = false;\n            if ((rule.operator === \"AND\") && (condition_and)) { passed = true }\n            if ((rule.operator === \"OR\") && (condition_or)) { passed = true }\n            if (passed) {\n                AddMessage(3, settings.loglevel, { fill: \"green\", shape: \"dot\", text: \"5| \" + rule.name + \": Condition result: \" + passed });\n            } else {\n                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"5| \" + rule.name + \": Condition result: \" + passed});\n            }\n\n            // Execute the actions\n            if (passed) { \n                for (let k=0; k<rule.actions.length; k++) { \n                    let action = rule.actions[k];\n                    AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"6| Starting action \" + action.type });\n                    switch (action.type) {\n                        case \"setstate\":\n                            datacache[action.state] = {\"id\": action.state, \"name\": action.name, \"type\": \"state\", \"value\": action.value}\n                            flow.set(\"datacache\", datacache);\n                            AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"7| Status set:\" + action.state });\n                            break;\n                        case \"control\":\n                            node.send({\"topic\": action.topic, \"payload\": action.value});\n                            AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"7| Control sent:\" + action.topic });\n                            break;\n                        default: AddMessage(1, settings.loglevel,{ fill: \"red\", shape: \"ring\", text: \"7| Unknown action type \" + action.type });\n                    }\n                } // End of action loop\n            } // End of actions \n\n        } // Condition was found\n    } // End of looping through the rules\n\n\n} // End of processing data message",
+        "func": "function AddMessage(priority, loglevel, message) {\n    if (priority <= loglevel) {\n        node.status(message);\n    }\n}\n\nlet settings = flow.get(\"settings\");\nif (settings === undefined) {\n    AddMessage(0,0,{fill:\"red\",shape:\"ring\",text:\"Missing settings\"});\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\nif (settings.loglevel === undefined) settings.loglevel = 6;\n\nlet rules = flow.get(\"rules\", settings.rulestore) ?? [];\nlet datacache = flow.get(\"datacache\") ?? {};\n\nif ((msg.topic === \"data\") || (msg.topic === \"time\")) {\n    AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"0| Input type: \" + msg.topic });\n    if (msg.topic === \"data\") {\n        datacache[msg.payload.id] = msg.payload;\n        flow.set(\"datacache\", datacache);\n    }\n\n\n    for (let i = 0; i < rules.length; i++) {\n        let rule = rules[i];\n        AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"0| Checking \" + rule.name });\n        if (!rule.enabled) {\n            // Rule is not enabled, skip to the next rule\n            AddMessage(3, settings.loglevel,{ fill: \"green\", shape: \"dot\", text: \"1a| Rule \" + rule.name + \" not enabled.\" });\n            continue;\n        } \n\n        // Check if the current data is listed in the conditions\n        if (((msg.topic === \"data\") && (rule.conditions.filter(e => e.operand === msg.payload.id).length > 0)) || ((msg.topic === \"time\") && (rule.conditions.filter(e => e.trigger === \"time\").length > 0))) {\n            AddMessage(4, settings.loglevel,{fill:\"grey\",shape:\"dot\",text:\"1| Evaluating rule \"+rule.name});\n            let condition_or = false;\n            let condition_and = true;\n            // evaluate conditions\n            for (let j = 0; j < rule.conditions.length; j++) {\n                let condition = rule.conditions[j];\n                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"2| Check condition \" + j + \", trigger:\" +condition.trigger});\n                let data = datacache[condition.operand];\n                switch (condition.trigger) {\n                    case \"time\": \n                        // Data validation\n                        if (condition.value.length !== 5) {\n                            AddMessage(1, settings.loglevel,{ fill: \"red\", shape: \"dot\", text: \"3| Date format incorrect (length)\" });\n                            condition_and = false;\n                            condition_or = false;\n                            break;\n                        }\n                        if (condition.value.split(\":\").length !== 2) {\n                            AddMessage(1, settings.loglevel,{ fill: \"red\", shape: \"dot\", text: \"3| Date format incorrect (hh:mm)\" });\n                            condition_and = false;\n                            condition_or = false;\n                            break;\n                        }\n                        // Construct the current time\n                        let now = new Date();\n                        let hour = \"00000\" + now.getHours();\n                        let minute = \"00000\" + now.getMinutes();\n                        hour = hour.substring(hour.length - 2, hour.length);\n                        minute = minute.substring(minute.length - 2, minute.length);\n\n                        data = { \"id\": \"time\", \"name\": \"time\", \"type\": \"string\", \"value\": hour + \":\" + minute };\n                        break;\n                    case \"data\":\n                    case \"state\":\n                        // if data does not exists, evaluate to true - most to allow initial states\n                        if (data === undefined) {\n                            condition_or = true;\n                            AddMessage(3, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"2| \" + condition.operand + \" data missing, evaluating to true\" });\n                            break;\n                        }\n                        break;\n                    default: AddMessage(1, settings.loglevel,{ fill: \"red\", shape: \"ring\", text: \"4| Unknown condition trigger \" + condition.trigger });\n\n                }\n\n                let breakout = false;\n                if (data !== undefined) {\n                    AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"3| \" + condition.operand + \" condition: \" + data.value+ \" \" + condition.operator + \" \"+ condition.value});\n                \n                    switch(condition.operator) {\n                        case \"GT\": \n                            if (data.value > condition.value) {\n                                condition_or = true;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition true\" });\n                            } else {\n                                condition_and = false;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition false\" });\n                                if (rule.operator === \"AND\") {\n                                    breakout = true;\n                                }\n                            }\n                            break;\n                        case \"LT\":\n                            if (data.value < condition.value) {\n                                condition_or = true;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition true\" });\n                            } else {\n                                condition_and = false;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition false\" });\n                                if (rule.operator === \"AND\") {\n                                    breakout = true;\n                                }\n                            }\n                            break;\n                        case \"EQ\":\n                            if (data.value === condition.value) {\n                                condition_or = true;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition true\" });\n                            } else {\n                                condition_and = false;\n                                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4| \" + condition.operand + \" condition false\" });\n                                if (rule.operator === \"AND\") {\n                                    breakout = true;\n                                }\n                            }\n                            break;\n                        default: AddMessage(1, settings.loglevel,{ fill: \"red\", shape: \"ring\", text: \"4| Unknown condition operator \"+ condition.operator});\n                    } // end switch\n                }\n                // Check if we need to break out from the loop (if a condition failed already and we are in AND mode)\n                if (breakout) {\n                    AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"4a| Exit condition checking\" });\n                    break;\n                }\n            } // end for j loop\n            // All the rules are evaluated\n            let passed = false;\n            if ((rule.operator === \"AND\") && (condition_and)) { passed = true }\n            if ((rule.operator === \"OR\") && (condition_or)) { passed = true }\n            if (passed) {\n                AddMessage(3, settings.loglevel, { fill: \"green\", shape: \"dot\", text: \"5| \" + rule.name + \": Condition result: \" + passed });\n            } else {\n                AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"5| \" + rule.name + \": Condition result: \" + passed});\n            }\n\n            // Execute the actions\n            if (passed) { \n                for (let k=0; k<rule.actions.length; k++) { \n                    let action = rule.actions[k];\n                    AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"6| Starting action \" + action.type });\n                    switch (action.type) {\n                        case \"setstate\":\n                            datacache[action.state] = {\"id\": action.state, \"name\": action.name, \"type\": \"state\", \"value\": action.value}\n                            flow.set(\"datacache\", datacache);\n                            AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"7| Status set:\" + action.state });\n                            break;\n                        case \"control\":\n                            node.send({\"topic\": action.topic, \"payload\": action.value});\n                            AddMessage(4, settings.loglevel,{ fill: \"grey\", shape: \"dot\", text: \"7| Control sent:\" + action.topic });\n                            break;\n                        default: AddMessage(1, settings.loglevel,{ fill: \"red\", shape: \"ring\", text: \"7| Unknown action type \" + action.type });\n                    }\n                } // End of action loop\n            } // End of actions \n\n        } // Condition was found\n    } // End of looping through the rules\n\n\n} // End of processing data message",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -922,7 +923,7 @@
         "type": "comment",
         "z": "dd535f73e60cae86",
         "name": "Version History",
-        "info": "# Version 1.2 - Small changes\n\n- Log level added to settings\n- Context storage can be defined in settings\n- Enable/disable flag for rules\n\n# Version 1.1 - Time conditions\n\n- Condition checking exists after a false condition - peformance improvment\n- Adding trigger attribute to conditions (date|state|time)\n- Time condition is available\n\n# Version 1.0 - First Release\n\n- Core logic\n- Supported conditions: data value, state\n- Supported operators: LT, EQ, GT\n- Supported actions: setstate, control\n- State logging for debugging\n- Simple UI to monitor data",
+        "info": "# Version 1.3 - Rule editor\n\n- Rule editor screen\n- Show rules, select rules, select conditions, select actions\n- Edit existing conditions\n- Enable/Disable rules (buttons)\n\n# Version 1.2 - Small changes\n\n- Log level added to settings\n- Context storage can be defined in settings\n- Enable/disable flag for rules\n\n# Version 1.1 - Time conditions\n\n- Condition checking exists after a false condition - peformance improvment\n- Adding trigger attribute to conditions (date|state|time)\n- Time condition is available\n\n# Version 1.0 - First Release\n\n- Core logic\n- Supported conditions: data value, state\n- Supported operators: LT, EQ, GT\n- Supported actions: setstate, control\n- State logging for debugging\n- Simple UI to monitor data",
         "x": 840,
         "y": 60,
         "wires": []
@@ -1063,7 +1064,10 @@
                 "542d139e5d1393dd",
                 "b8c0b09cc766f266"
             ],
-            []
+            [
+                "2d4f5d466b216f6a",
+                "9a115156b972bb49"
+            ]
         ]
     },
     {
@@ -1198,8 +1202,8 @@
         "positionSourceType": "str",
         "passthrough": false,
         "confData": {},
-        "x": 860,
-        "y": 860,
+        "x": 1640,
+        "y": 640,
         "wires": [
             [
                 "0dba633e1ad88a18"
@@ -1227,8 +1231,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 330,
-        "y": 860,
+        "x": 1110,
+        "y": 640,
         "wires": [
             [
                 "668f619db096a5d2"
@@ -1240,14 +1244,14 @@
         "type": "function",
         "z": "dd535f73e60cae86",
         "name": "Get Rule List",
-        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nif (rules.length===0) {\n    return;\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\nfor (let i = 0; i < rules.length; i++) {\n    rules[i].id = i;\n    // assign icons to the condition trigger types\n    for (let j = 0; j < rules[i].conditions.length; j++) {\n        switch(rules[i].conditions[j].trigger) {\n            case \"data\": \n                rules[i].conditions[j].icon = \"📝\";\n                break;\n            case \"state\":\n                rules[i].conditions[j].icon = \"🔁\";\n                break;\n            case \"time\":\n                rules[i].conditions[j].icon = \"🕒\";\n                break;\n            default:\n                rules[i].conditions[j].icon = \"🔠\";\n        }\n        rules[i].conditions[j].id = j;\n    }\n    // assign icons to the action types\n    for (let j = 0; j < rules[i].actions.length; j++) {\n        switch (rules[i].actions[j].type) {\n            case \"setstate\":\n                rules[i].actions[j].icon = \"📢\";\n                break;\n            case \"control\":\n                rules[i].actions[j].icon = \"📨\";\n                break;\n            default:\n                rules[i].actions[j].icon = \"🔠\";\n        }\n        rules[i].actions[j].id = j;\n    }\n    if (rules[i].selected) {\n        msg.selectedrulename = rules[i].name;\n    }\n\n}\n\nmsg.payload = rules;\nreturn msg;",
+        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nif (rules.length===0) {\n    return;\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\nfor (let i = 0; i < rules.length; i++) {\n    rules[i].id = i;\n    // assign icons to the condition trigger types\n    for (let j = 0; j < rules[i].conditions.length; j++) {\n        switch(rules[i].conditions[j].trigger) {\n            case \"data\": \n                rules[i].conditions[j].icon = \"📝\";\n                break;\n            case \"state\":\n                rules[i].conditions[j].icon = \"🔁\";\n                break;\n            case \"time\":\n                rules[i].conditions[j].icon = \"🕒\";\n                break;\n            default:\n                rules[i].conditions[j].icon = \"🔠\";\n        }\n        rules[i].conditions[j].id = j;\n    }\n    // assign icons to the action types\n    for (let j = 0; j < rules[i].actions.length; j++) {\n        switch (rules[i].actions[j].type) {\n            case \"setstate\":\n                rules[i].actions[j].icon = \"📢\";\n                break;\n            case \"control\":\n                rules[i].actions[j].icon = \"📨\";\n                break;\n            default:\n                rules[i].actions[j].icon = \"🔠\";\n        }\n        rules[i].actions[j].id = j;\n    }\n    if (rules[i].selected) {\n        msg.selectedrulename = rules[i].name;\n    }\n\n}\n\ndelete msg.uibuilderCtrl;\nmsg.payload = rules;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 530,
-        "y": 860,
+        "x": 1310,
+        "y": 640,
         "wires": [
             [
                 "60b01117f354d1ec",
@@ -1266,10 +1270,10 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{{#payload}}\n            <div class=\"list-item{{#selected}} selected{{/selected}}\" id=\"rule_{{id}}\" onclick=\"uibuilder.eventSend(event)\">\n                <div class=\"icon\">{{#enabled}}📂{{/enabled}}{{^enabled}}📁{{/enabled}}</div>\n                <div class=\"content\">\n                    <h3>{{name}}</h3>\n                    <p>{{#conditions}}{{icon}}&nbsp;{{/conditions}} → {{#actions}}{{icon}}&nbsp;{{/actions}}</p>\n                </div>\n            </div>\n{{/payload}}\n",
+        "template": "{{#payload}}\n            <div class=\"list-item{{#selected}} selected{{/selected}}\" id=\"rule_{{id}}\" onclick=\"uibuilder.eventSend(event)\">\n                <div class=\"icon\">{{#enabled}}🔔{{/enabled}}{{^enabled}}🔕{{/enabled}}</div>\n                <div class=\"content\">\n                    <h3>{{name}}</h3>\n                    <p>{{#conditions}}{{icon}}&nbsp;{{/conditions}} → {{#actions}}{{icon}}&nbsp;{{/actions}}</p>\n                </div>\n            </div>\n{{/payload}}\n",
         "output": "str",
-        "x": 700,
-        "y": 860,
+        "x": 1480,
+        "y": 640,
         "wires": [
             [
                 "ae19a38c056986a4"
@@ -1281,7 +1285,7 @@
         "type": "debug",
         "z": "dd535f73e60cae86",
         "name": "debug 78",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1298,7 +1302,7 @@
         "type": "function",
         "z": "dd535f73e60cae86",
         "name": "Process User Input",
-        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n// if (settings.loglevel === undefined) settings.loglevel = 6;\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nlet datacache = flow.get(\"datacache\");\nif (datacache === undefined) {\n    datacache = {};\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\nif (msg._ui.type ===\"eventSend\") {\n    let eventinput = msg._ui.id.split(\"_\");\n\n    // Handle the event if the user clicked on a rule\n    if (eventinput[0]===\"rule\") {\n        node.status({fill:\"green\",shape:\"ring\",text:\"Rule selection\"});\n        let ruleid = parseInt(eventinput[1]);\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Rule selected:\" +ruleid});\n        editor.ruleid = ruleid;\n        delete editor.conditionid;\n        delete editor.conditionid;\n        flow.set(\"editor\",editor);\n        msg.payload = editor;\n        msg.topic = \"ruleselected\";\n        // Set the selected flag on rules structure as well\n        for (let i = 0; i < rules.length; i++) {\n            if (i === editor.ruleid) {\n                rules[i].selected = true;\n            } else {\n                rules[i].selected = false;\n            }            \n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n\n    // Handle the event if the user click on a condition\n    if (eventinput[0] === \"condition\") {\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Condition selection\" });\n        let conditionid = parseInt(eventinput[1]);\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Condition selected:\" + conditionid });\n        editor.conditionid = conditionid;\n        flow.set(\"editor\", editor);\n        msg.payload = editor;\n        msg.topic = \"conditionselected\";\n        // Set the selected flag on conditions structure as well\n        for (let i = 0; i < rules[editor.ruleid].conditions.length; i++) {\n            if (i === editor.conditionid) {\n                rules[editor.ruleid].conditions[i].selected = true;\n            } else {\n                rules[editor.ruleid].conditions[i].selected = false;\n            }\n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n \n    // Handle the event if the user click on an action\n    if (eventinput[0] === \"action\") {\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Action selection\" });\n        let actionid = parseInt(eventinput[1]);\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Action selected:\" + actionid });\n        editor.actionid = actionid;\n        flow.set(\"editor\", editor);\n        msg.payload = editor;\n        msg.topic = \"actionselected\";\n        // Set the selected flag on action structure as well\n        for (let i = 0; i < rules[editor.ruleid].actions.length; i++) {\n            if (i === editor.actionid) {\n                rules[editor.ruleid].actions[i].selected = true;\n            } else {\n                rules[editor.ruleid].actions[i].selected = false;\n            }\n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n\n\n    node.status({ fill: \"red\", shape: \"dot\", text: \"Unhandled event: \" + msg._ui.id });\n}\n\n\n\n\n\nreturn msg;",
+        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n// if (settings.loglevel === undefined) settings.loglevel = 6;\n\nlet rules = flow.get(\"rules\", settings.rulestore) ?? [];\nlet datacache = flow.get(\"datacache\") ?? {};\nlet editor = flow.get(\"editor\") ?? {};\n\nif (msg._ui.type ===\"eventSend\") {\n    let eventinput = msg._ui.id.split(\"_\");\n\n    // Handle the event if the user clicked on a rule\n    if (eventinput[0]===\"rule\") {\n        node.status({fill:\"green\",shape:\"ring\",text:\"Rule selection\"});\n        let ruleid = parseInt(eventinput[1]);\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Rule selected:\" +ruleid});\n        editor.ruleid = ruleid;\n        delete editor.conditionid;\n        delete editor.conditionid;\n        flow.set(\"editor\",editor);\n        msg.payload = editor;\n        msg.topic = \"ruleselected\";\n        // Set the selected flag on rules structure as well\n        for (let i = 0; i < rules.length; i++) {\n            if (i === editor.ruleid) {\n                rules[i].selected = true;\n            } else {\n                rules[i].selected = false;\n            } \n            // Reset all the condition selections  \n            for (let j = 0; j < rules[i].conditions.length; j++) {\n                rules[i].conditions[j].selected = false;\n            }         \n            // Reset all the action selections  \n            for (let j = 0; j < rules[i].actions.length; j++) {\n                rules[i].actions[j].selected = false;\n            }         \n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n\n    // Handle the event if the user click on a condition\n    if (eventinput[0] === \"condition\") {\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Condition selection\" });\n        let conditionid = parseInt(eventinput[1]);\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Condition selected:\" + conditionid });\n        editor.conditionid = conditionid;\n        flow.set(\"editor\", editor);\n        msg.payload = editor;\n        msg.topic = \"conditionselected\";\n        // Set the selected flag on conditions structure as well\n        for (let i = 0; i < rules[editor.ruleid].conditions.length; i++) {\n            if (i === editor.conditionid) {\n                rules[editor.ruleid].conditions[i].selected = true;\n            } else {\n                rules[editor.ruleid].conditions[i].selected = false;\n            }\n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n \n    // Handle the event if the user click on an action\n    if (eventinput[0] === \"action\") {\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Action selection\" });\n        let actionid = parseInt(eventinput[1]);\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Action selected:\" + actionid });\n        editor.actionid = actionid;\n        flow.set(\"editor\", editor);\n        msg.payload = editor;\n        msg.topic = \"actionselected\";\n        // Set the selected flag on action structure as well\n        for (let i = 0; i < rules[editor.ruleid].actions.length; i++) {\n            if (i === editor.actionid) {\n                rules[editor.ruleid].actions[i].selected = true;\n            } else {\n                rules[editor.ruleid].actions[i].selected = false;\n            }\n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n\n    // Handle the event if the user submits the condition form\n    if ((eventinput[0] === \"submit\") && (eventinput[1] === \"conditionform\")) {\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Condition form submitted\" });\n\n        rules[editor.ruleid].conditions[editor.conditionid].trigger = msg.payload.trigger;\n        rules[editor.ruleid].conditions[editor.conditionid].operand = msg.payload.operand;\n        rules[editor.ruleid].conditions[editor.conditionid].operator = msg.payload.operator;\n        rules[editor.ruleid].conditions[editor.conditionid].value = msg.payload.value;       \n\n        delete editor.conditionid;\n        flow.set(\"editor\", editor);\n        msg.payload = editor;\n        msg.topic = \"conditionselected\";\n        // Remove the selected flag on all conditions (reset the view)\n        for (let i = 0; i < rules[editor.ruleid].conditions.length; i++) {\n            rules[editor.ruleid].conditions[i].selected = false;\n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n\n    // Handle the event if the user enables/disables the rule\n    if ((eventinput[0] === \"submit\") && ((eventinput[1] === \"ruleenable\") || (eventinput[1] === \"ruledisable\"))) {\n        node.status({ fill: \"green\", shape: \"ring\", text: \"Enable/Disable button pressed\" });\n\n        if (eventinput[1] === \"ruleenable\") {\n            rules[editor.ruleid].enabled = true;\n        } else {\n            rules[editor.ruleid].enabled = false;\n        }\n\n        delete editor.conditionid;\n        flow.set(\"editor\", editor);\n        msg.payload = editor;\n        msg.topic = \"ruleselected\";\n        // Remove the selected flag on all conditions (reset the view)\n        for (let i = 0; i < rules[editor.ruleid].conditions.length; i++) {\n            rules[editor.ruleid].conditions[i].selected = false;\n        }\n        flow.set(\"rules\", rules, settings.rulestore);\n        return msg;\n    }\n\n    node.status({ fill: \"red\", shape: \"dot\", text: \"Unhandled event: \" + msg._ui.id });\n}\n\n\n\n\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1334,8 +1338,8 @@
         "positionSourceType": "str",
         "passthrough": false,
         "confData": {},
-        "x": 870,
-        "y": 900,
+        "x": 1650,
+        "y": 680,
         "wires": [
             [
                 "0dba633e1ad88a18"
@@ -1350,7 +1354,8 @@
         "links": [
             "0dba633e1ad88a18",
             "6c07f6adc9eb6bc5",
-            "a9efb0678baddb7d"
+            "a9efb0678baddb7d",
+            "30aa09c757a14fc6"
         ],
         "x": 225,
         "y": 800,
@@ -1369,8 +1374,8 @@
         "links": [
             "da38e26f2fe532ea"
         ],
-        "x": 1025,
-        "y": 860,
+        "x": 1805,
+        "y": 640,
         "wires": []
     },
     {
@@ -1412,6 +1417,11 @@
             [
                 "9958dfd95401c6c4"
             ]
+        ],
+        "outputLabels": [
+            "Rule Selected",
+            "Condition Selected",
+            "Action Selected"
         ]
     },
     {
@@ -1436,8 +1446,8 @@
         "positionSourceType": "str",
         "passthrough": false,
         "confData": {},
-        "x": 870,
-        "y": 980,
+        "x": 1650,
+        "y": 760,
         "wires": [
             [
                 "6c07f6adc9eb6bc5"
@@ -1465,8 +1475,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 330,
-        "y": 980,
+        "x": 1110,
+        "y": 760,
         "wires": [
             [
                 "d402aad04b418547"
@@ -1478,17 +1488,18 @@
         "type": "function",
         "z": "dd535f73e60cae86",
         "name": "Get Condition List",
-        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nif (rules.length===0) {\n    return;\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\nmsg.payload = rules[editor.ruleid].conditions;\nreturn msg;",
+        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nif (rules.length===0) {\n    return;\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\ndelete msg.uibuilderCtrl;\nmsg.payload = rules[editor.ruleid].conditions;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 530,
-        "y": 980,
+        "x": 1310,
+        "y": 760,
         "wires": [
             [
-                "0d966e3b0e7392b3"
+                "0d966e3b0e7392b3",
+                "01c2101948778563"
             ]
         ]
     },
@@ -1501,10 +1512,10 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{{#payload}}\n            <div class=\"list-item{{#selected}} selected{{/selected}}\" id=\"condition_{{id}}\" onclick=\"uibuilder.eventSend(event)\">\n                <div class=\"content\">\n                    <h3>{{trigger}}&nbsp;{{operand}}&nbsp;{{operator}}&nbsp;{{value}}</h3>\n                </div>\n            </div>\n{{/payload}}\n",
+        "template": "{{#payload}}\n            <div class=\"list-item{{#selected}} selected{{/selected}}\" id=\"condition_{{id}}\" onclick=\"uibuilder.eventSend(event)\">\n                <div class=\"content\">\n                    <h3>{{trigger}}&nbsp;{{operand}}&nbsp;{{operator}}&nbsp;{{value}}</h3>\n                </div>\n            \n            </div>\n            {{#selected}}<div id=\"condition_editor\"></div>{{/selected}}\n{{/payload}}\n",
         "output": "str",
-        "x": 700,
-        "y": 980,
+        "x": 1480,
+        "y": 760,
         "wires": [
             [
                 "f2f50f12d29c52d1"
@@ -1520,15 +1531,15 @@
         "links": [
             "da38e26f2fe532ea"
         ],
-        "x": 1025,
-        "y": 980,
+        "x": 1805,
+        "y": 760,
         "wires": []
     },
     {
         "id": "124b37f0419c3941",
         "type": "uib-element",
         "z": "dd535f73e60cae86",
-        "name": "Condition list",
+        "name": "Action list",
         "topic": "",
         "elementtype": "html",
         "parent": "#actionlist",
@@ -1546,8 +1557,8 @@
         "positionSourceType": "str",
         "passthrough": false,
         "confData": {},
-        "x": 870,
-        "y": 1040,
+        "x": 1640,
+        "y": 820,
         "wires": [
             [
                 "a9efb0678baddb7d"
@@ -1575,8 +1586,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 330,
-        "y": 1040,
+        "x": 1110,
+        "y": 820,
         "wires": [
             [
                 "9958dfd95401c6c4"
@@ -1588,14 +1599,14 @@
         "type": "function",
         "z": "dd535f73e60cae86",
         "name": "Get Action List",
-        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nif (rules.length===0) {\n    return;\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\nmsg.payload = rules[editor.ruleid].actions;\nreturn msg;",
+        "func": "let settings = flow.get(\"settings\");\nif (settings === undefined) {\n    node.status({fill: \"red\", shape: \"ring\", text: \"Missing settings\" });\n    return;\n}\n// Set settings defaults\nif (settings.rulestore === undefined) settings.rulestore = \"\";\n\nlet rules = flow.get(\"rules\", settings.rulestore);\nif (rules === undefined) {\n    rules = [];\n}\n\nif (rules.length===0) {\n    return;\n}\n\nlet editor = flow.get(\"editor\");\nif (editor === undefined) {\n    editor = {};\n}\n\ndelete msg.uibuilderCtrl;\nmsg.payload = rules[editor.ruleid].actions;\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 520,
-        "y": 1040,
+        "x": 1300,
+        "y": 820,
         "wires": [
             [
                 "b031b0d78dc9ae2a"
@@ -1611,10 +1622,10 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "{{#payload}}\n            <div class=\"list-item{{#selected}} selected{{/selected}}\" id=\"action_{{id}}\" onclick=\"uibuilder.eventSend(event)\">\n                <div class=\"content\">\n                    <h3>{{type}}&nbsp;{{topic}}&nbsp;{{value}}</h3>\n                </div>\n            </div>\n{{/payload}}\n",
+        "template": "{{#payload}}\n            <div class=\"list-item{{#selected}} selected{{/selected}}\" id=\"action_{{id}}\" onclick=\"uibuilder.eventSend(event)\">\n                <div class=\"content\">\n                    <h3>{{type}}&nbsp;{{^name}}{{topic}}&nbsp;{{value}}{{/name}}{{#name}}{{name}}&nbsp;->&nbsp;{{value}}{{/name}}</h3>\n                </div>\n            </div>\n            {{#selected}}<div id=\"action_editor\"></div>{{/selected}}\n{{/payload}}\n",
         "output": "str",
-        "x": 700,
-        "y": 1040,
+        "x": 1480,
+        "y": 820,
         "wires": [
             [
                 "124b37f0419c3941"
@@ -1630,8 +1641,129 @@
         "links": [
             "da38e26f2fe532ea"
         ],
-        "x": 1025,
-        "y": 1040,
+        "x": 1805,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "2d4f5d466b216f6a",
+        "type": "switch",
+        "z": "dd535f73e60cae86",
+        "name": "Client Connect",
+        "property": "uibuilderCtrl",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "client connect",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 760,
+        "y": 760,
+        "wires": [
+            [
+                "668f619db096a5d2"
+            ]
+        ]
+    },
+    {
+        "id": "9a115156b972bb49",
+        "type": "debug",
+        "z": "dd535f73e60cae86",
+        "name": "debug 79",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 700,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "01c2101948778563",
+        "type": "function",
+        "z": "dd535f73e60cae86",
+        "name": "Prepare Condition Input Form",
+        "func": "let editor = flow.get(\"editor\") ?? {};\n\nif (editor.conditionid !== undefined) {\n\n    let form = \n    [\n            {\n                \"id\": \"trigger\",\n                \"label\": \"Trigger:\",\n                \"type\": \"select\",\n                \"options\": [\n                    {\n                        \"label\": \"Data\",\n                        \"value\": \"data\"\n                    },\n                    {\n                        \"label\": \"State\",\n                        \"value\": \"state\"\n                    },\n                    {\n                        \"label\": \"Time\",\n                        \"value\": \"time\"\n                    }\n                ],\n                \"value\": msg.payload[editor.conditionid].trigger\n            },\n            {\n                \"id\": \"operand\",\n                \"type\": \"text\",\n                \"required\": true,\n                \"label\": \"Operand:\",\n                \"value\": msg.payload[editor.conditionid].operand\n            },\n            {\n                \"id\": \"operator\",\n                \"label\": \"Operator:\",\n                \"type\": \"select\",\n                \"options\": [\n                    {\n                        \"label\": \"Less than\",\n                        \"value\": \"LQ\"\n                    },\n                    {\n                        \"label\": \"Greater than\",\n                        \"value\": \"GT\"\n                    },\n                    {\n                        \"label\": \"Equals to\",\n                        \"value\": \"EQ\"\n                    }\n                ],\n                \"value\": msg.payload[editor.conditionid].operator\n            },\n            {\n                \"id\": \"value\",\n                \"type\": \"text\",\n                \"required\": true,\n                \"label\": \"Value:\",\n                \"value\": msg.payload[editor.conditionid].value\n            },\n            {\n                \"id\": \"submit_conditionform\",\n                \"type\": \"button\",\n                \"label\": \"Save changes\",\n                \"value\": \"submit\"\n            }\n    ];\n\n    if (msg.payload[editor.conditionid].trigger===\"time\") {\n        form[1].type = \"hidden\";\n        form[1].label = \" \";\n    }\n\n    // delete msg.uibuilderCtrl;\n    // return msg;\n\n    return [{\"payload\": form}];\n\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1350,
+        "y": 880,
+        "wires": [
+            [
+                "204d235c9fdc3819"
+            ]
+        ]
+    },
+    {
+        "id": "204d235c9fdc3819",
+        "type": "uib-element",
+        "z": "dd535f73e60cae86",
+        "name": "Condition Form",
+        "topic": "",
+        "elementtype": "sform",
+        "parent": "#condition_editor",
+        "parentSource": "",
+        "parentSourceType": "str",
+        "elementid": "condition_editor_uib",
+        "elementId": "",
+        "elementIdSourceType": "str",
+        "heading": "",
+        "headingSourceType": "str",
+        "headingLevel": "h2",
+        "data": "payload",
+        "dataSourceType": "msg",
+        "position": "last",
+        "positionSourceType": "str",
+        "passthrough": false,
+        "confData": {},
+        "x": 1660,
+        "y": 880,
+        "wires": [
+            [
+                "30aa09c757a14fc6"
+            ]
+        ]
+    },
+    {
+        "id": "30aa09c757a14fc6",
+        "type": "link out",
+        "z": "dd535f73e60cae86",
+        "name": "link out 60",
+        "mode": "link",
+        "links": [
+            "da38e26f2fe532ea"
+        ],
+        "x": 1805,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "2f43a6e2d75fab3a",
+        "type": "debug",
+        "z": "dd535f73e60cae86",
+        "name": "debug 82",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 760,
         "wires": []
     },
     {
