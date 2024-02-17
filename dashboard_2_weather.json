@@ -1,0 +1,338 @@
+[
+    {
+        "id": "3b3ba57d6cfccb65",
+        "type": "inject",
+        "z": "0e3249ddee2000e3",
+        "name": "Example",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"lat\":47.4979,\"lon\":19.0402,\"timezone\":\"Europe/Budapest\",\"timezone_offset\":7200,\"current\":{\"dt\":1696411074,\"sunrise\":1696394764,\"sunset\":1696436348,\"temp\":18.69,\"feels_like\":18.08,\"pressure\":1025,\"humidity\":56,\"dew_point\":9.75,\"uvi\":1.95,\"clouds\":0,\"visibility\":10000,\"wind_speed\":8.75,\"wind_deg\":330,\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"clear sky\",\"icon\":\"01d\"}]},\"daily\":[{\"dt\":1696413600,\"sunrise\":1696394764,\"sunset\":1696436348,\"moonrise\":1696445520,\"moonset\":1696417500,\"moon_phase\":0.68,\"summary\":\"Expect a day of partly cloudy with clear spells\",\"temp\":{\"day\":19.16,\"min\":16.63,\"max\":21.42,\"night\":16.63,\"eve\":19.91,\"morn\":18.03},\"feels_like\":{\"day\":18.52,\"night\":15.45,\"eve\":18.9,\"morn\":17.64},\"pressure\":1025,\"humidity\":53,\"dew_point\":9.36,\"wind_speed\":6.07,\"wind_deg\":328,\"wind_gust\":13.53,\"weather\":[{\"id\":801,\"main\":\"Clouds\",\"description\":\"few clouds\",\"icon\":\"02d\"}],\"clouds\":19,\"pop\":0.16,\"uvi\":2.74},{\"dt\":1696500000,\"sunrise\":1696481247,\"sunset\":1696522627,\"moonrise\":1696534860,\"moonset\":1696507740,\"moon_phase\":0.71,\"summary\":\"Expect a day of partly cloudy with clear spells\",\"temp\":{\"day\":20.46,\"min\":14.49,\"max\":22.27,\"night\":17.88,\"eve\":20.66,\"morn\":14.86},\"feels_like\":{\"day\":19.45,\"night\":16.82,\"eve\":19.85,\"morn\":13.71},\"pressure\":1025,\"humidity\":34,\"dew_point\":3.88,\"wind_speed\":3.86,\"wind_deg\":300,\"wind_gust\":6.34,\"weather\":[{\"id\":802,\"main\":\"Clouds\",\"description\":\"scattered clouds\",\"icon\":\"03d\"}],\"clouds\":45,\"pop\":0,\"uvi\":2.9},{\"dt\":1696586400,\"sunrise\":1696567730,\"sunset\":1696608907,\"moonrise\":1696624740,\"moonset\":1696597320,\"moon_phase\":0.75,\"summary\":\"Expect a day of partly cloudy with clear spells\",\"temp\":{\"day\":19.48,\"min\":15.35,\"max\":21.58,\"night\":17.26,\"eve\":20.3,\"morn\":15.8},\"feels_like\":{\"day\":18.5,\"night\":16.29,\"eve\":19.35,\"morn\":14.66},\"pressure\":1026,\"humidity\":39,\"dew_point\":4.89,\"wind_speed\":2.88,\"wind_deg\":306,\"wind_gust\":6.97,\"weather\":[{\"id\":804,\"main\":\"Clouds\",\"description\":\"overcast clouds\",\"icon\":\"04d\"}],\"clouds\":100,\"pop\":0,\"uvi\":3.02},{\"dt\":1696672800,\"sunrise\":1696654213,\"sunset\":1696695188,\"moonrise\":1696715100,\"moonset\":1696686120,\"moon_phase\":0.78,\"summary\":\"There will be clear sky until morning, then partly cloudy\",\"temp\":{\"day\":20.09,\"min\":14.68,\"max\":22.74,\"night\":20.55,\"eve\":22.74,\"morn\":15.03},\"feels_like\":{\"day\":19.25,\"night\":19.91,\"eve\":22.04,\"morn\":13.97},\"pressure\":1023,\"humidity\":42,\"dew_point\":6.58,\"wind_speed\":6.13,\"wind_deg\":277,\"wind_gust\":11.95,\"weather\":[{\"id\":804,\"main\":\"Clouds\",\"description\":\"overcast clouds\",\"icon\":\"04d\"}],\"clouds\":88,\"pop\":0,\"uvi\":3.4},{\"dt\":1696759200,\"sunrise\":1696740696,\"sunset\":1696781469,\"moonrise\":0,\"moonset\":1696774320,\"moon_phase\":0.81,\"summary\":\"There will be partly cloudy today\",\"temp\":{\"day\":23.71,\"min\":12.25,\"max\":25.48,\"night\":12.25,\"eve\":16.9,\"morn\":19.53},\"feels_like\":{\"day\":23,\"night\":10.68,\"eve\":15.98,\"morn\":18.79},\"pressure\":1016,\"humidity\":33,\"dew_point\":6.5,\"wind_speed\":8.1,\"wind_deg\":304,\"wind_gust\":18.46,\"weather\":[{\"id\":802,\"main\":\"Clouds\",\"description\":\"scattered clouds\",\"icon\":\"03d\"}],\"clouds\":44,\"pop\":0,\"uvi\":3.12},{\"dt\":1696845600,\"sunrise\":1696827180,\"sunset\":1696867750,\"moonrise\":1696805520,\"moonset\":1696862160,\"moon_phase\":0.84,\"summary\":\"There will be partly cloudy today\",\"temp\":{\"day\":11.6,\"min\":9.31,\"max\":13.25,\"night\":11.6,\"eve\":13.13,\"morn\":9.31},\"feels_like\":{\"day\":9.73,\"night\":9.44,\"eve\":11.1,\"morn\":8.75},\"pressure\":1031,\"humidity\":35,\"dew_point\":-3.58,\"wind_speed\":3.96,\"wind_deg\":330,\"wind_gust\":7.14,\"weather\":[{\"id\":803,\"main\":\"Clouds\",\"description\":\"broken clouds\",\"icon\":\"04d\"}],\"clouds\":84,\"pop\":0,\"uvi\":4},{\"dt\":1696932000,\"sunrise\":1696913665,\"sunset\":1696954033,\"moonrise\":1696896060,\"moonset\":1696949700,\"moon_phase\":0.87,\"summary\":\"Expect a day of partly cloudy with clear spells\",\"temp\":{\"day\":11.89,\"min\":9.03,\"max\":16.9,\"night\":14.61,\"eve\":16.9,\"morn\":9.56},\"feels_like\":{\"day\":9.89,\"night\":13.09,\"eve\":15.38,\"morn\":9.56},\"pressure\":1028,\"humidity\":29,\"dew_point\":-5.68,\"wind_speed\":3.08,\"wind_deg\":204,\"wind_gust\":5.82,\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"clear sky\",\"icon\":\"01d\"}],\"clouds\":5,\"pop\":0,\"uvi\":4},{\"dt\":1697018400,\"sunrise\":1697000149,\"sunset\":1697040316,\"moonrise\":1696986540,\"moonset\":1697037060,\"moon_phase\":0.9,\"summary\":\"You can expect partly cloudy in the morning, with clearing in the afternoon\",\"temp\":{\"day\":17.75,\"min\":13.37,\"max\":23.03,\"night\":17.42,\"eve\":23.03,\"morn\":13.37},\"feels_like\":{\"day\":16.65,\"night\":16.52,\"eve\":22.38,\"morn\":11.91},\"pressure\":1023,\"humidity\":41,\"dew_point\":4.23,\"wind_speed\":1.82,\"wind_deg\":247,\"wind_gust\":4.16,\"weather\":[{\"id\":804,\"main\":\"Clouds\",\"description\":\"overcast clouds\",\"icon\":\"04d\"}],\"clouds\":100,\"pop\":0,\"uvi\":4}]}",
+        "payloadType": "json",
+        "x": 140,
+        "y": 3200,
+        "wires": [
+            [
+                "5ec3b4e21d28030a",
+                "8f99d95860b23efe"
+            ]
+        ]
+    },
+    {
+        "id": "f93b9f5e3b4b39b4",
+        "type": "ui-template",
+        "z": "0e3249ddee2000e3",
+        "group": "82ae1c5a017a9bdc",
+        "page": "",
+        "ui": "",
+        "name": "Weather Card with forecast",
+        "order": 2,
+        "width": "0",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n  <v-card \n    class=\"mx-auto\"\n    max-width=\"368\"\n    color=\"white\"\n  >\n    <v-card-item :title=\"payload.city\">\n      <template v-slot:subtitle>\n        {{ payload.description }}\n      </template>\n    </v-card-item>\n\n    <v-card-text class=\"py-0\">\n      <v-row align=\"center\" no-gutters>\n        <v-col\n          class=\"text-h2\"\n          cols=\"6\"\n        >\n          {{ payload.temp }}&deg;C\n        </v-col>\n\n        <v-col cols=\"6\" class=\"text-right\">\n          <v-icon :icon=\"payload.mdiicon\" :color=\"payload.mdiiconcolor\"size=\"88\"></v-icon>\n        </v-col>\n      </v-row>\n    </v-card-text>\n\n    <div class=\"d-flex py-3 justify-space-between\">\n      <v-list-item\n        density=\"compact\"\n        prepend-icon=\"mdi-weather-windy\"\n      >\n        <v-list-item-subtitle>{{ payload.wind_speed }} km/h</v-list-item-subtitle>\n      </v-list-item>\n\n      <v-list-item\n        density=\"compact\"\n        prepend-icon=\"mdi-weather-pouring\"\n      >\n        <v-list-item-subtitle>{{ payload.pop }}%</v-list-item-subtitle>\n      </v-list-item>\n    </div>\n\n    <v-expand-transition>\n      <div v-if=\"expand\">\n        <v-list class=\"bg-transparent\">\n          <v-list-item\n            v-for=\"item in payload.daily\"\n            :key=\"item.key\"\n            :title=\"item.daytext\"\n            :append-icon=\"item.icon\"\n            :subtitle=\"item.tempminmax\"\n          >\n          </v-list-item>\n        </v-list>\n      </div>\n    </v-expand-transition>\n\n    <v-divider></v-divider>\n\n    <v-card-actions>\n      <v-btn @click=\"expand = !expand\">\n        {{ !expand ? 'Show Forecast' : 'Hide Forecast' }}\n      </v-btn>\n    </v-card-actions>\n  </v-card>\n</template>\n\n<script>\n    export default {\n        data() {\n            return {      \n                expand: false,     \n                payload: {}    \n            }\n        },\n        watch: {\n            msg: function(){            \n                if(this.msg.payload != undefined){                    \n                    this.payload = this.msg.payload;\n                }\n            }\n        }\n    }\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 740,
+        "y": 3240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5ec3b4e21d28030a",
+        "type": "function",
+        "z": "0e3249ddee2000e3",
+        "name": "Prep Data for Weather Card",
+        "func": "// Change the city weather here\nlet weather = { \"city\": \"Budapest\" };\n\nfunction getDayText(daynum) {\n    let thisday = new Date(daynum);\n    const dayNames = [\"Sunday\", \"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\"];\n    return dayNames[thisday.getDay()];\n}\n\nfunction getDayTextShort(daynum) {\n    let thisday = new Date(daynum);\n    const dayNames = [\"Sun\", \"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\", \"Sat\"];\n    return dayNames[thisday.getDay()];\n}\n\nfunction getMDIicon(iconname) {\n    switch (iconname) {\n        case \"01d\": return \"mdi-white-balance-sunny\";\n        case \"01n\": return \"mdi-weather-night\";\n        case \"02d\": return \"mdi-weather-partly-cloudy\";\n        case \"02n\": return \"mdi-weather-night-partly-cloudy\";\n        case \"03d\": return \"mdi-weather-cloudy\";\n        case \"03n\": return \"mdi-weather-cloudy\";\n        case \"04d\": return \"mdi-weather-cloudy\";\n        case \"04n\": return \"mdi-weather-cloudy\";\n        case \"09d\": return \"mdi-weather-rainy\";\n        case \"09n\": return \"mdi-weather-rainy\";\n        case \"10d\": return \"mdi-weather-partly-rainy\";\n        case \"10n\": return \"mdi-weather-partly-rainy\";\n        case \"11d\": return \"mdi-weather-lightning-rainy\";\n        case \"11n\": return \"mdi-weather-lightning-rainy\";\n        case \"13d\": return \"mdi-snowflake\";\n        case \"13n\": return \"mdi-snowflake\";\n        case \"50d\": return \"mdi-weather-fog\";\n        case \"50n\": return \"mdi-weather-fog\";\n        default: return \"mdi-weather-cloudy-clock\";\n    }\n}\n\nfunction getMDIiconColor(iconname) {\n    switch (iconname) {\n        case \"01d\": return \"orange\";\n        case \"01n\": return \"blue-grey\";\n        case \"02d\": return \"blue-grey\";\n        case \"02n\": return \"blue-grey\";\n        case \"03d\": return \"blue-grey\";\n        case \"03n\": return \"blue-grey\";\n        case \"04d\": return \"blue-grey\";\n        case \"04n\": return \"indigo\";\n        case \"09d\": return \"indigo\";\n        case \"09n\": return \"indigo\";\n        case \"10d\": return \"indigo\";\n        case \"10n\": return \"yellow\";\n        case \"11d\": return \"yellow\";\n        case \"11n\": return \"indigo\";\n        case \"13d\": return \"indigo\";\n        case \"13n\": return \"blue-grey\";\n        case \"50d\": return \"blue-grey\";\n        case \"50n\": return \"blue-grey\";\n        default: return \"blue-grey\";\n    }\n}\n\n\n\nweather.temp = msg.payload.current.temp.toFixed(0);\nweather.feels_like = msg.payload.current.feels_like.toFixed(0);\nweather.wind_speed = msg.payload.current.wind_speed.toFixed(1);\nweather.description = msg.payload.daily[0].summary;\nweather.mdiicon = getMDIicon(msg.payload.current.weather[0].icon);\nweather.mdiiconcolor = getMDIiconColor(msg.payload.current.weather[0].icon);\nweather.pop = msg.payload.daily[0].pop * 100;\nweather.daily = [];\nfor (let i=0; i<msg.payload.daily.length; i++) {\n    let day = {};\n    day.key = i;\n    day.daytext = getDayText(msg.payload.daily[i].dt*1000);\n    day.daytextshort = getDayTextShort(msg.payload.daily[i].dt * 1000);\n    day.rain = 0;\n    day.tempminmax = msg.payload.daily[i].temp.min.toFixed(0) + \"\\xB0/\" + msg.payload.daily[i].temp.max.toFixed(0) + \"\\xB0\"\n    day.icon = getMDIicon(msg.payload.daily[i].weather[0].icon);\n    day.pop = msg.payload.daily[i].pop * 100;\n    weather.daily.push(day);\n}\n\nmsg.payload = weather;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 3200,
+        "wires": [
+            [
+                "f93b9f5e3b4b39b4",
+                "44a2e2c9e89b56e1",
+                "4877f2555b77028e",
+                "f6a6a2be043e9c25",
+                "9052b143d9d56fc0"
+            ]
+        ]
+    },
+    {
+        "id": "44a2e2c9e89b56e1",
+        "type": "debug",
+        "z": "0e3249ddee2000e3",
+        "name": "Data for weather card",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 660,
+        "y": 3140,
+        "wires": []
+    },
+    {
+        "id": "8f99d95860b23efe",
+        "type": "debug",
+        "z": "0e3249ddee2000e3",
+        "name": "OWM response",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 360,
+        "y": 3140,
+        "wires": []
+    },
+    {
+        "id": "4877f2555b77028e",
+        "type": "ui-template",
+        "z": "0e3249ddee2000e3",
+        "group": "82ae1c5a017a9bdc",
+        "page": "",
+        "ui": "",
+        "name": "Weather Card simple",
+        "order": 4,
+        "width": "0",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n  <v-card \n    class=\"mx-auto\"\n    max-width=\"368\"\n    color=\"white\"\n  >\n    <v-card-item :title=\"payload.city\">\n      <template v-slot:subtitle>\n        <div class=\"text-h5 text-right\">Feels like: {{ payload.feels_like }}&deg;C</div>\n      </template>\n    </v-card-item>\n\n    <v-card-text class=\"py-0\">\n      <v-row align=\"center\" no-gutters>\n        <v-col cols=\"6\" >\n          <v-icon :icon=\"payload.mdiicon\" :color=\"payload.mdiiconcolor\" size=\"88\"></v-icon>\n        </v-col>\n        <v-col class=\"text-h2 text-right\" cols=\"6\">\n          {{ payload.temp }}&deg;C\n        </v-col>\n      </v-row>\n      <v-row align=\"center\" no-gutters>\n        <v-col cols=\"6\">\n        </v-col>\n        <v-col class=\"text-h5 text-right\" cols=\"6\">\n          {{ payload.daily[0].tempminmax }}\n        </v-col>\n      </v-row>\n    </v-card-text>\n    <div class=\"d-flex py-2 justify-space-between\"></div>\n\n    <v-divider></v-divider>\n\n  </v-card>\n</template>\n\n<script>\n    export default {\n        data() {\n            return {      \n                payload: {}    \n            }\n        },\n        watch: {\n            msg: function(){            \n                if(this.msg.payload != undefined){                    \n                    this.payload = this.msg.payload;\n                }\n            }\n        }\n    }\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 720,
+        "y": 3320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f6a6a2be043e9c25",
+        "type": "ui-template",
+        "z": "0e3249ddee2000e3",
+        "group": "82ae1c5a017a9bdc",
+        "page": "",
+        "ui": "",
+        "name": "Weather Card forcast shown",
+        "order": 6,
+        "width": "0",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n  <v-card \n    class=\"mx-auto\"\n    max-width=\"368\"\n    color=\"white\"\n  >\n    <v-card-item :title=\"payload.city\">\n      <template v-slot:subtitle>\n        {{ payload.description }}\n      </template>\n    </v-card-item>\n\n    <v-card-text class=\"py-0\">\n      <div class=\"d-flex py-2 justify-space-between\"></div>\n      <v-row align=\"center\" no-gutters>\n        <v-col\n          class=\"text-h2\"\n          cols=\"6\"\n        >\n          {{ payload.temp }}&deg;C\n        </v-col>\n\n        <v-col cols=\"6\" class=\"text-right\">\n          <v-icon :icon=\"payload.mdiicon\" :color=\"payload.mdiiconcolor\"size=\"88\"></v-icon><br/>\n        </v-col>\n      </v-row>\n      <div class=\"d-flex py-2 justify-space-between\"></div>\n      <v-row align=\"center\" no-gutters>\n                <v-col cols=\"2\" class=\"text-center\">\n                  {{ payload.daily[0].daytextshort}}<br/>\n                  {{ payload.daily[0].pop}}%<br/>\n                  <v-icon :icon=\"payload.daily[0].icon\" size=\"45\"></v-icon><br/>\n                  {{ payload.daily[0].tempminmax}}\n                </v-col>\n                <v-col cols=\"2\" class=\"text-center\">\n                  {{ payload.daily[1].daytextshort}}<br/>\n                  {{ payload.daily[1].pop}}%<br/>\n                  <v-icon :icon=\"payload.daily[1].icon\" size=\"45\"></v-icon><br/>\n                  {{ payload.daily[1].tempminmax}}\n                </v-col>\n                <v-col cols=\"2\" class=\"text-center\">\n                  {{ payload.daily[2].daytextshort}}<br/>\n                  {{ payload.daily[2].pop}}%<br/>\n                  <v-icon :icon=\"payload.daily[2].icon\" size=\"45\"></v-icon><br/>\n                  {{ payload.daily[2].tempminmax}}\n                </v-col>\n                <v-col cols=\"2\" class=\"text-center\">\n                  {{ payload.daily[3].daytextshort}}<br/>\n                  {{ payload.daily[3].pop}}%<br/>\n                  <v-icon :icon=\"payload.daily[3].icon\" size=\"45\"></v-icon><br/>\n                  {{ payload.daily[3].tempminmax}}\n                </v-col>\n                <v-col cols=\"2\" class=\"text-center\">\n                  {{ payload.daily[4].daytextshort}}<br/>\n                  {{ payload.daily[4].pop}}%<br/>\n                  <v-icon :icon=\"payload.daily[4].icon\" size=\"45\"></v-icon><br/>\n                  {{ payload.daily[4].tempminmax}}\n                </v-col>\n                <v-col cols=\"2\" class=\"text-center\">\n                  {{ payload.daily[0].daytextshort}}<br/>\n                  {{ payload.daily[5].pop}}%<br/>\n                  <v-icon :icon=\"payload.daily[0].icon\" size=\"45\"></v-icon><br/>\n                  {{ payload.daily[0].tempminmax}}\n                </v-col>                                \n\n\n\n      </v-row>\n      <div class=\"d-flex py-2 justify-space-between\"></div>\n    </v-card-text>\n\n\n\n\n\n    <v-divider></v-divider>\n\n\n</template>\n\n<script>\n    export default {\n        data() {\n            return {      \n                expand: false,     \n                payload: {}    \n            }\n        },\n        watch: {\n            msg: function(){            \n                if(this.msg.payload != undefined){                    \n                    this.payload = this.msg.payload;\n                }\n            }\n        }\n    }\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 740,
+        "y": 3400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9052b143d9d56fc0",
+        "type": "ui-template",
+        "z": "0e3249ddee2000e3",
+        "group": "82ae1c5a017a9bdc",
+        "page": "",
+        "ui": "",
+        "name": "Weather Card with image",
+        "order": 8,
+        "width": "0",
+        "height": "0",
+        "head": "",
+        "format": "<template>\n  <v-card \n    class=\"mx-auto\"\n    max-width=\"368\"\n    color=\"white\"\n  >\n    <v-img src=\"http://192.168.1.80/street.jpg\" height=\"300px\" cover></v-img>\n    <div class=\"d-flex py-1 justify-space-between\"></div>\n    <v-card-text class=\"py-0\">\n      <v-row align=\"center\" no-gutters>\n        <v-col cols=\"6\">\n          <v-icon :icon=\"payload.mdiicon\" :color=\"payload.mdiiconcolor\" size=\"50\"></v-icon>\n        </v-col>\n        <v-col class=\"text-h6 text-right\" cols=\"6\">\n          <strong>{{ payload.temp }}&deg;C</strong><br/>\n          {{ payload.daily[0].tempminmax }}\n        </v-col>\n      </v-row>\n    </v-card-text>\n    <div class=\"d-flex py-2 justify-space-between\"></div>\n\n    <v-divider></v-divider>\n\n  </v-card>\n</template>\n\n<script>\n    export default {\n        data() {\n            return {      \n                payload: {}    \n            }\n        },\n        watch: {\n            msg: function(){            \n                if(this.msg.payload != undefined){                    \n                    this.payload = this.msg.payload;\n                }\n            }\n        }\n    }\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 730,
+        "y": 3480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ba03ae224cadd0df",
+        "type": "ui-markdown",
+        "z": "0e3249ddee2000e3",
+        "group": "82ae1c5a017a9bdc",
+        "name": "Text: Intro",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "content": "# Weather examples in v-card\n\nThese examples show how to use the [Cards](https://vuetifyjs.com/en/components/cards/) Vuetify component to create weather icons. These examples use response from the OpenWeatherMap One Call 3.0 API JSON response.\n\nIn the example, the OWM response is \"hardcoded\" in a `inject` node, replace that with a `http-request` that calls OWM and properly configured. The JSON data goes into the `Prep Data for Weather Card\" function call which converts the data for the Weather Cards. Such as converting icons, determining colors, etc.\n\nGo into the function node and edit your city name (which is not included in the OWM response):\n```\n// Change the city weather here\nlet weather = { \"city\": \"Budapest\" };\n```\n\nAlso, you may localize the day names in the `getDayText` and `getDayTextShort` functions in the function node.",
+        "className": "",
+        "x": 680,
+        "y": 3200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2889a82e6caa1d4c",
+        "type": "ui-markdown",
+        "z": "0e3249ddee2000e3",
+        "group": "82ae1c5a017a9bdc",
+        "name": "Text: First",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "content": "## Weather Card with Expandable Forecast\n\nThis template contains a card with the name of the city, summary of the current day's weather, weather icon, current temperature, wind speed and change of rain.\nthere is an expandable forecast which shows the temperatures and weather icon for the next 7 days.\n\nUnits of measure are stored in the template, so replace the `&deg;C` and `km/h` to different units.",
+        "className": "",
+        "x": 680,
+        "y": 3280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1c68c6f99f09258e",
+        "type": "ui-markdown",
+        "z": "0e3249ddee2000e3",
+        "group": "82ae1c5a017a9bdc",
+        "name": "Text: Simple",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "content": "## Simple Weather Card\n\nThis template contains a simple weather card, which shows the name of the city, summary of the current day's weather, weather icon, current temperature, feels like temperature and todays minimum and maximum.\n",
+        "className": "",
+        "x": 690,
+        "y": 3360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "881222fa49100842",
+        "type": "ui-markdown",
+        "z": "0e3249ddee2000e3",
+        "group": "82ae1c5a017a9bdc",
+        "name": "Text: Forecast",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "content": "## Weather Card with Forecast\n\nThis template contains very similar to the first example, but the 6 day forecast is shown at the bottom of the card in horizontal layout.",
+        "className": "",
+        "x": 700,
+        "y": 3440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1d23f36d141cf4e8",
+        "type": "ui-markdown",
+        "z": "0e3249ddee2000e3",
+        "group": "82ae1c5a017a9bdc",
+        "name": "Text: With Image",
+        "order": 9,
+        "width": 0,
+        "height": 0,
+        "content": "## Weather Card with Image\n\nThis template shows an image on top, which can be a webcam image or in my case a static image from a security camera, and a summary current weahter condition below it.",
+        "className": "",
+        "x": 710,
+        "y": 3520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2eccd02984b84718",
+        "type": "comment",
+        "z": "0e3249ddee2000e3",
+        "name": "Weather Cards",
+        "info": "",
+        "x": 110,
+        "y": 3120,
+        "wires": []
+    },
+    {
+        "id": "82ae1c5a017a9bdc",
+        "type": "ui-group",
+        "name": "Weather examples",
+        "page": "4791e9f82f583fb8",
+        "width": "12",
+        "height": "1",
+        "order": -1,
+        "showTitle": false,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "4791e9f82f583fb8",
+        "type": "ui-page",
+        "name": "Weather",
+        "ui": "cb79bc4520925e32",
+        "path": "/weather",
+        "icon": "weather-partly-cloudy",
+        "layout": "notebook",
+        "theme": "0d92c765bfad87e6",
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "cb79bc4520925e32",
+        "type": "ui-base",
+        "name": "My UI",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false
+    },
+    {
+        "id": "0d92c765bfad87e6",
+        "type": "ui-theme",
+        "name": "Basic Blue Theme",
+        "colors": {
+            "surface": "#4d58ff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    }
+]
