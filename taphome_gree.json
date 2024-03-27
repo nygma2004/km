@@ -1,0 +1,246 @@
+[
+    {
+        "id": "aa7e9a0d70e1cd3f",
+        "type": "debug",
+        "z": "eb90c8df0fedd91b",
+        "name": "Message to Gree",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "fa3d94f4a95e0f7b",
+        "type": "tcp request",
+        "z": "eb90c8df0fedd91b",
+        "name": "Wellness Legkondi",
+        "server": "192.168.0.10",
+        "port": "10000",
+        "out": "sit",
+        "ret": "string",
+        "splitc": " ",
+        "newline": "\\n",
+        "trim": false,
+        "tls": "",
+        "x": 370,
+        "y": 1260,
+        "wires": [
+            [
+                "ef09a627bf62a551",
+                "1e21ca4f5401b8f2"
+            ]
+        ]
+    },
+    {
+        "id": "ccb7fcf44c34db33",
+        "type": "inject",
+        "z": "eb90c8df0fedd91b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "\\n",
+        "payloadType": "str",
+        "x": 130,
+        "y": 1260,
+        "wires": [
+            [
+                "fa3d94f4a95e0f7b"
+            ]
+        ]
+    },
+    {
+        "id": "60279daafc60ee7c",
+        "type": "gree-hvac",
+        "z": "eb90c8df0fedd91b",
+        "name": "Wellness Legkondi",
+        "device": "bce76804697ca0ae",
+        "interval": "3",
+        "debug": false,
+        "x": 1010,
+        "y": 1260,
+        "wires": [
+            [
+                "1b8591e9256d55db"
+            ],
+            [
+                "1c2548eb4f439cf7",
+                "13818512ebd84f30"
+            ]
+        ]
+    },
+    {
+        "id": "1b8591e9256d55db",
+        "type": "debug",
+        "z": "eb90c8df0fedd91b",
+        "name": "debug 6",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1240,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "1c2548eb4f439cf7",
+        "type": "debug",
+        "z": "eb90c8df0fedd91b",
+        "name": "debug 7",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1240,
+        "y": 1180,
+        "wires": []
+    },
+    {
+        "id": "ef09a627bf62a551",
+        "type": "function",
+        "z": "eb90c8df0fedd91b",
+        "name": "Convert to Gree",
+        "func": "let modetext = [\"auto\", \"cool\", \"dry\", \"fan_only\", \"heat\"];\nlet fantext = [\"auto\", \"low\", \"medium\", \"high\"];\n\nmsg.payload = msg.payload.replace(/(\\r\\n|\\n|\\r)/gm, \"\").split(\",\");\n\nif (msg.payload.length>1) {\n\n    switch (msg.payload[0]) {\n        case \"1\":\n            msg.topic = \"power\";\n            msg.payload = msg.payload[2] === \"0\" ? \"off\" : \"on\";\n            return msg;\n        case \"2\": \n            msg.topic = \"temperature\";\n            msg.payload = Math.floor(parseFloat(msg.payload[2]));\n            return msg;\n        case \"3\":\n            msg.topic = \"mode\";\n            msg.payload = modetext[parseInt(msg.payload[2])];\n            return msg;\n        case \"4\":\n            msg.topic = \"fan\";\n            msg.payload = fantext[parseInt(msg.payload[2])];\n            return msg;\n\n    }\n\n}\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 1260,
+        "wires": [
+            [
+                "aa7e9a0d70e1cd3f",
+                "ddcb9442e762484d"
+            ]
+        ]
+    },
+    {
+        "id": "ddcb9442e762484d",
+        "type": "rbe",
+        "z": "eb90c8df0fedd91b",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 790,
+        "y": 1260,
+        "wires": [
+            [
+                "60279daafc60ee7c"
+            ]
+        ]
+    },
+    {
+        "id": "13818512ebd84f30",
+        "type": "function",
+        "z": "eb90c8df0fedd91b",
+        "name": "Convert to TapHome",
+        "func": "let modetext = [\"auto\", \"cool\", \"dry\", \"fan_only\", \"heat\"];\nlet fantext = [\"auto\", \"low\", \"medium\", \"high\"];\n\nnode.send({ \"topic\": \"power\", \"payload\": msg.payload.power === \"off\" ? \"SET 1 0 0\\n\" : \"SET 1 0 1\\n\" });\nnode.send({ \"topic\": \"temperature\", \"payload\": \"SET 2 0 \" + msg.payload.temperature + \"\\n\" });\nnode.send({ \"topic\": \"mode\", \"payload\": \"SET 3 0 \" + modetext.indexOf(msg.payload.mode) + \"\\n\" });\nif (fantext.indexOf(msg.payload.fanSpeed) !== -1) {\n    node.send({ \"topic\": \"fan\", \"payload\": \"SET 4 0 \" + fantext.indexOf(msg.payload.fanSpeed) + \"\\n\" });\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1290,
+        "y": 1260,
+        "wires": [
+            [
+                "6f67d163d6a8d797"
+            ]
+        ]
+    },
+    {
+        "id": "ac2fb3b66ce72824",
+        "type": "debug",
+        "z": "eb90c8df0fedd91b",
+        "name": "Message to TapHome",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1760,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "6f67d163d6a8d797",
+        "type": "rbe",
+        "z": "eb90c8df0fedd91b",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 1530,
+        "y": 1260,
+        "wires": [
+            [
+                "ac2fb3b66ce72824",
+                "fa3d94f4a95e0f7b"
+            ]
+        ]
+    },
+    {
+        "id": "1e21ca4f5401b8f2",
+        "type": "debug",
+        "z": "eb90c8df0fedd91b",
+        "name": "Update from TapHome",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "bce76804697ca0ae",
+        "type": "gree-hvac-config",
+        "name": "Wellness",
+        "host": "192.168.0.109"
+    }
+]
