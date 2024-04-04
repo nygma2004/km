@@ -1,0 +1,155 @@
+[
+    {
+        "id": "efe7ae1fa69beac4",
+        "type": "tcp request",
+        "z": "ec27da163f44ec69",
+        "name": "Sonos activations",
+        "server": "192.168.0.10",
+        "port": "10002",
+        "out": "sit",
+        "ret": "string",
+        "splitc": " ",
+        "newline": "\\n",
+        "trim": false,
+        "tls": "",
+        "x": 410,
+        "y": 80,
+        "wires": [
+            [
+                "a729b721a6a07109"
+            ]
+        ]
+    },
+    {
+        "id": "7a0ea90aa232e710",
+        "type": "inject",
+        "z": "ec27da163f44ec69",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "\\n",
+        "payloadType": "str",
+        "x": 170,
+        "y": 80,
+        "wires": [
+            [
+                "efe7ae1fa69beac4"
+            ]
+        ]
+    },
+    {
+        "id": "a729b721a6a07109",
+        "type": "function",
+        "z": "ec27da163f44ec69",
+        "name": "Convert data",
+        "func": "\nmsg.payload = msg.payload.replace(/(\\r\\n|\\n|\\r)/gm, \"\").split(\",\");\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 80,
+        "wires": [
+            [
+                "a0f12063a6e72c26",
+                "52ab0478742837f8"
+            ]
+        ]
+    },
+    {
+        "id": "a0f12063a6e72c26",
+        "type": "debug",
+        "z": "ec27da163f44ec69",
+        "name": "debug 12",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1240,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "52ab0478742837f8",
+        "type": "switch",
+        "z": "ec27da163f44ec69",
+        "name": "Trigger type",
+        "property": "payload[0]",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1070,
+        "y": 160,
+        "wires": [
+            [
+                "2dacf49a10b8acd8"
+            ]
+        ]
+    },
+    {
+        "id": "2dacf49a10b8acd8",
+        "type": "change",
+        "z": "ec27da163f44ec69",
+        "name": "Select audio",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "http://192.168.0.2/joreggelt.mp3",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1280,
+        "y": 160,
+        "wires": [
+            [
+                "1ae0e10ed563a3fa"
+            ]
+        ]
+    },
+    {
+        "id": "1ae0e10ed563a3fa",
+        "type": "link out",
+        "z": "ec27da163f44ec69",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "1ecc63cbec46fadf",
+            "8a361119fa01b161"
+        ],
+        "x": 1505,
+        "y": 160,
+        "wires": []
+    }
+]
