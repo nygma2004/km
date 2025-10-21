@@ -62,8 +62,8 @@ Shelly.addEventHandler(function (event) {
   
   // Virtual button 200 is pressed
   if (
-    typeof event === 'object' ||
-    event.event === 'single_push' ||
+    typeof event === 'object' &&
+    event.event === 'single_push' &&
     event.component === "button:200"
   ) {
     sendMessage("AO");
