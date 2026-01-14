@@ -1,0 +1,2193 @@
+[
+    {
+        "id": "2d3fa57a83854412",
+        "type": "tab",
+        "label": "EVSE Control",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "d343e79fab08357f",
+        "type": "CS server",
+        "z": "2d3fa57a83854412",
+        "name": "CentralSystem@8834",
+        "port": "8834",
+        "portType": "num",
+        "enabled15": false,
+        "path15": "/ocpp15s",
+        "enabled16": false,
+        "path16": "/ocpp16s",
+        "enabled16j": true,
+        "path16j": "/ocpp",
+        "log": true,
+        "pathlog": "/home/admin/ocpp__.log",
+        "x": 140,
+        "y": 180,
+        "wires": [
+            [
+                "a059fc90e2bd6721",
+                "7958b4664b433bc5"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "6c1a055b2216f606",
+        "type": "comment",
+        "z": "2d3fa57a83854412",
+        "name": "OCPP Central System Server",
+        "info": "Change the port address and paths to meet your needs.\nThis is a very basic (does represent a fully functional CS) example",
+        "x": 160,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "f2a5794877304a30",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "BootNotification",
+        "func": "msg.payload = {\n    interval: 120,\n    currentTime: new Date().toISOString(),\n    status: \"Accepted\"\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 60,
+        "wires": [
+            [
+                "c9c1e83afd391fee"
+            ]
+        ]
+    },
+    {
+        "id": "c9c1e83afd391fee",
+        "type": "link out",
+        "z": "2d3fa57a83854412",
+        "name": "link out 5",
+        "mode": "link",
+        "links": [
+            "03f2d97bab72c288"
+        ],
+        "x": 1015,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "799ac589fa67dffb",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 350,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "dda9ad1f6936b558",
+        "type": "switch",
+        "z": "2d3fa57a83854412",
+        "name": "OCPP CS Command Switch",
+        "property": "payload.command",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "BootNotification",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Authorize",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Heartbeat",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "StatusNotification",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "MeterValues",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "StartTransaction",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "StopTransaction",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 8,
+        "x": 500,
+        "y": 180,
+        "wires": [
+            [
+                "f2a5794877304a30"
+            ],
+            [
+                "89071ca2540ab01d"
+            ],
+            [
+                "f72e3d1773121cd0",
+                "d61264425f86e47d"
+            ],
+            [
+                "de8490fd8979c86d",
+                "017f37bb32b760d3",
+                "ceda77b40ddef293"
+            ],
+            [
+                "de8490fd8979c86d",
+                "9a27df05bd77ca6c",
+                "06b4f886f954c342",
+                "23cb7cdedde3454f"
+            ],
+            [
+                "4554bcec5e84d436",
+                "bf690a9723a875c1"
+            ],
+            [
+                "89071ca2540ab01d",
+                "a2bcf5ef68367fbe"
+            ],
+            [
+                "fbeeca21373dac41"
+            ]
+        ]
+    },
+    {
+        "id": "85159ea367842771",
+        "type": "server response",
+        "z": "2d3fa57a83854412",
+        "name": "",
+        "x": 300,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "4554bcec5e84d436",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Start Transaction",
+        "func": "msg.payload = {\n    idTagInfo: {\n        status: \"Accepted\",\n    },\n    transactionId: getRndInteger(0,100000)\n}\nreturn msg;\n\nfunction getRndInteger(min, max) {\n    return Math.floor(Math.random() * (max - min + 1) ) + min;\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 220,
+        "wires": [
+            [
+                "789d36bc4373e1d8",
+                "e3c4c805af93bbfb",
+                "06b4f886f954c342"
+            ]
+        ]
+    },
+    {
+        "id": "f72e3d1773121cd0",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "Heartbeat",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "payload.currentTime",
+                "pt": "msg",
+                "to": "$now()",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 800,
+        "y": 140,
+        "wires": [
+            [
+                "93e420cc4d185289",
+                "6e6c662bc0a5a2e3"
+            ]
+        ]
+    },
+    {
+        "id": "89071ca2540ab01d",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "Generic Status=Accepted",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"idTagInfo\":{\"status\":\"Accepted\"}}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 850,
+        "y": 100,
+        "wires": [
+            [
+                "4ede3cce294ee8be",
+                "6dc65ef4ba60611d"
+            ]
+        ]
+    },
+    {
+        "id": "de8490fd8979c86d",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "Generic Return",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ocpp.data",
+                "pt": "msg",
+                "to": "payload.data",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 820,
+        "y": 180,
+        "wires": [
+            [
+                "63278c3d793b3714",
+                "aef924aa79d22707"
+            ]
+        ]
+    },
+    {
+        "id": "fbeeca21373dac41",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "Unsupported Command",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 510,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "4ede3cce294ee8be",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "generic status",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1150,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "aef924aa79d22707",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "generic",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1130,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "93e420cc4d185289",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "heartbeat",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1130,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "789d36bc4373e1d8",
+        "type": "link out",
+        "z": "2d3fa57a83854412",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "03f2d97bab72c288"
+        ],
+        "x": 1015,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "03f2d97bab72c288",
+        "type": "link in",
+        "z": "2d3fa57a83854412",
+        "name": "link in 2",
+        "links": [
+            "789d36bc4373e1d8",
+            "63278c3d793b3714",
+            "6e6c662bc0a5a2e3",
+            "c9c1e83afd391fee",
+            "6dc65ef4ba60611d"
+        ],
+        "x": 65,
+        "y": 400,
+        "wires": [
+            [
+                "2688019f501c7abf"
+            ]
+        ]
+    },
+    {
+        "id": "63278c3d793b3714",
+        "type": "link out",
+        "z": "2d3fa57a83854412",
+        "name": "link out 3",
+        "mode": "link",
+        "links": [
+            "03f2d97bab72c288"
+        ],
+        "x": 1015,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "6e6c662bc0a5a2e3",
+        "type": "link out",
+        "z": "2d3fa57a83854412",
+        "name": "link out 4",
+        "mode": "link",
+        "links": [
+            "03f2d97bab72c288"
+        ],
+        "x": 1015,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "6dc65ef4ba60611d",
+        "type": "link out",
+        "z": "2d3fa57a83854412",
+        "name": "link out 6",
+        "mode": "link",
+        "links": [
+            "03f2d97bab72c288"
+        ],
+        "x": 1015,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "e3c4c805af93bbfb",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "start transaction",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1150,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "7958b4664b433bc5",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "ensure ocpp is object",
+        "func": "msg.ocppData = msg.ocpp\nif (typeof msg.ocppData !== 'object') {\n    msg.ocppData = {\n        ocpp: msg.ocpp\n    }\n}\nmsg.ocppData = RED.util.cloneMessage(msg.ocppData);\nmsg.ocppData.payload = RED.util.cloneMessage(msg.payload || {})\nmsg.ocppData.command = msg.payload?.command || msg.ocppData.command || 'unknown'\n\nif (msg.ocppData.command === 'unknown') {\n    if (msg.ocppData.websocket === \"ONLINE\") {\n        msg.ocppData.command = \"OnlineNotification\"\n        // Log online status\n        let evse = flow.get(\"evse\",\"file\") ?? {};\n        let chargeboxid = msg.ocpp.chargeBoxIdentity;\n        if (!evse.hasOwnProperty(chargeboxid)) {\n            evse[chargeboxid] = {};\n        }\n        evse[chargeboxid].csstatus = \"ONLINE\";\n        flow.set(\"evse\", evse,\"file\");\n    }\n    if (msg.ocppData.websocket === \"OFFLINE\") {\n        msg.ocppData.command = \"OfflineNotification\"\n        // Log offline status\n        let evse = flow.get(\"evse\",\"file\") ?? {};\n        let chargeboxid = msg.ocpp.chargeBoxIdentity;\n        if (!evse.hasOwnProperty(chargeboxid)) {\n            evse[chargeboxid] = {};\n        }\n        evse[chargeboxid].csstatus = \"OFFLINE\";\n        flow.set(\"evse\", evse,\"file\");\n    }\n}\nmsg.topic = msg.ocppData.command\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 325,
+        "y": 180,
+        "wires": [
+            [
+                "dda9ad1f6936b558",
+                "799ac589fa67dffb"
+            ]
+        ],
+        "l": false
+    },
+    {
+        "id": "a456a4ce6145e1d3",
+        "type": "link out",
+        "z": "2d3fa57a83854412",
+        "name": "OCPP",
+        "mode": "link",
+        "links": [
+            "de0a45696db245f2"
+        ],
+        "x": 150,
+        "y": 460,
+        "wires": [],
+        "l": true
+    },
+    {
+        "id": "2688019f501c7abf",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "sanitise",
+        "func": "delete msg.error\ndelete msg._error\ndelete msg.ocppData\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 155,
+        "y": 400,
+        "wires": [
+            [
+                "85159ea367842771",
+                "23b653a8003cada2"
+            ]
+        ],
+        "l": false
+    },
+    {
+        "id": "ef1c9d1e073dad23",
+        "type": "catch",
+        "z": "2d3fa57a83854412",
+        "name": "",
+        "scope": [
+            "7958b4664b433bc5",
+            "2688019f501c7abf"
+        ],
+        "uncaught": false,
+        "x": 200,
+        "y": 80,
+        "wires": [
+            [
+                "799ac589fa67dffb"
+            ]
+        ]
+    },
+    {
+        "id": "a059fc90e2bd6721",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "incomming",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 198,
+        "y": 129,
+        "wires": []
+    },
+    {
+        "id": "23b653a8003cada2",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "response",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 360,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "56c550e1db7ed236",
+        "type": "comment",
+        "z": "2d3fa57a83854412",
+        "name": "☝️ README",
+        "info": "Adjust the CS Server Port to suit your env\nThis will form part of the URL in your charger\n\nSee CS Server nodes built in help (and your chargers manual)",
+        "x": 110,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "017f37bb32b760d3",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Save StatusNotification",
+        "func": "let evse = flow.get(\"evse\",\"file\") ?? {};\n\nlet chargeboxid = msg.ocpp.chargeBoxIdentity;\n\nif (!evse.hasOwnProperty(chargeboxid)) {\n    evse[chargeboxid] = {};\n}\n\nif (msg.payload.data.errorCode === \"NoError\") {\n    evse[chargeboxid].status = msg.payload.data.status;\n    switch (msg.payload.data.status) {\n        case \"Available\":\n            evse[chargeboxid].taphomestatus = 0;\n            break;\n        case \"Preparing\":\n            evse[chargeboxid].taphomestatus = 1;\n            break;\n        case \"Charging\":\n            evse[chargeboxid].taphomestatus = 2;\n            break;\n        case \"SuspendedEV\":\n            evse[chargeboxid].taphomestatus = 3;\n            break;\n        case \"Finishing\":\n            evse[chargeboxid].taphomestatus = 4;\n            break;\n        case \"SuspendedEVSE\":\n            evse[chargeboxid].taphomestatus = 5;\n            break;\n        case \"Reserved\":\n            evse[chargeboxid].taphomestatus = 6;\n            break;\n        case \"Unavailable\":\n            evse[chargeboxid].taphomestatus = 7;\n            break;\n        case \"Faulted\":\n            evse[chargeboxid].taphomestatus = 8;\n            break;\n        default:\n            evse[chargeboxid].taphomestatus = 0;\n    }\n} else {\n    evse[chargeboxid].errorcode = msg.payload.data.errorCode;\n}\n\nflow.set(\"evse\", evse,\"file\");\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 540,
+        "wires": [
+            [
+                "f4900c7d2e56f633"
+            ]
+        ]
+    },
+    {
+        "id": "9a27df05bd77ca6c",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Save MeterValues",
+        "func": "let evse = flow.get(\"evse\",\"file\") ?? {};\n\nlet chargeboxid = msg.ocpp.chargeBoxIdentity;\n\nif (!evse.hasOwnProperty(chargeboxid)) {\n    evse[chargeboxid] = {};\n}\n\nevse[chargeboxid].current1 = parseFloat(msg.payload.data.meterValue[0].sampledValue[3].value);\nevse[chargeboxid].current2 = parseFloat(msg.payload.data.meterValue[0].sampledValue[4].value);\nevse[chargeboxid].current3 = parseFloat(msg.payload.data.meterValue[0].sampledValue[5].value);\nevse[chargeboxid].power = parseInt(msg.payload.data.meterValue[0].sampledValue[6].value);\nevse[chargeboxid].energy = parseInt(msg.payload.data.meterValue[0].sampledValue[7].value);\nevse[chargeboxid].session = evse[chargeboxid].energy - evse[chargeboxid].meterstart;\nevse[chargeboxid].transactionid = msg.payload.data.transactionId;\n\nflow.set(\"evse\", evse,\"file\");\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 500,
+        "wires": [
+            [
+                "f4900c7d2e56f633"
+            ]
+        ]
+    },
+    {
+        "id": "a2bcf5ef68367fbe",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Save Stop Transaction",
+        "func": "let evse = flow.get(\"evse\",\"file\") ?? {};\n\nlet chargeboxid = msg.ocpp.chargeBoxIdentity;\n\nif (!evse.hasOwnProperty(chargeboxid)) {\n    evse[chargeboxid] = {};\n}\n\nevse[chargeboxid].meterstop = msg.payload.data.meterStop\nevse[chargeboxid].session = evse[chargeboxid].meterstop - evse[chargeboxid].meterstart;\n\nevse[chargeboxid].current1 = 0;\nevse[chargeboxid].current2 = 0;\nevse[chargeboxid].current3 = 0;\nevse[chargeboxid].power = 0;\n\nflow.set(\"evse\", evse,\"file\");\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 460,
+        "wires": [
+            [
+                "f4900c7d2e56f633"
+            ]
+        ]
+    },
+    {
+        "id": "bf690a9723a875c1",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Save Start Transaction",
+        "func": "let evse = flow.get(\"evse\",\"file\") ?? {};\n\nlet chargeboxid = msg.ocpp.chargeBoxIdentity;\n\nif (!evse.hasOwnProperty(chargeboxid)) {\n    evse[chargeboxid] = {};\n}\n\nevse[chargeboxid].idtag = msg.payload.data.idTag;\nevse[chargeboxid].meterstart = msg.payload.data.meterStart;\n\nflow.set(\"evse\", evse,\"file\");\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 420,
+        "wires": [
+            [
+                "f4900c7d2e56f633"
+            ]
+        ]
+    },
+    {
+        "id": "340a6fc7b6348d56",
+        "type": "comment",
+        "z": "2d3fa57a83854412",
+        "name": "TapHome states",
+        "info": "0: Available\n1: Preparing\n2: Charging\n3: SuspendedEV\n4: Finishing\n5: SuspendedEVSE\n6: Reserved\n7: Unavailable\n8: Faulted",
+        "x": 1160,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "c994752840224409",
+        "type": "tcp request",
+        "z": "2d3fa57a83854412",
+        "name": "Evse",
+        "server": "192.168.0.10",
+        "port": "10005",
+        "out": "sit",
+        "ret": "string",
+        "splitc": " ",
+        "newline": "\\n",
+        "trim": false,
+        "tls": "",
+        "x": 1490,
+        "y": 520,
+        "wires": [
+            [
+                "c51b5e4a0c8d2491"
+            ]
+        ]
+    },
+    {
+        "id": "fee69f54a87147ad",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "\\n",
+        "payloadType": "str",
+        "x": 1330,
+        "y": 480,
+        "wires": [
+            [
+                "c994752840224409"
+            ]
+        ]
+    },
+    {
+        "id": "f4900c7d2e56f633",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Convert to TapHome",
+        "func": "let evse = flow.get(\"evse\", \"file\") ?? {};\n\n// bal tolto\nlet chargeboxid = \"241200476\";\n\nif (evse.hasOwnProperty(chargeboxid)) {\n    if (evse[chargeboxid].hasOwnProperty(\"taphomestatus\")) {\n        node.send({ \"topic\": \"left_status\", \"payload\": \"SET 1 0 \" + evse[chargeboxid].taphomestatus + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"current1\")) {\n        node.send({ \"topic\": \"left_c1\", \"payload\": \"SET 2 0 \" + evse[chargeboxid].current1 + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"current2\")) {\n        node.send({ \"topic\": \"left_c2\", \"payload\": \"SET 3 0 \" + evse[chargeboxid].current2 + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"current3\")) {\n        node.send({ \"topic\": \"left_c3\", \"payload\": \"SET 4 0 \" + evse[chargeboxid].current3 + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"power\")) {\n        node.send({ \"topic\": \"left_power\", \"payload\": \"SET 6 0 \" + evse[chargeboxid].power + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"energy\")) {\n        node.send({ \"topic\": \"left_cons\", \"payload\": \"SET 5 0 \" + evse[chargeboxid].energy + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"session\")) {\n        node.send({ \"topic\": \"left_session\", \"payload\": \"SET 7 0 \" + evse[chargeboxid].session + \"\\n\" });\n    }\n}\n\n// kozepso tolto\nchargeboxid = \"241200477\";\n\nif (evse.hasOwnProperty(chargeboxid)) {\n    if (evse[chargeboxid].hasOwnProperty(\"taphomestatus\")) {\n        node.send({ \"topic\": \"centre_status\", \"payload\": \"SET 8 0 \" + evse[chargeboxid].taphomestatus + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"current1\")) {\n        node.send({ \"topic\": \"centre_c1\", \"payload\": \"SET 9 0 \" + evse[chargeboxid].current1 + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"current2\")) {\n        node.send({ \"topic\": \"centre_c2\", \"payload\": \"SET 10 0 \" + evse[chargeboxid].current2 + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"current3\")) {\n        node.send({ \"topic\": \"centre_c3\", \"payload\": \"SET 11 0 \" + evse[chargeboxid].current3 + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"power\")) {\n        node.send({ \"topic\": \"centre_power\", \"payload\": \"SET 13 0 \" + evse[chargeboxid].power + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"energy\")) {\n        node.send({ \"topic\": \"centre_cons\", \"payload\": \"SET 12 0 \" + evse[chargeboxid].energy + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"session\")) {\n        node.send({ \"topic\": \"centre_session\", \"payload\": \"SET 14 0 \" + evse[chargeboxid].session + \"\\n\" });\n    }\n}\n\n// jobb tolto\nchargeboxid = \"241000082\";\n\nif (evse.hasOwnProperty(chargeboxid)) {\n    if (evse[chargeboxid].hasOwnProperty(\"taphomestatus\")) {\n        node.send({ \"topic\": \"right_status\", \"payload\": \"SET 15 0 \" + evse[chargeboxid].taphomestatus + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"current1\")) {\n        node.send({ \"topic\": \"right_c1\", \"payload\": \"SET 16 0 \" + evse[chargeboxid].current1 + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"current2\")) {\n        node.send({ \"topic\": \"right_c2\", \"payload\": \"SET 17 0 \" + evse[chargeboxid].current2 + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"current3\")) {\n        node.send({ \"topic\": \"right_c3\", \"payload\": \"SET 18 0 \" + evse[chargeboxid].current3 + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"power\")) {\n        node.send({ \"topic\": \"right_power\", \"payload\": \"SET 20 0 \" + evse[chargeboxid].power + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"energy\")) {\n        node.send({ \"topic\": \"right_cons\", \"payload\": \"SET 19 0 \" + evse[chargeboxid].energy + \"\\n\" });\n    }\n    if (evse[chargeboxid].hasOwnProperty(\"session\")) {\n        node.send({ \"topic\": \"right_session\", \"payload\": \"SET 21 0 \" + evse[chargeboxid].session + \"\\n\" });\n    }\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1140,
+        "y": 520,
+        "wires": [
+            [
+                "bbb25760926a495e",
+                "c994752840224409"
+            ]
+        ]
+    },
+    {
+        "id": "bbb25760926a495e",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "debug 381",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1490,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "d61264425f86e47d",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Save Heartbeat",
+        "func": "let evse = flow.get(\"evse\",\"file\") ?? {};\n\nlet chargeboxid = msg.ocpp.chargeBoxIdentity;\n\nif (!evse.hasOwnProperty(chargeboxid)) {\n    evse[chargeboxid] = {};\n}\n\nif (evse[chargeboxid].hasOwnProperty(\"lastheartbeat\")) {\n    let lastheartbeat = evse[chargeboxid].lastheartbeat;\n}\n\nlet now = new Date();\nevse[chargeboxid].lastheartbeat = now.getTime();\n\nflow.set(\"evse\", evse,\"file\");\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ceda77b40ddef293",
+        "type": "switch",
+        "z": "2d3fa57a83854412",
+        "name": "Preparing?",
+        "property": "payload.data.status",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "Preparing",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 790,
+        "y": 700,
+        "wires": [
+            [
+                "d1935ce098a5aa34"
+            ]
+        ]
+    },
+    {
+        "id": "622afca86c3158b9",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "RemoteStartTransaction",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"RemoteStartTransaction\",\"data\":{\"connectorId\":1,\"timestamp\":\"2024-05-23T00:27:13.049Z\",\"idTag\":\"5D6D600E\"}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "payload.data.timestamp",
+                "pt": "msg",
+                "to": "$now()",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "RemoteStartTransaction",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1170,
+        "y": 700,
+        "wires": [
+            [
+                "700ac38b83ee83ec"
+            ]
+        ]
+    },
+    {
+        "id": "c4be8a7082430305",
+        "type": "CS request JSON",
+        "z": "2d3fa57a83854412",
+        "name": "CS Request - Bal",
+        "remotecb": "f6124ffbe1303cad",
+        "command": "GetDiagnostics",
+        "cmddata": "{}",
+        "log": true,
+        "pathlog": "",
+        "x": 1690,
+        "y": 700,
+        "wires": [
+            [
+                "355cb72576c5751a"
+            ]
+        ]
+    },
+    {
+        "id": "d1935ce098a5aa34",
+        "type": "delay",
+        "z": "2d3fa57a83854412",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 960,
+        "y": 700,
+        "wires": [
+            [
+                "622afca86c3158b9"
+            ]
+        ]
+    },
+    {
+        "id": "700ac38b83ee83ec",
+        "type": "switch",
+        "z": "2d3fa57a83854412",
+        "name": "chargeBoxIdentity?",
+        "property": "ocpp.chargeBoxIdentity",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "241200476",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "241200477",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "241000082",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 1430,
+        "y": 700,
+        "wires": [
+            [
+                "c4be8a7082430305"
+            ],
+            [
+                "2c83b3af70c0e791"
+            ],
+            [
+                "839f669bafb808f4"
+            ]
+        ]
+    },
+    {
+        "id": "2c83b3af70c0e791",
+        "type": "CS request JSON",
+        "z": "2d3fa57a83854412",
+        "name": "CS Request - Kozepso",
+        "remotecb": "d38eb8290fb8d903",
+        "command": "GetDiagnostics",
+        "cmddata": "{}",
+        "log": true,
+        "pathlog": "",
+        "x": 1700,
+        "y": 760,
+        "wires": [
+            [
+                "28a70bcc9e473b27"
+            ]
+        ]
+    },
+    {
+        "id": "839f669bafb808f4",
+        "type": "CS request JSON",
+        "z": "2d3fa57a83854412",
+        "name": "CS Request - Jobb",
+        "remotecb": "b6c02b976a9be226",
+        "command": "GetDiagnostics",
+        "cmddata": "{}",
+        "log": true,
+        "pathlog": "",
+        "x": 1690,
+        "y": 820,
+        "wires": [
+            [
+                "f6cc4c1df17f388d"
+            ]
+        ]
+    },
+    {
+        "id": "355cb72576c5751a",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "Bal start",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload.data.status",
+        "statusType": "msg",
+        "x": 1920,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "28a70bcc9e473b27",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "Kozep start",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload.data.status",
+        "statusType": "msg",
+        "x": 1930,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "f6cc4c1df17f388d",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "Jobb start",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload.data.status",
+        "statusType": "msg",
+        "x": 1920,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "06b4f886f954c342",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Save TransactionId",
+        "func": "let evse = flow.get(\"evse\",\"file\") ?? {};\n\nlet chargeboxid = msg.ocpp.chargeBoxIdentity;\n\nif (!evse.hasOwnProperty(chargeboxid)) {\n    evse[chargeboxid] = {};\n}\n\nif (msg.payload.hasOwnProperty(\"transactionId\")) {\n    evse[chargeboxid].transactionId = msg.payload.transactionId;\n    flow.set(\"evse\", evse,\"file\");\n    node.status({ fill: \"blue\", shape: \"ring\", text: msg.payload.transactionId });\n}\n\nif (msg.payload.hasOwnProperty(\"data\")) {\n    if (msg.payload.data.hasOwnProperty(\"transactionId\")) {\n        evse[chargeboxid].transactionId = msg.payload.data.transactionId;\n        flow.set(\"evse\", evse,\"file\");\n        node.status({ fill: \"blue\", shape: \"dot\", text: msg.payload.data.transactionId });\n    }\n}\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 870,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c8c9813127639bba",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "16A TxDefaultProfile profile",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 770,
+        "y": 960,
+        "wires": [
+            [
+                "e3e9b5162102ca58"
+            ]
+        ]
+    },
+    {
+        "id": "3d8a426bf79d96d5",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Inject transaction ID",
+        "func": "let evse = flow.get(\"evse\",\"file\") ?? {};\n\nlet chargeboxid = msg.ocpp.chargeBoxIdentity;\n\nif (!evse.hasOwnProperty(chargeboxid)) {\n    // no data, do not return anything\n    return;\n}\n\nif (!evse[chargeboxid].hasOwnProperty(\"transactionId\")) {\n    // missing transaction id, do not return anything\n    return;\n}\n\n// update the transaction id in the message\nmsg.payload.data.csChargingProfiles.transactionId = evse[chargeboxid].transactionId\nnode.status({ fill: \"blue\", shape: \"dot\", text: msg.payload.data.csChargingProfiles.transactionId });\n\nreturn msg;\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1500,
+        "y": 1020,
+        "wires": [
+            [
+                "c4be8a7082430305"
+            ]
+        ]
+    },
+    {
+        "id": "9ee1b134cede3762",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "SetChargingProfile",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"SetChargingProfile\",\"data\":{\"connectorId\":1,\"csChargingProfiles\":{\"chargingProfileId\":1,\"transactionId\":1111,\"stackLevel\":1,\"chargingProfilePurpose\":\"TxDefaultProfile\",\"chargingProfileKind\":\"Relative\",\"chargingSchedule\":{\"chargingRateUnit\":\"A\",\"chargingSchedulePeriod\":[{\"startPeriod\":0,\"limit\":16,\"numberPhases\":3}]}}}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "SetChargingProfile",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1250,
+        "y": 960,
+        "wires": [
+            [
+                "c4be8a7082430305"
+            ]
+        ]
+    },
+    {
+        "id": "e3e9b5162102ca58",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "Add ID for testing",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ocpp",
+                "pt": "msg",
+                "to": "{ \"chargeBoxIdentity\": \"241200476\" }",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1010,
+        "y": 960,
+        "wires": [
+            [
+                "9ee1b134cede3762"
+            ]
+        ]
+    },
+    {
+        "id": "2438496ff8391145",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "16A TxProfile profile",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "amplimit",
+                "v": "16",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 510,
+        "y": 1000,
+        "wires": [
+            [
+                "542065e4ce74e87c"
+            ]
+        ]
+    },
+    {
+        "id": "542065e4ce74e87c",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "SetChargingProfile",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"SetChargingProfile\",\"data\":{\"connectorId\":1,\"csChargingProfiles\":{\"chargingProfileId\":1,\"transactionId\":1111,\"stackLevel\":1,\"chargingProfilePurpose\":\"TxProfile\",\"chargingProfileKind\":\"Relative\",\"chargingSchedule\":{\"chargingRateUnit\":\"A\",\"chargingSchedulePeriod\":[{\"startPeriod\":0,\"limit\":10,\"numberPhases\":3}]}}}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "SetChargingProfile",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 990,
+        "y": 1020,
+        "wires": [
+            [
+                "f90cf0e27ee1f4e3"
+            ]
+        ]
+    },
+    {
+        "id": "b3223cd63f278f7a",
+        "type": "comment",
+        "z": "2d3fa57a83854412",
+        "name": "Good Documentation",
+        "info": "https://www.ampcontrol.io/ocpp-guide/how-to-use-smart-charging-with-ocpp",
+        "x": 810,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "769ed0bfb74a6440",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "16A Max profile",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 740,
+        "y": 1120,
+        "wires": [
+            [
+                "143f7a7c6a5116f1"
+            ]
+        ]
+    },
+    {
+        "id": "612a2718ae07358a",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "SetChargingProfile",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"SetChargingProfile\",\"data\":{\"connectorId\":0,\"csChargingProfiles\":{\"chargingProfileId\":1,\"stackLevel\":1,\"chargingProfilePurpose\":\"ChargePointMaxProfile\",\"chargingProfileKind\":\"Relative\",\"chargingSchedule\":{\"chargingRateUnit\":\"A\",\"chargingSchedulePeriod\":[{\"startPeriod\":0,\"limit\":16,\"numberPhases\":3}]}}}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "SetChargingProfile",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1250,
+        "y": 1120,
+        "wires": [
+            [
+                "c4be8a7082430305"
+            ]
+        ]
+    },
+    {
+        "id": "143f7a7c6a5116f1",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "Add ID for testing",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ocpp",
+                "pt": "msg",
+                "to": "{ \"chargeBoxIdentity\": \"241200476\" }",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1010,
+        "y": 1120,
+        "wires": [
+            [
+                "612a2718ae07358a"
+            ]
+        ]
+    },
+    {
+        "id": "6f086f0873bb0f64",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "Clear TxDefaultProfile profile",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 980,
+        "y": 1220,
+        "wires": [
+            [
+                "d95f6d23834dd313"
+            ]
+        ]
+    },
+    {
+        "id": "d95f6d23834dd313",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "ClearChargingProfile",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"ClearChargingProfile\",\"data\":{\"connectorId\":1,\"chargingProfilePurpose\":\"TxDefaultProfile\"}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "ClearChargingProfile",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1260,
+        "y": 1220,
+        "wires": [
+            [
+                "c4be8a7082430305"
+            ]
+        ]
+    },
+    {
+        "id": "389ce5aaf4956bde",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "Clear TxProfile profile",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 960,
+        "y": 1280,
+        "wires": [
+            [
+                "f2b4427aa91cc815"
+            ]
+        ]
+    },
+    {
+        "id": "f2b4427aa91cc815",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "ClearChargingProfile",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"ClearChargingProfile\",\"data\":{\"connectorId\":1,\"chargingProfilePurpose\":\"TxProfile\"}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "ClearChargingProfile",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1260,
+        "y": 1280,
+        "wires": [
+            [
+                "c4be8a7082430305"
+            ]
+        ]
+    },
+    {
+        "id": "bc5235f569fce84c",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "Clear Max profile",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 940,
+        "y": 1340,
+        "wires": [
+            [
+                "5614eccac4b31be2"
+            ]
+        ]
+    },
+    {
+        "id": "5614eccac4b31be2",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "ClearChargingProfile",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"ClearChargingProfile\",\"data\":{\"connectorId\":0,\"chargingProfilePurpose\":\"ChargePointMaxProfile\"}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "ClearChargingProfile",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1260,
+        "y": 1340,
+        "wires": [
+            [
+                "c4be8a7082430305"
+            ]
+        ]
+    },
+    {
+        "id": "1a1d813205f1b9ee",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "Manual Start",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "ocpp",
+                "v": "{ \"chargeBoxIdentity\": \"241200476\" }",
+                "vt": "json"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 950,
+        "y": 660,
+        "wires": [
+            [
+                "622afca86c3158b9"
+            ]
+        ]
+    },
+    {
+        "id": "a7a1173d4ff9f54a",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "Manual Stop",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "ocpp",
+                "v": "{ \"chargeBoxIdentity\": \"241200476\" }",
+                "vt": "json"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 650,
+        "y": 780,
+        "wires": [
+            [
+                "479fa1b9f9409c81"
+            ]
+        ]
+    },
+    {
+        "id": "479fa1b9f9409c81",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "RemoteStopTransaction",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"RemoteStopTransaction\",\"data\":{\"idTag\":\"5D6D600E\",\"timestamp\":\"2024-05-04T10:14:27.669Z\"}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "payload.data.timestamp",
+                "pt": "msg",
+                "to": "$now()",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "RemoteStopTransaction",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 890,
+        "y": 780,
+        "wires": [
+            [
+                "c0a959944b828426"
+            ]
+        ]
+    },
+    {
+        "id": "c0a959944b828426",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Inject transaction ID",
+        "func": "let evse = flow.get(\"evse\",\"file\") ?? {};\n\nlet chargeboxid = msg.ocpp.chargeBoxIdentity;\n\nif (!evse.hasOwnProperty(chargeboxid)) {\n    // no data, do not return anything\n    return;\n}\n\nif (!evse[chargeboxid].hasOwnProperty(\"transactionId\")) {\n    // missing transaction id, do not return anything\n    return;\n}\n\n// update the transaction id in the message\nmsg.payload.data.transactionId = evse[chargeboxid].transactionId\nnode.status({ fill: \"blue\", shape: \"dot\", text: msg.payload.data.transactionId });\n\nreturn msg;\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1160,
+        "y": 780,
+        "wires": [
+            [
+                "700ac38b83ee83ec"
+            ]
+        ]
+    },
+    {
+        "id": "ee0a01577bdbdcc5",
+        "type": "comment",
+        "z": "2d3fa57a83854412",
+        "name": "ID cards",
+        "info": "241000082: 5D6D600E\n241200476: 5D6D600E\n241200477: 5D6D600E",
+        "x": 1130,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "f37a343965a0be2d",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "Firmware update",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 940,
+        "y": 1420,
+        "wires": [
+            [
+                "7527da35c706bf9f"
+            ]
+        ]
+    },
+    {
+        "id": "7527da35c706bf9f",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "UpdateFirmware",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"UpdateFirmware\",\"data\":{\"location\":\"http://106.15.78.131/BCP/V1100/BCP-AT2N-P_SW1_1_0_HW1.bin\",\"retrieveDate\":\"2024-05-23T00:27:13.049Z\",\"retries\":5,\"retryInterval\":60}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "payload.data.retrieveDate",
+                "pt": "msg",
+                "to": "$now()",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "UpdateFirmware",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1280,
+        "y": 1420,
+        "wires": [
+            [
+                "c4be8a7082430305"
+            ]
+        ]
+    },
+    {
+        "id": "4253a8a2a1e6aa1d",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "11kW TxProfile profile",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 1620,
+        "y": 1160,
+        "wires": [
+            [
+                "136e0d887c900a32"
+            ]
+        ]
+    },
+    {
+        "id": "74e8288d7c60d0dc",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "SetChargingProfile",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"SetChargingProfile\",\"data\":{\"connectorId\":1,\"csChargingProfiles\":{\"chargingProfileId\":1,\"transactionId\":1111,\"stackLevel\":1,\"chargingProfilePurpose\":\"TxProfile\",\"chargingProfileKind\":\"Relative\",\"chargingSchedule\":{\"chargingRateUnit\":\"kW\",\"chargingSchedulePeriod\":[{\"startPeriod\":0,\"limit\":11}]}}}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "SetChargingProfile",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2110,
+        "y": 1160,
+        "wires": [
+            [
+                "3d8a426bf79d96d5"
+            ]
+        ]
+    },
+    {
+        "id": "136e0d887c900a32",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "Add ID for testing",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ocpp",
+                "pt": "msg",
+                "to": "{ \"chargeBoxIdentity\": \"241200476\" }",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1870,
+        "y": 1160,
+        "wires": [
+            [
+                "74e8288d7c60d0dc"
+            ]
+        ]
+    },
+    {
+        "id": "eb62af4116b7eb3f",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "6.9kW TxProfile profile",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 1620,
+        "y": 1200,
+        "wires": [
+            [
+                "64b5dab9b3861d45"
+            ]
+        ]
+    },
+    {
+        "id": "93712c9b7702abb3",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "SetChargingProfile",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"SetChargingProfile\",\"data\":{\"connectorId\":1,\"csChargingProfiles\":{\"chargingProfileId\":1,\"transactionId\":1111,\"stackLevel\":1,\"chargingProfilePurpose\":\"TxProfile\",\"chargingProfileKind\":\"Relative\",\"chargingSchedule\":{\"chargingRateUnit\":\"kW\",\"chargingSchedulePeriod\":[{\"startPeriod\":0,\"limit\":6.9}]}}}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "SetChargingProfile",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2110,
+        "y": 1200,
+        "wires": [
+            [
+                "3d8a426bf79d96d5"
+            ]
+        ]
+    },
+    {
+        "id": "64b5dab9b3861d45",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "Add ID for testing",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ocpp",
+                "pt": "msg",
+                "to": "{ \"chargeBoxIdentity\": \"241200476\" }",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1870,
+        "y": 1200,
+        "wires": [
+            [
+                "93712c9b7702abb3"
+            ]
+        ]
+    },
+    {
+        "id": "f90cf0e27ee1f4e3",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "Add ID for testing",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ocpp",
+                "pt": "msg",
+                "to": "{ \"chargeBoxIdentity\": \"241200476\" }",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "payload.data.csChargingProfiles.chargingSchedule.chargingSchedulePeriod[0].limit",
+                "pt": "msg",
+                "to": "amplimit",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1230,
+        "y": 1020,
+        "wires": [
+            [
+                "3d8a426bf79d96d5"
+            ]
+        ]
+    },
+    {
+        "id": "81f8a152331edb3b",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "10A TxProfile profile",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "amplimit",
+                "v": "10",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 510,
+        "y": 1040,
+        "wires": [
+            [
+                "542065e4ce74e87c"
+            ]
+        ]
+    },
+    {
+        "id": "c4f8e1d15d752ce3",
+        "type": "inject",
+        "z": "2d3fa57a83854412",
+        "name": "6A TxProfile profile",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "amplimit",
+                "v": "6",
+                "vt": "num"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 510,
+        "y": 1080,
+        "wires": [
+            [
+                "542065e4ce74e87c"
+            ]
+        ]
+    },
+    {
+        "id": "92bc61c06696439c",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Read update",
+        "func": "// mapping TapHome values to A limit\nlet amplimit = [6,10,12,16];\n\n// create the ocpp object\nmsg.ocpp = {};\n\n// split the incoming message\nmsg.payload = msg.payload.replace(/(\\r\\n|\\n|\\r)/gm, \"\").split(\",\");\n\nif (msg.payload.length>1) {\n\n    switch (msg.payload[0]) {\n        case \"22\":\n            msg.ocpp.chargeBoxIdentity = \"241200476\";\n            msg.amplimit = amplimit[parseInt(msg.payload[2])];\n            return msg;\n        case \"23\": \n            msg.ocpp.chargeBoxIdentity = \"241200477\";\n            msg.amplimit = amplimit[parseInt(msg.payload[2])];\n            return msg;\n        case \"24\":\n            msg.ocpp.chargeBoxIdentity = \"241000082\";\n            msg.amplimit = amplimit[parseInt(msg.payload[2])];\n            return msg;\n    }\n\n}\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1810,
+        "y": 520,
+        "wires": [
+            [
+                "e4381596a948ec6a",
+                "4404aa247e4464c7"
+            ]
+        ]
+    },
+    {
+        "id": "e4381596a948ec6a",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "SetChargingProfile",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"SetChargingProfile\",\"data\":{\"connectorId\":1,\"csChargingProfiles\":{\"chargingProfileId\":1,\"transactionId\":1111,\"stackLevel\":1,\"chargingProfilePurpose\":\"TxDefaultProfile\",\"chargingProfileKind\":\"Relative\",\"chargingSchedule\":{\"chargingRateUnit\":\"A\",\"chargingSchedulePeriod\":[{\"startPeriod\":0,\"limit\":16,\"numberPhases\":3}]}}}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "SetChargingProfile",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload.data.csChargingProfiles.chargingSchedule.chargingSchedulePeriod[0].limit",
+                "pt": "msg",
+                "to": "amplimit",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2190,
+        "y": 520,
+        "wires": [
+            [
+                "700ac38b83ee83ec"
+            ]
+        ]
+    },
+    {
+        "id": "c51b5e4a0c8d2491",
+        "type": "rbe",
+        "z": "2d3fa57a83854412",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 1650,
+        "y": 520,
+        "wires": [
+            [
+                "92bc61c06696439c"
+            ]
+        ]
+    },
+    {
+        "id": "c38e14ca9616ee32",
+        "type": "change",
+        "z": "2d3fa57a83854412",
+        "name": "SetChargingProfile",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"command\":\"SetChargingProfile\",\"data\":{\"connectorId\":1,\"csChargingProfiles\":{\"chargingProfileId\":1,\"transactionId\":1111,\"stackLevel\":1,\"chargingProfilePurpose\":\"TxProfile\",\"chargingProfileKind\":\"Relative\",\"chargingSchedule\":{\"chargingRateUnit\":\"A\",\"chargingSchedulePeriod\":[{\"startPeriod\":0,\"limit\":10,\"numberPhases\":3}]}}}}",
+                "tot": "json"
+            },
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "SetChargingProfile",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "payload.data.csChargingProfiles.chargingSchedule.chargingSchedulePeriod[0].limit",
+                "pt": "msg",
+                "to": "amplimit",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 2190,
+        "y": 580,
+        "wires": [
+            [
+                "9b6ebf1598d11c51"
+            ]
+        ]
+    },
+    {
+        "id": "4404aa247e4464c7",
+        "type": "delay",
+        "z": "2d3fa57a83854412",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1980,
+        "y": 580,
+        "wires": [
+            [
+                "c38e14ca9616ee32"
+            ]
+        ]
+    },
+    {
+        "id": "9b6ebf1598d11c51",
+        "type": "function",
+        "z": "2d3fa57a83854412",
+        "name": "Inject transaction ID",
+        "func": "let evse = flow.get(\"evse\",\"file\") ?? {};\n\nlet chargeboxid = msg.ocpp.chargeBoxIdentity;\n\nif (!evse.hasOwnProperty(chargeboxid)) {\n    // no data, do not return anything\n    return;\n}\n\nif (!evse[chargeboxid].hasOwnProperty(\"transactionId\") || (evse[chargeboxid].status!==\"Charging\")) {\n    // missing transaction id, do not return anything\n    return;\n}\n\n// update the transaction id in the message\nmsg.payload.data.csChargingProfiles.transactionId = evse[chargeboxid].transactionId\nnode.status({ fill: \"blue\", shape: \"dot\", text: msg.payload.data.csChargingProfiles.transactionId });\n\nreturn msg;\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2440,
+        "y": 580,
+        "wires": [
+            [
+                "700ac38b83ee83ec"
+            ]
+        ]
+    },
+    {
+        "id": "23cb7cdedde3454f",
+        "type": "debug",
+        "z": "2d3fa57a83854412",
+        "name": "meter values",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "f6124ffbe1303cad",
+        "type": "ocpp-remotej-cp",
+        "name": "Bal oldali töltő",
+        "cbId": "241200476",
+        "ocppver": "1.6j"
+    },
+    {
+        "id": "d38eb8290fb8d903",
+        "type": "ocpp-remotej-cp",
+        "name": "Középső töltő",
+        "cbId": "241200477",
+        "ocppver": "1.6j"
+    },
+    {
+        "id": "b6c02b976a9be226",
+        "type": "ocpp-remotej-cp",
+        "name": "Jobb oldali töltő",
+        "cbId": "241000082",
+        "ocppver": "1.6j"
+    }
+]
