@@ -1,0 +1,737 @@
+[
+    {
+        "id": "5f5d3bc63a6caa70",
+        "type": "function",
+        "z": "e6fc167eca35bfbb",
+        "name": "Filename generator",
+        "func": "// Get the current time and convert it to text\nvar now = new Date();\nvar yyyy = now.getFullYear();\nvar mm = now.getMonth() < 9 ? \"0\" + (now.getMonth() + 1) : (now.getMonth() + 1); // getMonth() is zero-based\nvar dd  = now.getDate() < 10 ? \"0\" + now.getDate() : now.getDate();\nvar hh = now.getHours() < 10 ? \"0\" + now.getHours() : now.getHours();\nvar mmm  = now.getMinutes() < 10 ? \"0\" + now.getMinutes() : now.getMinutes();\nvar ss  = now.getSeconds() < 10 ? \"0\" + now.getSeconds() : now.getSeconds();\n\n// Generate out file name pattern\nmsg.fname = \"speech_\"+ yyyy + mm + dd + \"_\"+ hh+mmm+ss+\".wav\";\n// Full filename with path for the file node later\n// msg.voicepath is used by the Whisper node as input\nmsg.voicepath = \"/home/nygma/speechfiles/\"+ msg.fname;\n\nnode.status({fill:\"blue\",shape:\"ring\",text:msg.fname});\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 400,
+        "wires": [
+            [
+                "ba5d5f2c223cefdb"
+            ]
+        ]
+    },
+    {
+        "id": "ba5d5f2c223cefdb",
+        "type": "file",
+        "z": "e6fc167eca35bfbb",
+        "name": "Save audio",
+        "filename": "voicepath",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 430,
+        "y": 400,
+        "wires": [
+            [
+                "cc25fa7187204fd7",
+                "b6fe2f2d4e96c50f"
+            ]
+        ]
+    },
+    {
+        "id": "08156360eb531407",
+        "type": "whisper",
+        "z": "e6fc167eca35bfbb",
+        "name": "",
+        "voicepath": "",
+        "language": "english",
+        "model": "base.en",
+        "x": 380,
+        "y": 520,
+        "wires": [
+            [
+                "28f6e390de05816a"
+            ]
+        ]
+    },
+    {
+        "id": "13b5dc2a7f34f026",
+        "type": "debug",
+        "z": "e6fc167eca35bfbb",
+        "name": "Whisper output",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "cc25fa7187204fd7",
+        "type": "change",
+        "z": "e6fc167eca35bfbb",
+        "name": "Save timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ts_audiosaved",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            },
+            {
+                "t": "set",
+                "p": "audiosaveseconds",
+                "pt": "msg",
+                "to": "msg.ts_audiosaved - msg.ts_audioreceived",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 620,
+        "y": 400,
+        "wires": [
+            [
+                "6709f78e2e00ce49",
+                "2f3d210b248cbfc1"
+            ]
+        ]
+    },
+    {
+        "id": "28f6e390de05816a",
+        "type": "change",
+        "z": "e6fc167eca35bfbb",
+        "name": "Save timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ts_transcribed",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            },
+            {
+                "t": "set",
+                "p": "transcribedtext",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "whisperseconds",
+                "pt": "msg",
+                "to": "$formatNumber((msg.ts_transcribed - msg.ts_audiosaved) / 1000 , \"#0.00\") ",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 560,
+        "y": 520,
+        "wires": [
+            [
+                "13b5dc2a7f34f026",
+                "67310a4897e1f375",
+                "5e228fe03181212c"
+            ]
+        ]
+    },
+    {
+        "id": "b6fe2f2d4e96c50f",
+        "type": "delay",
+        "z": "e6fc167eca35bfbb",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "minutes",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 620,
+        "y": 340,
+        "wires": [
+            [
+                "097a28f7027e1379"
+            ]
+        ]
+    },
+    {
+        "id": "097a28f7027e1379",
+        "type": "file",
+        "z": "e6fc167eca35bfbb",
+        "name": "Delete audio",
+        "filename": "voicepath",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "delete",
+        "encoding": "none",
+        "x": 790,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "544ff01388860c31",
+        "type": "ui-template",
+        "z": "e6fc167eca35bfbb",
+        "group": "cd9750487d9b0385",
+        "page": "",
+        "ui": "",
+        "name": "Single button",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n  <div class=\"d-flex flex-column align-center justify-center\" style=\"height: 100%;\">\n    <v-btn :color=\"isRecording ? 'red' : 'primary'\" x-large fab dark class=\"mb-4\" @mousedown=\"startRecording\"\n      @mouseup=\"stopRecording\" @mouseleave=\"isRecording ? stopRecording() : null\" @touchstart.prevent=\"startRecording\"\n      @touchend.prevent=\"stopRecording\">\n      <v-icon size=\"36\">\n        {{ isRecording ? 'mdi-microphone' : 'mdi-microphone-outline' }}\n      </v-icon>\n    </v-btn>\n\n    <div class=\"text-subtitle-1 font-weight-bold\">\n      {{ isRecording ? 'Recording... Release to Send' : 'Hold to Speak' }}\n    </div>\n\n    <v-icon :color=\"isRecording ? 'red' : 'grey-lighten-1'\" class=\"mt-2\">\n      {{ isRecording ? 'mdi-record-circle' : 'mdi-record-circle-outline' }}\n    </v-icon>\n  </div>\n</template>\n\n<script>\n  export default {\n  data() {\n    return {\n      isRecording: false,\n      mediaRecorder: null,\n      audioChunks: [],\n    };\n  },\n  methods: {\n    startRecording() {\n      if (this.isRecording) return; // Prevent double trigger\n\n      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {\n        alert('getUserMedia not supported in this browser.');\n        return;\n      }\n\n      navigator.mediaDevices.getUserMedia({ audio: true })\n        .then(stream => {\n          this.isRecording = true;\n          this.audioChunks = [];\n          this.mediaRecorder = new MediaRecorder(stream);\n\n          // Send audio data to Node-RED\n          this.send({\n            payload: \"\",\n            topic: \"rec_start\"\n          });\n          \n          this.mediaRecorder.ondataavailable = event => {\n            if (event.data.size > 0) {\n              this.audioChunks.push(event.data);\n            }\n          };\n\n          this.mediaRecorder.onstop = () => {\n            const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });\n            \n            // Send audio data to Node-RED\n            this.send({ \n                payload: audioBlob,\n                topic: \"voice_note\" \n            });\n\n            // Clean up the stream tracks immediately\n            stream.getTracks().forEach(track => track.stop());\n            this.mediaRecorder = null;\n          };\n\n          this.mediaRecorder.start();\n        })\n        .catch(err => {\n          console.error('Error accessing microphone:', err);\n          this.isRecording = false;\n        });\n    },\n    stopRecording() {\n      if (this.mediaRecorder && this.isRecording) {\n        this.isRecording = false;\n        // Small delay ensures the last chunk is captured cleanly\n        setTimeout(() => {\n            if (this.mediaRecorder) {\n                this.mediaRecorder.stop();\n            }\n        }, 100);\n      }\n    }\n  }\n};\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 150,
+        "y": 260,
+        "wires": [
+            [
+                "0d3f2a8382a3b849"
+            ]
+        ]
+    },
+    {
+        "id": "67310a4897e1f375",
+        "type": "function",
+        "z": "e6fc167eca35bfbb",
+        "name": "Add system prompt",
+        "func": "let request = [\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a sophisticated home controller. Convert the user's speech into a structured JSON command.\\n\\n\"+\n      \"Rooms: [kitchen, bedroom, office, garden]\\n\"+\n      \"Devices: [light, heater, blinds, music]\\n\"+\n      \"Respond only with JSON:\\n\"+\n      \"{\\n\"+\n      \"'action': 'ON/OFF/SET/UP/DOWN'\\n\"+\n      \"'target': 'device_name'\\n\"+\n      \"'location': 'room_name'\\n\"+\n      \"'parameters': { 'brightness': 0 - 100, 'temp': 15 - 30 }\\n\"+\n      \"}\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": msg.payload\n  }\n];\n\nmsg.payload = request;\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 210,
+        "y": 620,
+        "wires": [
+            [
+                "500788c2965a6e99"
+            ]
+        ]
+    },
+    {
+        "id": "500788c2965a6e99",
+        "type": "ollama-chat",
+        "z": "e6fc167eca35bfbb",
+        "name": "Ollama Chat",
+        "server": "7f89aa7714eb32f6",
+        "model": "llama3.2",
+        "modelType": "str",
+        "messages": "payload",
+        "messagesType": "msg",
+        "format": "",
+        "stream": false,
+        "think": false,
+        "keepAlive": "5m",
+        "keepAliveType": "str",
+        "tools": "",
+        "options": "",
+        "x": 450,
+        "y": 620,
+        "wires": [
+            [
+                "f65a262160b433bc"
+            ]
+        ]
+    },
+    {
+        "id": "f65a262160b433bc",
+        "type": "change",
+        "z": "e6fc167eca35bfbb",
+        "name": "Save timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ts_llmcompleted",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            },
+            {
+                "t": "set",
+                "p": "llmseconds",
+                "pt": "msg",
+                "to": "$formatNumber((msg.ts_llmcompleted - msg.ts_transcribed) / 1000 , \"#0.00\") ",
+                "tot": "jsonata"
+            },
+            {
+                "t": "set",
+                "p": "llmoutputstep",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 620,
+        "wires": [
+            [
+                "054a394853d51467",
+                "43dabde9d3f64c14"
+            ]
+        ]
+    },
+    {
+        "id": "054a394853d51467",
+        "type": "debug",
+        "z": "e6fc167eca35bfbb",
+        "name": "LLM output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 850,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "f82a13fe04978f0f",
+        "type": "ui-template",
+        "z": "e6fc167eca35bfbb",
+        "group": "ef50b15e07f7083c",
+        "page": "",
+        "ui": "",
+        "name": "Progress",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n    <v-timeline side=\"end\">\n        <v-timeline-item :dot-color=\"voice_color\" size=\"small\">\n            <div class=\"d-flex\">\n                <strong class=\"me-4\">{{voice_amount}}</strong>\n                <div>\n                    <strong>Audio recording</strong>\n                    <div class=\"text-body-small\">\n                        {{voice_text}}\n                    </div>\n                </div>\n            </div>\n        </v-timeline-item>\n\n        <v-timeline-item :dot-color=\"whisper_color\" size=\"small\">\n            <div class=\"d-flex\">\n                <strong class=\"me-4\">{{whisper_amount}}</strong>\n                <div>\n                    <strong>Transcribe Audio</strong>\n                    <div class=\"text-body-small\">\n                        {{whisper_text}}\n                    </div>\n                </div>\n            </div>\n        </v-timeline-item>\n\n        <v-timeline-item :dot-color=\"llm_color\" size=\"small\">\n            <div class=\"d-flex\">\n                <strong class=\"me-4\">{{llm_amount}}</strong>\n                <div>\n                    <strong>Recognize Intent</strong>\n                    <div class=\"text-body-small\">\n                        {{llm_text}}\n                    </div>\n                </div>\n            </div>\n        </v-timeline-item>\n\n    </v-timeline>\n</template>\n\n<script>\n    export default {\n        data() {\n            // define variables available component-wide\n            // (in <template> and component functions)\n            return {\n                voice_color: 'grey',\n                voice_text: 'No Audio',\n                voice_amount: '',\n                whisper_color: 'grey',\n                whisper_text: 'Not completed yet',\n                whisper_amount: '',\n                llm_color: 'grey',\n                llm_text: 'Not triggered yet',\n                llm_amount: '',\n            }\n        },\n        watch: {\n            // watch for any changes of \"count\"\n\n        },\n        computed: {\n\n        },\n        methods: {\n            // expose a method to our <template> and Vue Application\n            resetDefaults() {\n                this.voice_color = 'grey';\n                this.voice_text = 'No Audio';\n                this.voice_amount = '';\n                this.whisper_color = 'grey';\n                this.whisper_text = 'Not completed yet';\n                this.whisper_amount = '';\n                this.llm_color = 'grey';\n                this.llm_text = 'Not triggered yet';\n                this.llm_amount = '';\n\n            }\n        },\n\n        mounted() {\n            // code here when the component is first loaded\n            this.$socket.on('msg-input:' + this.id, (msg) => {\n                // do stuff with msg\n                // runs only when messages are received\n                    this.resetDefaults()\n\n                    if (msg.rec_start) {\n                        this.voice_color = 'red';\n                        this.voice_amount = '';\n                        this.voice_text = 'Recording...';\n                    } \n                    if (msg.rec_done) {\n                        this.voice_color = 'yellow';\n                        this.voice_amount = '';\n                        this.voice_text = 'Saving recording...';\n                    }\n                    if (msg.fname !== undefined) {\n                        this.voice_color = 'green';\n                        this.voice_amount = msg.audiosaveseconds + \"ms\";\n                        this.voice_text = msg.fname;\n                        this.whisper_color = 'yellow';\n                        this.whisper_text = \"Processing...\";\n                    } \n                    if (msg.transcribedtext !== undefined) {\n                        this.whisper_color = 'green';\n                        this.whisper_amount = msg.whisperseconds + \"s\";\n                        this.whisper_text = msg.transcribedtext;\n                        this.llm_color = 'yellow';\n                        this.llm_text = \"Processing...\";\n                    } \n                    if (msg.llmoutputstep) {\n                        if (!msg.payload.done) { \n                            this.llm_color = 'red';\n                            this.llm_amount = msg.llmseconds + \"s\";\n                            this.llm_text = \"Error\";\n                        } else {\n                            this.llm_color = 'green';\n                            this.llm_amount = msg.llmseconds + \"s\";\n                            this.llm_text = msg.payload.message.content;\n                        }\n                    }\n\n            })\n        },\n        unmounted() {\n            // code here when the component is removed from the Dashboard\n            // i.e. when the user navigates away from the page\n        }\n    }\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1180,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3a12155732ccc7bd",
+        "type": "link in",
+        "z": "e6fc167eca35bfbb",
+        "name": "Update progress",
+        "links": [
+            "67b3cbc153a3e266",
+            "5e228fe03181212c",
+            "43dabde9d3f64c14",
+            "6709f78e2e00ce49"
+        ],
+        "x": 1055,
+        "y": 440,
+        "wires": [
+            [
+                "f82a13fe04978f0f",
+                "c21e1c3d79061de6"
+            ]
+        ]
+    },
+    {
+        "id": "67b3cbc153a3e266",
+        "type": "link out",
+        "z": "e6fc167eca35bfbb",
+        "name": "link out 1",
+        "mode": "link",
+        "links": [
+            "3a12155732ccc7bd"
+        ],
+        "x": 805,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "5e228fe03181212c",
+        "type": "link out",
+        "z": "e6fc167eca35bfbb",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "3a12155732ccc7bd"
+        ],
+        "x": 845,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "43dabde9d3f64c14",
+        "type": "link out",
+        "z": "e6fc167eca35bfbb",
+        "name": "link out 3",
+        "mode": "link",
+        "links": [
+            "3a12155732ccc7bd"
+        ],
+        "x": 805,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "0d3f2a8382a3b849",
+        "type": "switch",
+        "z": "e6fc167eca35bfbb",
+        "name": "Topic",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "rec_start",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "voice_note",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 350,
+        "y": 260,
+        "wires": [
+            [
+                "3e6422dfce5708db"
+            ],
+            [
+                "f4f9e45df08695c8",
+                "92d03fd4a28573d2"
+            ]
+        ]
+    },
+    {
+        "id": "3e6422dfce5708db",
+        "type": "change",
+        "z": "e6fc167eca35bfbb",
+        "name": "Add data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "rec_start",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 180,
+        "wires": [
+            [
+                "67b3cbc153a3e266"
+            ]
+        ]
+    },
+    {
+        "id": "27105c307414a7d6",
+        "type": "inject",
+        "z": "e6fc167eca35bfbb",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 1090,
+        "y": 520,
+        "wires": [
+            [
+                "f82a13fe04978f0f"
+            ]
+        ]
+    },
+    {
+        "id": "f4f9e45df08695c8",
+        "type": "change",
+        "z": "e6fc167eca35bfbb",
+        "name": "Add data",
+        "rules": [
+            {
+                "t": "set",
+                "p": "rec_done",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 220,
+        "wires": [
+            [
+                "67b3cbc153a3e266"
+            ]
+        ]
+    },
+    {
+        "id": "92d03fd4a28573d2",
+        "type": "change",
+        "z": "e6fc167eca35bfbb",
+        "name": "Save timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "ts_audioreceived",
+                "pt": "msg",
+                "to": "",
+                "tot": "date"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 260,
+        "wires": [
+            [
+                "5f5d3bc63a6caa70"
+            ]
+        ]
+    },
+    {
+        "id": "3dd07e8509925cbd",
+        "type": "comment",
+        "z": "e6fc167eca35bfbb",
+        "name": "Intent recognition test",
+        "info": "",
+        "x": 130,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "6709f78e2e00ce49",
+        "type": "link out",
+        "z": "e6fc167eca35bfbb",
+        "name": "link out 4",
+        "mode": "link",
+        "links": [
+            "3a12155732ccc7bd"
+        ],
+        "x": 845,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "c21e1c3d79061de6",
+        "type": "debug",
+        "z": "e6fc167eca35bfbb",
+        "name": "debug 1",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1200,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "2f3d210b248cbfc1",
+        "type": "delay",
+        "z": "e6fc167eca35bfbb",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "10",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 210,
+        "y": 520,
+        "wires": [
+            [
+                "08156360eb531407"
+            ]
+        ]
+    },
+    {
+        "id": "cd9750487d9b0385",
+        "type": "ui-group",
+        "name": "Assistant",
+        "page": "853ed6101b219ccc",
+        "width": 6,
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "7f89aa7714eb32f6",
+        "type": "ollama-config-server",
+        "host": "localhost",
+        "port": 11434,
+        "useCloud": false
+    },
+    {
+        "id": "ef50b15e07f7083c",
+        "type": "ui-group",
+        "name": "Processing",
+        "page": "853ed6101b219ccc",
+        "width": 6,
+        "height": 1,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "853ed6101b219ccc",
+        "type": "ui-page",
+        "name": "Speech",
+        "ui": "cb79bc4520925e32",
+        "path": "/speech",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "e897c1bd8f550a54",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": true,
+        "disabled": false
+    },
+    {
+        "id": "cb79bc4520925e32",
+        "type": "ui-base",
+        "name": "My UI",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control",
+            "ui-text"
+        ],
+        "showPathInSidebar": false
+    },
+    {
+        "id": "e897c1bd8f550a54",
+        "type": "ui-theme",
+        "name": "Default",
+        "colors": {
+            "surface": "#4d58ff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "1ef79c26e5c75577",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@background404/node-red-contrib-whisper": "0.0.3",
+            "@flowfuse/node-red-dashboard": "1.30.2",
+            "node-red-contrib-ollama": "0.5.0"
+        }
+    }
+]
