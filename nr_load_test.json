@@ -1,0 +1,1819 @@
+[
+    {
+        "id": "0385308d07f6f959",
+        "type": "tab",
+        "label": "Load test",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "8a53f416204b9a62",
+        "type": "inject",
+        "z": "0385308d07f6f959",
+        "name": "Test",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 220,
+        "wires": [
+            [
+                "5ae64bbf5e4cde35"
+            ]
+        ]
+    },
+    {
+        "id": "5ae64bbf5e4cde35",
+        "type": "exec",
+        "z": "0385308d07f6f959",
+        "command": "cat /sys/class/thermal/thermal_zone*/temp",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 440,
+        "y": 220,
+        "wires": [
+            [
+                "c1f0455cdb183d40",
+                "5ffb8f254edd31e6"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c1f0455cdb183d40",
+        "type": "function",
+        "z": "0385308d07f6f959",
+        "name": "Get Temp",
+        "func": "let arr = msg.payload.split(/\\r?\\n/);\n\nfor (let i = 0; i < arr.length; i++) {\n    if (arr[i]===\"\") {\n        arr.splice(i,1);\n    } else {\n        arr[i] = parseInt(arr[i])/1000;\n    }\n}\n\nreturn [\n    {\"topic\": \"Socket\", \"payload\": arr[0]},\n    {\"topic\": \"Chipset\", \"payload\": arr[1]},\n    {\"topic\": \"CPU\", \"payload\": arr[2]}\n];",
+        "outputs": 3,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 200,
+        "wires": [
+            [
+                "0c2197f099e6f6b1",
+                "2ce55c5e658d16c4"
+            ],
+            [
+                "b4df5cd66280bb91",
+                "2ce55c5e658d16c4"
+            ],
+            [
+                "f9967a32296f1997",
+                "2ce55c5e658d16c4"
+            ]
+        ]
+    },
+    {
+        "id": "0c2197f099e6f6b1",
+        "type": "ui-gauge",
+        "z": "0385308d07f6f959",
+        "name": "Socket",
+        "group": "9b66899355eba84b",
+        "order": 3,
+        "value": "payload",
+        "valueType": "msg",
+        "width": "2",
+        "height": "2",
+        "gtype": "gauge-half",
+        "gstyle": "needle",
+        "title": "",
+        "alwaysShowTitle": false,
+        "floatingTitlePosition": "top-left",
+        "units": "°C",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "80",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "119",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": "130",
+        "sizeThickness": "16",
+        "sizeGap": "4",
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 950,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b4df5cd66280bb91",
+        "type": "ui-gauge",
+        "z": "0385308d07f6f959",
+        "name": "Chipset",
+        "group": "9b66899355eba84b",
+        "order": 2,
+        "value": "payload",
+        "valueType": "msg",
+        "width": "2",
+        "height": "2",
+        "gtype": "gauge-half",
+        "gstyle": "needle",
+        "title": "",
+        "alwaysShowTitle": false,
+        "floatingTitlePosition": "top-left",
+        "units": "°C",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "80",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "119",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": "130",
+        "sizeThickness": "16",
+        "sizeGap": "4",
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 960,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f9967a32296f1997",
+        "type": "ui-gauge",
+        "z": "0385308d07f6f959",
+        "name": "CPU",
+        "group": "9b66899355eba84b",
+        "order": 1,
+        "value": "payload",
+        "valueType": "msg",
+        "width": "2",
+        "height": "2",
+        "gtype": "gauge-half",
+        "gstyle": "needle",
+        "title": "",
+        "alwaysShowTitle": false,
+        "floatingTitlePosition": "top-left",
+        "units": "°C",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "84",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "100",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": "130",
+        "sizeThickness": "16",
+        "sizeGap": "4",
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 950,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5ffb8f254edd31e6",
+        "type": "debug",
+        "z": "0385308d07f6f959",
+        "name": "debug 4",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "b1f0e6a0aad92edf",
+        "type": "inject",
+        "z": "0385308d07f6f959",
+        "name": "Test",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 560,
+        "wires": [
+            [
+                "734db39602868d44"
+            ]
+        ]
+    },
+    {
+        "id": "734db39602868d44",
+        "type": "change",
+        "z": "0385308d07f6f959",
+        "name": "RPC request",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{     \"id\": 0,     \"src\": \"9c1887b8-0418-4f71-b40a-f5631f5a8cab\",     \"method\": \"Switch.Status.Get\",     \"params\": {       \"id\": 1     }   }  ",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 370,
+        "y": 560,
+        "wires": [
+            [
+                "10b68fa644caa014"
+            ]
+        ]
+    },
+    {
+        "id": "10b68fa644caa014",
+        "type": "mqtt out",
+        "z": "0385308d07f6f959",
+        "name": "RPC subscribe",
+        "topic": "refoss-p11s/rpc/subscribe",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "421b56e056c86c2a",
+        "x": 600,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "42763840c32ae571",
+        "type": "mqtt in",
+        "z": "0385308d07f6f959",
+        "name": "",
+        "topic": "refoss-p11s/rpc/publish",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "421b56e056c86c2a",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 160,
+        "y": 640,
+        "wires": [
+            [
+                "6952cc299d5becab"
+            ]
+        ]
+    },
+    {
+        "id": "6952cc299d5becab",
+        "type": "function",
+        "z": "0385308d07f6f959",
+        "name": "Power",
+        "func": "if (msg.payload.result.output) {\n    let power = msg.payload.result.apower / 1000;\n    node.status({fill:\"green\",shape:\"ring\",text:power+\" W\"});\n    msg.payload = power;\n    return msg;\n} else {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"Off\" });\n    \n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 640,
+        "wires": [
+            [
+                "dec09fea4f615098",
+                "e84ac74eb2d0e984"
+            ]
+        ]
+    },
+    {
+        "id": "2ce55c5e658d16c4",
+        "type": "ui-chart",
+        "z": "0385308d07f6f959",
+        "group": "9b66899355eba84b",
+        "name": "Temperatures",
+        "label": "",
+        "order": 4,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "false",
+        "pointRadius": 4,
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "60",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "3",
+        "height": "3",
+        "className": "",
+        "interpolation": "linear",
+        "x": 980,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b3d6caf8258d29e5",
+        "type": "exec",
+        "z": "0385308d07f6f959",
+        "command": "cat /sys/class/hwmon/hwmon3/fan1_input",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 440,
+        "y": 400,
+        "wires": [
+            [
+                "05f9c4b3d59e6a4a",
+                "c59cdfd0d4a1f8fb"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "83000608598fcfb5",
+        "type": "inject",
+        "z": "0385308d07f6f959",
+        "name": "Test",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 400,
+        "wires": [
+            [
+                "b3d6caf8258d29e5"
+            ]
+        ]
+    },
+    {
+        "id": "05f9c4b3d59e6a4a",
+        "type": "ui-gauge",
+        "z": "0385308d07f6f959",
+        "name": "Fan",
+        "group": "325d18f2953eb842",
+        "order": 1,
+        "value": "payload",
+        "valueType": "msg",
+        "width": "2",
+        "height": "2",
+        "gtype": "gauge-half",
+        "gstyle": "needle",
+        "title": "",
+        "alwaysShowTitle": false,
+        "floatingTitlePosition": "top-left",
+        "units": "RPM",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "5000",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "6500",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": "7100",
+        "sizeThickness": "16",
+        "sizeGap": "4",
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 990,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a37271241567864e",
+        "type": "ui-chart",
+        "z": "0385308d07f6f959",
+        "group": "325d18f2953eb842",
+        "name": "Fan speed",
+        "label": "",
+        "order": 2,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "false",
+        "pointRadius": 4,
+        "showLegend": false,
+        "removeOlder": 1,
+        "removeOlderUnit": "60",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "2",
+        "height": "2",
+        "className": "",
+        "interpolation": "linear",
+        "x": 1010,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c59cdfd0d4a1f8fb",
+        "type": "change",
+        "z": "0385308d07f6f959",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "Fan speed",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 790,
+        "y": 440,
+        "wires": [
+            [
+                "a37271241567864e"
+            ]
+        ]
+    },
+    {
+        "id": "dec09fea4f615098",
+        "type": "ui-gauge",
+        "z": "0385308d07f6f959",
+        "name": "Power",
+        "group": "685366d950a97afe",
+        "order": 1,
+        "value": "payload",
+        "valueType": "msg",
+        "width": "2",
+        "height": "2",
+        "gtype": "gauge-half",
+        "gstyle": "needle",
+        "title": "",
+        "alwaysShowTitle": false,
+        "floatingTitlePosition": "top-left",
+        "units": "W",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "60",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "100",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": "130",
+        "sizeThickness": "16",
+        "sizeGap": "4",
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 700,
+        "y": 640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e84ac74eb2d0e984",
+        "type": "ui-chart",
+        "z": "0385308d07f6f959",
+        "group": "685366d950a97afe",
+        "name": "Power",
+        "label": "",
+        "order": 2,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "false",
+        "pointRadius": 4,
+        "showLegend": false,
+        "removeOlder": 1,
+        "removeOlderUnit": "60",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "2",
+        "height": "2",
+        "className": "",
+        "interpolation": "linear",
+        "x": 700,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bc4ecabe76a06c6d",
+        "type": "inject",
+        "z": "0385308d07f6f959",
+        "name": "1 sec",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "tick",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 120,
+        "wires": [
+            [
+                "b19d1f45135cb890"
+            ]
+        ]
+    },
+    {
+        "id": "b19d1f45135cb890",
+        "type": "function",
+        "z": "0385308d07f6f959",
+        "name": "Toggle",
+        "func": "let state = context.get(\"state\") || false;\n\nif (msg.topic === \"switch\") {\n    state = msg.payload;\n    context.set(\"state\", state);\n    return;\n}\n\nif (msg.topic === \"tick\") {\n    node.status({fill:\"grey\",shape:\"ring\",text:\"Off\"});\n    if (state) {\n        node.status({ fill: \"green\", shape: \"ring\", text: \"On\" });\n        return msg;\n    }\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 60,
+        "wires": [
+            [
+                "b589400c50dae3f2"
+            ]
+        ]
+    },
+    {
+        "id": "08a7f6964566a3c9",
+        "type": "ui-template",
+        "z": "0385308d07f6f959",
+        "group": "8a46beab219edf9b",
+        "page": "",
+        "ui": "",
+        "name": "Monitor",
+        "order": 1,
+        "width": "2",
+        "height": "1",
+        "head": "",
+        "format": "<template>\n    <div class=\"d-flex justify-center align-center\" style=\"height: 100%;\">\n        <v-btn :color=\"isActive ? 'success' : 'grey-lighten-1'\" size=\"large\" class=\"white--text\"\n            :prepend-icon=\"isActive ? 'mdi-power-on' : 'mdi-power-off'\" @click=\"toggleState\">\n            Monitor\n        </v-btn>\n    </div>\n</template>\n\n<script>\nexport default {\n    data() {\n        return {\n            // Local state of the button\n            isActive: false\n        };\n    },\n    watch: {\n        // This listens for incoming messages from Node-RED to update the button\n        msg: function (newMsg) {\n            if (newMsg && typeof newMsg.payload === 'boolean') {\n                this.isActive = newMsg.payload;\n            }\n        }\n    },\n    methods: {\n        toggleState() {\n            // 1. Flip the local state\n            this.isActive = !this.isActive;\n            // 2. Send the new state back to Node-RED\n            this.send({ topic: \"switch\", payload: this.isActive });\n        }\n    }\n};\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 140,
+        "y": 60,
+        "wires": [
+            [
+                "b19d1f45135cb890"
+            ]
+        ]
+    },
+    {
+        "id": "b589400c50dae3f2",
+        "type": "link out",
+        "z": "0385308d07f6f959",
+        "name": "link out 5",
+        "mode": "link",
+        "links": [
+            "55f1bbfc13427088",
+            "55bbc6c038a4a95d",
+            "7575f72357e01124",
+            "6b92fb48b75e3d2a"
+        ],
+        "x": 455,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "55f1bbfc13427088",
+        "type": "link in",
+        "z": "0385308d07f6f959",
+        "name": "link in 1",
+        "links": [
+            "b589400c50dae3f2"
+        ],
+        "x": 165,
+        "y": 260,
+        "wires": [
+            [
+                "5ae64bbf5e4cde35"
+            ]
+        ]
+    },
+    {
+        "id": "55bbc6c038a4a95d",
+        "type": "link in",
+        "z": "0385308d07f6f959",
+        "name": "link in 2",
+        "links": [
+            "b589400c50dae3f2"
+        ],
+        "x": 155,
+        "y": 440,
+        "wires": [
+            [
+                "b3d6caf8258d29e5"
+            ]
+        ]
+    },
+    {
+        "id": "7575f72357e01124",
+        "type": "link in",
+        "z": "0385308d07f6f959",
+        "name": "link in 3",
+        "links": [
+            "b589400c50dae3f2"
+        ],
+        "x": 155,
+        "y": 600,
+        "wires": [
+            [
+                "734db39602868d44"
+            ]
+        ]
+    },
+    {
+        "id": "0d6e6c74dc1a45d9",
+        "type": "comment",
+        "z": "0385308d07f6f959",
+        "name": "Temperatures",
+        "info": "",
+        "x": 90,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "02c40b55e396d12a",
+        "type": "comment",
+        "z": "0385308d07f6f959",
+        "name": "CPU Fan speed",
+        "info": "",
+        "x": 100,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "975a6a7b01387d4e",
+        "type": "comment",
+        "z": "0385308d07f6f959",
+        "name": "Power consumption - Refoss P11S smart plug",
+        "info": "",
+        "x": 190,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "10ade11360906f99",
+        "type": "inject",
+        "z": "0385308d07f6f959",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 260,
+        "y": 1480,
+        "wires": [
+            [
+                "2321e2d0a1832739"
+            ]
+        ]
+    },
+    {
+        "id": "2321e2d0a1832739",
+        "type": "function",
+        "z": "0385308d07f6f959",
+        "name": "Prime caluclation",
+        "func": "const limit = msg.payload.limit || 1000000;\nconst chunkSize = 50000;\nlet current = 0;\n\nconst startTime = Date.now();\n\nfunction isPrime(num) {\n    for (let i = 2, s = Math.sqrt(num); i <= s; i++) {\n        if (num % i === 0) return false;\n    }\n    return num > 1;\n}\n\nfunction processChunk() {\n    const end = Math.min(current + chunkSize, limit);\n\n    for (; current <= end; current++) {\n        isPrime(current);\n    }\n\n    if (current < limit) {\n        // Use setTimeout instead of setImmediate\n        // 0ms delay tells Node-RED: \"Finish other tasks, then come back to this.\"\n        setTimeout(() => {\n            processChunk();\n        }, 0);\n    } else {\n        // We use node.send because the function has already \"returned\"\n        const duration = Date.now() - startTime;\n        node.send({\n            payload: {\n                status: \"Completed\",\n                execution_time_ms: duration,\n                limit: limit\n            }\n        });\n        node.done();\n    }\n}\n\n// Start the process\nprocessChunk();\n\n// Return null to tell Node-RED not to send a message yet\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 1480,
+        "wires": [
+            [
+                "5788d82e1d0db458",
+                "0db5d5baf80f2cac"
+            ]
+        ]
+    },
+    {
+        "id": "5788d82e1d0db458",
+        "type": "debug",
+        "z": "0385308d07f6f959",
+        "name": "debug 5",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "3b4b80c567cc1e2f",
+        "type": "exec",
+        "z": "0385308d07f6f959",
+        "command": "grep 'cpu MHz' /proc/cpuinfo",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "",
+        "x": 400,
+        "y": 800,
+        "wires": [
+            [
+                "aae8e8b606e1393b"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "46c5d7f8f55d675d",
+        "type": "inject",
+        "z": "0385308d07f6f959",
+        "name": "Test",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 800,
+        "wires": [
+            [
+                "3b4b80c567cc1e2f"
+            ]
+        ]
+    },
+    {
+        "id": "6b92fb48b75e3d2a",
+        "type": "link in",
+        "z": "0385308d07f6f959",
+        "name": "link in 4",
+        "links": [
+            "b589400c50dae3f2"
+        ],
+        "x": 165,
+        "y": 840,
+        "wires": [
+            [
+                "3b4b80c567cc1e2f"
+            ]
+        ]
+    },
+    {
+        "id": "aae8e8b606e1393b",
+        "type": "function",
+        "z": "0385308d07f6f959",
+        "name": "Get MHz",
+        "func": "let arr = msg.payload.split(/\\r?\\n/);\n\nfor (let i = 0; i < arr.length; i++) {\n    if (arr[i]===\"\") {\n        arr.splice(i,1);\n    } else {\n        arr[i] = Math.round(parseFloat(arr[i].split(\":\")[1]));\n        node.send({\"topic\": \"Core \"+i, \"payload\": arr[i]});\n    }\n}\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 780,
+        "wires": [
+            [
+                "1fae4c4b4ad4a0a4",
+                "1dadd177644d8207",
+                "26bee36da8cae2df"
+            ]
+        ]
+    },
+    {
+        "id": "1fae4c4b4ad4a0a4",
+        "type": "debug",
+        "z": "0385308d07f6f959",
+        "name": "debug 6",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 960,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "1dadd177644d8207",
+        "type": "ui-chart",
+        "z": "0385308d07f6f959",
+        "group": "e4e9a4ac234f1e40",
+        "name": "Core MHz",
+        "label": "",
+        "order": 1,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "false",
+        "pointRadius": 4,
+        "showLegend": false,
+        "removeOlder": 1,
+        "removeOlderUnit": "60",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "2",
+        "height": "2",
+        "className": "",
+        "interpolation": "linear",
+        "x": 960,
+        "y": 820,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "525e2718b88b544a",
+        "type": "ui-text",
+        "z": "0385308d07f6f959",
+        "group": "e4e9a4ac234f1e40",
+        "order": 7,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Core 0",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "msg.payload & \" MHz\"",
+        "valueType": "jsonata",
+        "x": 1010,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "26bee36da8cae2df",
+        "type": "switch",
+        "z": "0385308d07f6f959",
+        "name": "Core?",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "Core 0",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Core 1",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Core 2",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Core 3",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Core 4",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Core 5",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 6,
+        "x": 830,
+        "y": 900,
+        "wires": [
+            [
+                "525e2718b88b544a"
+            ],
+            [
+                "b83e1ef720fe4e98"
+            ],
+            [
+                "3ea2b10b43445e84"
+            ],
+            [
+                "e802617b91c4ab3d"
+            ],
+            [
+                "174730a6362c387f"
+            ],
+            [
+                "5d6f1e5eef2fe812"
+            ]
+        ]
+    },
+    {
+        "id": "b83e1ef720fe4e98",
+        "type": "ui-text",
+        "z": "0385308d07f6f959",
+        "group": "e4e9a4ac234f1e40",
+        "order": 6,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Core 1",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "msg.payload & \" MHz\"",
+        "valueType": "jsonata",
+        "x": 1010,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "3ea2b10b43445e84",
+        "type": "ui-text",
+        "z": "0385308d07f6f959",
+        "group": "e4e9a4ac234f1e40",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Core 2",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "msg.payload & \" MHz\"",
+        "valueType": "jsonata",
+        "x": 1010,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "e802617b91c4ab3d",
+        "type": "ui-text",
+        "z": "0385308d07f6f959",
+        "group": "e4e9a4ac234f1e40",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Core 3",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "msg.payload & \" MHz\"",
+        "valueType": "jsonata",
+        "x": 1010,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "174730a6362c387f",
+        "type": "ui-text",
+        "z": "0385308d07f6f959",
+        "group": "e4e9a4ac234f1e40",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Core 4",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "msg.payload & \" MHz\"",
+        "valueType": "jsonata",
+        "x": 1010,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "5d6f1e5eef2fe812",
+        "type": "ui-text",
+        "z": "0385308d07f6f959",
+        "group": "e4e9a4ac234f1e40",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Core 5",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "msg.payload & \" MHz\"",
+        "valueType": "jsonata",
+        "x": 1010,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "d8805cde29956c94",
+        "type": "comment",
+        "z": "0385308d07f6f959",
+        "name": "Load test: prime numbers",
+        "info": "",
+        "x": 150,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "86d3fa850aebaf45",
+        "type": "inject",
+        "z": "0385308d07f6f959",
+        "name": "2 Hz",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "0.5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "tick",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 1200,
+        "wires": [
+            [
+                "210fe8856963f0b1",
+                "f032f8ab18c22856",
+                "10fe8a27acc2a723",
+                "a468084a2370c00e"
+            ]
+        ]
+    },
+    {
+        "id": "210fe8856963f0b1",
+        "type": "function",
+        "z": "0385308d07f6f959",
+        "name": "Toggle",
+        "func": "let state = context.get(\"state\") || false;\n\nif (msg.topic === \"switch\") {\n    state = msg.payload;\n    context.set(\"state\", state);\n    return;\n}\n\nif (msg.topic === \"tick\") {\n    node.status({fill:\"grey\",shape:\"ring\",text:\"Off\"});\n    if (state) {\n        return msg;\n    }\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1240,
+        "wires": [
+            [
+                "2321e2d0a1832739"
+            ]
+        ]
+    },
+    {
+        "id": "deb17466be5df757",
+        "type": "ui-template",
+        "z": "0385308d07f6f959",
+        "group": "8a46beab219edf9b",
+        "page": "",
+        "ui": "",
+        "name": "Prime 1",
+        "order": 3,
+        "width": "1",
+        "height": "1",
+        "head": "",
+        "format": "<template>\n    <div class=\"d-flex justify-center align-center\" style=\"height: 100%;\">\n        <v-btn :color=\"isActive ? 'success' : 'grey-lighten-1'\" size=\"large\" class=\"white--text\"\n            :prepend-icon=\"isActive ? 'mdi-power-on' : 'mdi-power-off'\" @click=\"toggleState\">\n            # 1\n        </v-btn>\n    </div>\n</template>\n\n<script>\nexport default {\n    data() {\n        return {\n            // Local state of the button\n            isActive: false\n        };\n    },\n    watch: {\n        // This listens for incoming messages from Node-RED to update the button\n        msg: function (newMsg) {\n            if (newMsg && typeof newMsg.payload === 'boolean') {\n                this.isActive = newMsg.payload;\n            }\n        }\n    },\n    methods: {\n        toggleState() {\n            // 1. Flip the local state\n            this.isActive = !this.isActive;\n            // 2. Send the new state back to Node-RED\n            this.send({ topic: \"switch\", payload: this.isActive });\n        }\n    }\n};\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 140,
+        "y": 1240,
+        "wires": [
+            [
+                "210fe8856963f0b1"
+            ]
+        ]
+    },
+    {
+        "id": "0db5d5baf80f2cac",
+        "type": "ui-text",
+        "z": "0385308d07f6f959",
+        "group": "8a46beab219edf9b",
+        "order": 2,
+        "width": "2",
+        "height": "1",
+        "name": "Execution time",
+        "label": "Prime calculation",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "msg.payload.execution_time_ms & \" ms\"",
+        "valueType": "jsonata",
+        "x": 820,
+        "y": 1480,
+        "wires": []
+    },
+    {
+        "id": "bba06f39463271f1",
+        "type": "ui-template",
+        "z": "0385308d07f6f959",
+        "group": "8a46beab219edf9b",
+        "page": "",
+        "ui": "",
+        "name": "Prime 2",
+        "order": 4,
+        "width": "1",
+        "height": "1",
+        "head": "",
+        "format": "<template>\n    <div class=\"d-flex justify-center align-center\" style=\"height: 100%;\">\n        <v-btn :color=\"isActive ? 'success' : 'grey-lighten-1'\" size=\"large\" class=\"white--text\"\n            :prepend-icon=\"isActive ? 'mdi-power-on' : 'mdi-power-off'\" @click=\"toggleState\">\n            # 2\n        </v-btn>\n    </div>\n</template>\n\n<script>\nexport default {\n    data() {\n        return {\n            // Local state of the button\n            isActive: false\n        };\n    },\n    watch: {\n        // This listens for incoming messages from Node-RED to update the button\n        msg: function (newMsg) {\n            if (newMsg && typeof newMsg.payload === 'boolean') {\n                this.isActive = newMsg.payload;\n            }\n        }\n    },\n    methods: {\n        toggleState() {\n            // 1. Flip the local state\n            this.isActive = !this.isActive;\n            // 2. Send the new state back to Node-RED\n            this.send({ topic: \"switch\", payload: this.isActive });\n        }\n    }\n};\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 140,
+        "y": 1300,
+        "wires": [
+            [
+                "f032f8ab18c22856"
+            ]
+        ]
+    },
+    {
+        "id": "f032f8ab18c22856",
+        "type": "function",
+        "z": "0385308d07f6f959",
+        "name": "Toggle",
+        "func": "let state = context.get(\"state\") || false;\n\nif (msg.topic === \"switch\") {\n    state = msg.payload;\n    context.set(\"state\", state);\n    return;\n}\n\nif (msg.topic === \"tick\") {\n    node.status({fill:\"grey\",shape:\"ring\",text:\"Off\"});\n    if (state) {\n        return msg;\n    }\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1300,
+        "wires": [
+            [
+                "2321e2d0a1832739"
+            ]
+        ]
+    },
+    {
+        "id": "243efab98f78b28c",
+        "type": "ui-template",
+        "z": "0385308d07f6f959",
+        "group": "8a46beab219edf9b",
+        "page": "",
+        "ui": "",
+        "name": "Prime 3",
+        "order": 5,
+        "width": "1",
+        "height": "1",
+        "head": "",
+        "format": "<template>\n    <div class=\"d-flex justify-center align-center\" style=\"height: 100%;\">\n        <v-btn :color=\"isActive ? 'success' : 'grey-lighten-1'\" size=\"large\" class=\"white--text\"\n            :prepend-icon=\"isActive ? 'mdi-power-on' : 'mdi-power-off'\" @click=\"toggleState\">\n            # 3\n        </v-btn>\n    </div>\n</template>\n\n<script>\nexport default {\n    data() {\n        return {\n            // Local state of the button\n            isActive: false\n        };\n    },\n    watch: {\n        // This listens for incoming messages from Node-RED to update the button\n        msg: function (newMsg) {\n            if (newMsg && typeof newMsg.payload === 'boolean') {\n                this.isActive = newMsg.payload;\n            }\n        }\n    },\n    methods: {\n        toggleState() {\n            // 1. Flip the local state\n            this.isActive = !this.isActive;\n            // 2. Send the new state back to Node-RED\n            this.send({ topic: \"switch\", payload: this.isActive });\n        }\n    }\n};\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 140,
+        "y": 1360,
+        "wires": [
+            [
+                "10fe8a27acc2a723"
+            ]
+        ]
+    },
+    {
+        "id": "10fe8a27acc2a723",
+        "type": "function",
+        "z": "0385308d07f6f959",
+        "name": "Toggle",
+        "func": "let state = context.get(\"state\") || false;\n\nif (msg.topic === \"switch\") {\n    state = msg.payload;\n    context.set(\"state\", state);\n    return;\n}\n\nif (msg.topic === \"tick\") {\n    node.status({fill:\"grey\",shape:\"ring\",text:\"Off\"});\n    if (state) {\n        return msg;\n    }\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1360,
+        "wires": [
+            [
+                "2321e2d0a1832739"
+            ]
+        ]
+    },
+    {
+        "id": "fa658290ef112de5",
+        "type": "ui-template",
+        "z": "0385308d07f6f959",
+        "group": "8a46beab219edf9b",
+        "page": "",
+        "ui": "",
+        "name": "Prime 4",
+        "order": 6,
+        "width": "1",
+        "height": "1",
+        "head": "",
+        "format": "<template>\n    <div class=\"d-flex justify-center align-center\" style=\"height: 100%;\">\n        <v-btn :color=\"isActive ? 'success' : 'grey-lighten-1'\" size=\"large\" class=\"white--text\"\n            :prepend-icon=\"isActive ? 'mdi-power-on' : 'mdi-power-off'\" @click=\"toggleState\">\n            # 4\n        </v-btn>\n    </div>\n</template>\n\n<script>\nexport default {\n    data() {\n        return {\n            // Local state of the button\n            isActive: false\n        };\n    },\n    watch: {\n        // This listens for incoming messages from Node-RED to update the button\n        msg: function (newMsg) {\n            if (newMsg && typeof newMsg.payload === 'boolean') {\n                this.isActive = newMsg.payload;\n            }\n        }\n    },\n    methods: {\n        toggleState() {\n            // 1. Flip the local state\n            this.isActive = !this.isActive;\n            // 2. Send the new state back to Node-RED\n            this.send({ topic: \"switch\", payload: this.isActive });\n        }\n    }\n};\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 140,
+        "y": 1420,
+        "wires": [
+            [
+                "a468084a2370c00e"
+            ]
+        ]
+    },
+    {
+        "id": "a468084a2370c00e",
+        "type": "function",
+        "z": "0385308d07f6f959",
+        "name": "Toggle",
+        "func": "let state = context.get(\"state\") || false;\n\nif (msg.topic === \"switch\") {\n    state = msg.payload;\n    context.set(\"state\", state);\n    return;\n}\n\nif (msg.topic === \"tick\") {\n    node.status({fill:\"grey\",shape:\"ring\",text:\"Off\"});\n    if (state) {\n        return msg;\n    }\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1420,
+        "wires": [
+            [
+                "2321e2d0a1832739"
+            ]
+        ]
+    },
+    {
+        "id": "7c6bf7723714ead4",
+        "type": "ui-text",
+        "z": "0385308d07f6f959",
+        "group": "8a46beab219edf9b",
+        "order": 7,
+        "width": "2",
+        "height": "1",
+        "name": "LLM test",
+        "label": "LLM test",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 160,
+        "y": 1540,
+        "wires": []
+    },
+    {
+        "id": "9b66899355eba84b",
+        "type": "ui-group",
+        "name": "Temperatures",
+        "page": "3d26eadfe63f2df1",
+        "width": "2",
+        "height": 1,
+        "order": 5,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "421b56e056c86c2a",
+        "type": "mqtt-broker",
+        "name": "Main broker",
+        "broker": "192.168.1.80",
+        "port": 1883,
+        "clientid": "llm",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "325d18f2953eb842",
+        "type": "ui-group",
+        "name": "Fan",
+        "page": "3d26eadfe63f2df1",
+        "width": "2",
+        "height": 1,
+        "order": 4,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "685366d950a97afe",
+        "type": "ui-group",
+        "name": "Power consumption",
+        "page": "3d26eadfe63f2df1",
+        "width": "2",
+        "height": 1,
+        "order": 3,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "8a46beab219edf9b",
+        "type": "ui-group",
+        "name": "Load testing",
+        "page": "3d26eadfe63f2df1",
+        "width": "2",
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "e4e9a4ac234f1e40",
+        "type": "ui-group",
+        "name": "Core MHz",
+        "page": "3d26eadfe63f2df1",
+        "width": "2",
+        "height": 1,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "3d26eadfe63f2df1",
+        "type": "ui-page",
+        "name": "System",
+        "ui": "cb79bc4520925e32",
+        "path": "/system",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "b78b69c1815d21f1",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "cb79bc4520925e32",
+        "type": "ui-base",
+        "name": "My UI",
+        "path": "/dashboard",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control",
+            "ui-text"
+        ],
+        "showPathInSidebar": false
+    },
+    {
+        "id": "b78b69c1815d21f1",
+        "type": "ui-theme",
+        "name": "Basic Blue Theme",
+        "colors": {
+            "surface": "#4d58ff",
+            "primary": "#0094ce",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "4f83321d41dad580",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]
